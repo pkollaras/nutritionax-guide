@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,8 @@ const UserProgress = () => {
   const [dayOfDiet, setDayOfDiet] = useState('');
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [selectedNotes, setSelectedNotes] = useState('');
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -125,6 +128,10 @@ const UserProgress = () => {
     const dayIndex = new Date(date).getDay();
     const dayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     return t(`days.${dayKeys[dayIndex]}`);
+  };
+
+  const shouldShowViewAllButton = (text: string) => {
+    return text && text.length > 50;
   };
 
   const chartData = reports.map((report) => ({
@@ -292,7 +299,23 @@ const UserProgress = () => {
                       <TableCell>{report.weight} kg</TableCell>
                       <TableCell>{report.wc || 0} {t('userDashboard.progress.times')}</TableCell>
                       <TableCell>{report.morning_bm ? t('userDashboard.progress.yes') : t('userDashboard.progress.no')}</TableCell>
-                      <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
+                      <TableCell className="max-w-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate">{report.notes}</span>
+                          {shouldShowViewAllButton(report.notes) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedNotes(report.notes);
+                                setNotesDialogOpen(true);
+                              }}
+                            >
+                              {t('common.viewAll')}
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Button 
                           variant="outline" 
@@ -316,6 +339,15 @@ const UserProgress = () => {
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('userDashboard.progress.notesTitle')}</DialogTitle>
+          </DialogHeader>
+          <div className="whitespace-pre-wrap">{selectedNotes}</div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

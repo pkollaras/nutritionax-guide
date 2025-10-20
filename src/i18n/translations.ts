@@ -16,6 +16,7 @@ export const translations = {
       upload: 'Ανέβασμα',
       uploading: 'Ανέβασμα...',
       creating: 'Δημιουργία...',
+      viewAll: 'Προβολή Όλων',
     },
     auth: {
       title: 'Nutritionax',
@@ -102,6 +103,7 @@ export const translations = {
         noEntries: 'Δεν υπάρχουν καταχωρίσεις ακόμα',
         noData: 'Δεν υπάρχουν δεδομένα ακόμα',
         actions: 'Ενέργειες',
+        notesTitle: 'Σημειώσεις / Αποκλίσεις / Σχόλια',
       },
       diet: {
         title: 'Το Διατροφικό μου Πρόγραμμα',
@@ -313,6 +315,7 @@ export const translations = {
         notesHeader: 'Σημειώσεις',
         dayNumber: 'Ημέρα {{day}}',
         noReportsMessage: 'Δεν βρέθηκαν αναφορές προόδου για αυτόν τον χρήστη.',
+        notesTitle: 'Σημειώσεις / Αποκλίσεις / Σχόλια',
       },
     },
     days: {
@@ -344,6 +347,7 @@ export const translations = {
       upload: 'Upload',
       uploading: 'Uploading...',
       creating: 'Creating...',
+      viewAll: 'View All',
     },
     auth: {
       title: 'Nutritionax',
@@ -430,6 +434,7 @@ export const translations = {
         noEntries: 'No progress entries yet',
         noData: 'No data yet',
         actions: 'Actions',
+        notesTitle: 'Notes / Deviations / Comments',
       },
       diet: {
         title: 'My Diet Plan',
@@ -641,6 +646,7 @@ export const translations = {
         viewDiet: 'View Diet',
         dietForDay: 'Diet for {{day}}',
         noMeals: 'No meals for this day',
+        notesTitle: 'Notes / Deviations / Comments',
       },
     },
     days: {

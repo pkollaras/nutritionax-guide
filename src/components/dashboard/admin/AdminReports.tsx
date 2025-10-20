@@ -16,6 +16,8 @@ const AdminReports = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [selectedDiet, setSelectedDiet] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedNotes, setSelectedNotes] = useState('');
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -66,6 +68,10 @@ const AdminReports = () => {
 
     setSelectedDiet(data);
     setDialogOpen(true);
+  };
+
+  const shouldShowViewAllButton = (text: string) => {
+    return text && text.length > 50;
   };
 
   const chartData = reports.map((report) => ({
@@ -143,7 +149,23 @@ const AdminReports = () => {
                       <TableCell>{report.weight} kg</TableCell>
                       <TableCell>{report.wc || 0} {t('adminDashboard.reports.times')}</TableCell>
                       <TableCell>{report.morning_bm ? t('adminDashboard.reports.yes') : t('adminDashboard.reports.no')}</TableCell>
-                      <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
+                      <TableCell className="max-w-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate">{report.notes}</span>
+                          {shouldShowViewAllButton(report.notes) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedNotes(report.notes);
+                                setNotesDialogOpen(true);
+                              }}
+                            >
+                              {t('common.viewAll')}
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Button
                           variant="outline"
@@ -201,6 +223,15 @@ const AdminReports = () => {
           ) : (
             <p className="text-center text-muted-foreground">{t('adminDashboard.reports.noMeals')}</p>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('adminDashboard.reports.notesTitle')}</DialogTitle>
+          </DialogHeader>
+          <div className="whitespace-pre-wrap">{selectedNotes}</div>
         </DialogContent>
       </Dialog>
     </div>
