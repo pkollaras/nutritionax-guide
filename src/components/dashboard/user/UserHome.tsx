@@ -43,7 +43,42 @@ const UserHome = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    
+    // Check for date change every minute
+    const checkDateChange = () => {
+      const newDate = new Date().toISOString().split('T')[0];
+      const storedDate = localStorage.getItem('userHomeDateCheck');
+      
+      if (storedDate && storedDate !== newDate) {
+        // Day changed - clear fields and reload data
+        setWeight('');
+        setToiletVisits('');
+        setMorningBM(false);
+        setNotes('');
+        // Auto-increment day of diet
+        setDayOfDiet((prev) => {
+          if (prev && !isNaN(parseInt(prev))) {
+            return (parseInt(prev) + 1).toString();
+          }
+          return prev;
+        });
+        
+        // Fetch new day's data (will be empty if no data exists)
+        fetchData();
+      }
+      
+      localStorage.setItem('userHomeDateCheck', newDate);
+    };
+    
+    // Initialize date check
+    const currentDate = new Date().toISOString().split('T')[0];
+    localStorage.setItem('userHomeDateCheck', currentDate);
+    
+    // Check every minute
+    const interval = setInterval(checkDateChange, 60000);
+    
+    return () => clearInterval(interval);
+  }, [user]);
 
   const fetchData = async () => {
     if (!user) return;
