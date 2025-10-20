@@ -70,7 +70,7 @@ const AdminReports = () => {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Πρόοδος Βάρους</CardTitle>
+              <CardTitle>{t('adminDashboard.reports.weightProgressTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -87,28 +87,28 @@ const AdminReports = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Ιστορικό Προόδου</CardTitle>
+              <CardTitle>{t('adminDashboard.reports.progressHistoryTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ημερομηνία</TableHead>
-                    <TableHead>Ημέρα</TableHead>
-                    <TableHead>Βάρος (kg)</TableHead>
-                    <TableHead>Επισκέψεις στην Τουαλέτα</TableHead>
-                    <TableHead>Πρωινή Κένωση</TableHead>
-                    <TableHead>Σημειώσεις</TableHead>
+                    <TableHead>{t('adminDashboard.reports.dateHeader')}</TableHead>
+                    <TableHead>{t('adminDashboard.reports.dayHeader')}</TableHead>
+                    <TableHead>{t('adminDashboard.reports.weightHeader')}</TableHead>
+                    <TableHead>{t('adminDashboard.reports.toiletVisitsHeader')}</TableHead>
+                    <TableHead>{t('adminDashboard.reports.morningBMHeader')}</TableHead>
+                    <TableHead>{t('adminDashboard.reports.notesHeader')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reports.map((report) => (
                     <TableRow key={report.id}>
                       <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
-                      <TableCell>Ημέρα {report.day_of_diet}</TableCell>
+                      <TableCell>{t('adminDashboard.reports.dayNumber', { day: report.day_of_diet })}</TableCell>
                       <TableCell>{report.weight}</TableCell>
-                      <TableCell>{report.wc || 0} φορές</TableCell>
-                      <TableCell>{report.morning_bm ? '✓ Ναι' : '✗ Όχι'}</TableCell>
+                      <TableCell>{report.wc || 0} {t('adminDashboard.reports.times')}</TableCell>
+                      <TableCell>{report.morning_bm ? t('adminDashboard.reports.yes') : t('adminDashboard.reports.no')}</TableCell>
                       <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
                     </TableRow>
                   ))}
@@ -122,7 +122,7 @@ const AdminReports = () => {
       {selectedUser && reports.length === 0 && (
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground">
-            Δεν βρέθηκαν αναφορές προόδου για αυτόν τον χρήστη.
+            {t('adminDashboard.reports.noReportsMessage')}
           </CardContent>
         </Card>
       )}
