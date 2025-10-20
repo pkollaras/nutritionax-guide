@@ -141,10 +141,10 @@ const UserProgress = () => {
   }));
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t('userDashboard.progress.title')}</h1>
-        <Button onClick={() => { resetForm(); setShowAddForm(!showAddForm); }}>
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">{t('userDashboard.progress.title')}</h1>
+        <Button onClick={() => { resetForm(); setShowAddForm(!showAddForm); }} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           {showAddForm ? t('userDashboard.progress.closeForm') : t('userDashboard.progress.addEntry')}
         </Button>
@@ -155,7 +155,7 @@ const UserProgress = () => {
           <CardHeader>
             <CardTitle>{editingId ? t('userDashboard.progress.editEntry') : t('userDashboard.progress.addNewEntry')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-4 sm:p-6">
             <div className="space-y-2">
               <Label>{t('userDashboard.progress.selectDate')}</Label>
               <Popover>
@@ -240,12 +240,12 @@ const UserProgress = () => {
               />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button onClick={handleSave} className="flex-1" disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />
                 {loading ? t('common.saving') : t('userDashboard.progress.saveProgress')}
               </Button>
-              <Button onClick={() => { setShowAddForm(false); resetForm(); }} variant="outline">
+              <Button onClick={() => { setShowAddForm(false); resetForm(); }} variant="outline" className="sm:w-auto">
                 {t('common.cancel')}
               </Button>
             </div>
@@ -259,12 +259,18 @@ const UserProgress = () => {
             <CardHeader>
               <CardTitle>{t('userDashboard.progress.weightProgress')}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-2 sm:p-6">
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2} />
                 </LineChart>
@@ -277,58 +283,131 @@ const UserProgress = () => {
               <CardTitle>{t('userDashboard.progress.history')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('userDashboard.progress.date')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.dayOfWeek')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.day')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.weight')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.toiletVisits')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.morningBM')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.notes')}</TableHead>
-                    <TableHead>{t('userDashboard.progress.actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {reports.map((report) => (
-                    <TableRow key={report.id}>
-                      <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
-                      <TableCell>{getDayName(report.date)}</TableCell>
-                      <TableCell>{t('userDashboard.progress.dayNumber', { day: report.day_of_diet })}</TableCell>
-                      <TableCell>{report.weight} kg</TableCell>
-                      <TableCell>{report.wc || 0} {t('userDashboard.progress.times')}</TableCell>
-                      <TableCell>{report.morning_bm ? t('userDashboard.progress.yes') : t('userDashboard.progress.no')}</TableCell>
-                      <TableCell className="max-w-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate">{report.notes}</span>
-                          {shouldShowViewAllButton(report.notes) && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedNotes(report.notes);
-                                setNotesDialogOpen(true);
-                              }}
-                            >
-                              {t('common.viewAll')}
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEdit(report)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              {/* Desktop Table - Hidden on mobile */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t('userDashboard.progress.date')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.dayOfWeek')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.day')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.weight')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.toiletVisits')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.morningBM')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.notes')}</TableHead>
+                      <TableHead>{t('userDashboard.progress.actions')}</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {reports.map((report) => (
+                      <TableRow key={report.id}>
+                        <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{getDayName(report.date)}</TableCell>
+                        <TableCell>{t('userDashboard.progress.dayNumber', { day: report.day_of_diet })}</TableCell>
+                        <TableCell>{report.weight} kg</TableCell>
+                        <TableCell>{report.wc || 0} {t('userDashboard.progress.times')}</TableCell>
+                        <TableCell>{report.morning_bm ? t('userDashboard.progress.yes') : t('userDashboard.progress.no')}</TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate">{report.notes}</span>
+                            {shouldShowViewAllButton(report.notes) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedNotes(report.notes);
+                                  setNotesDialogOpen(true);
+                                }}
+                              >
+                                {t('common.viewAll')}
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleEdit(report)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile Cards - Hidden on desktop */}
+              <div className="md:hidden space-y-4">
+                {reports.map((report) => (
+                  <Card key={report.id} className="border-2">
+                    <CardContent className="pt-6">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">
+                              {new Date(report.date).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {getDayName(report.date)}
+                            </p>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleEdit(report)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">{t('userDashboard.progress.day')}:</span>
+                            <span className="ml-2 font-medium">{report.day_of_diet || '-'}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">{t('userDashboard.progress.weight')}:</span>
+                            <span className="ml-2 font-medium">{report.weight} kg</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">WC:</span>
+                            <span className="ml-2 font-medium">{report.wc || 0}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">{t('userDashboard.progress.morningBM')}:</span>
+                            <span className="ml-2 font-medium">
+                              {report.morning_bm ? '✓' : '✗'}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {report.notes && (
+                          <div className="text-sm pt-2 border-t">
+                            <p className="text-muted-foreground mb-1">{t('userDashboard.progress.notes')}:</p>
+                            <p className="line-clamp-2">{report.notes}</p>
+                            {shouldShowViewAllButton(report.notes) && (
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="px-0 h-auto mt-1"
+                                onClick={() => {
+                                  setSelectedNotes(report.notes);
+                                  setNotesDialogOpen(true);
+                                }}
+                              >
+                                {t('common.viewAll')}
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </>
