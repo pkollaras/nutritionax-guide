@@ -63,6 +63,30 @@ const UserProgress = () => {
     setSelectedDate(new Date());
   };
 
+  const autoFillDietDay = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('progress_reports')
+        .select('day_of_diet, date')
+        .eq('user_id', user.id)
+        .not('day_of_diet', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data && data.day_of_diet) {
+        setDayOfDiet((data.day_of_diet + 1).toString());
+      }
+    } catch (error) {
+      console.error('Error auto-filling diet day:', error);
+      // Don't show error to user, just leave field empty
+    }
+  };
+
   const handleEdit = (report: any) => {
     setEditingId(report.id);
     setSelectedDate(new Date(report.date));
@@ -175,7 +199,7 @@ const UserProgress = () => {
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold">{t('userDashboard.progress.title')}</h1>
-        <Button onClick={() => { resetForm(); setShowAddForm(!showAddForm); }} className="w-full sm:w-auto">
+        <Button onClick={() => { resetForm(); if (!showAddForm) autoFillDietDay(); setShowAddForm(!showAddForm); }} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           {showAddForm ? t('userDashboard.progress.closeForm') : t('userDashboard.progress.addEntry')}
         </Button>
