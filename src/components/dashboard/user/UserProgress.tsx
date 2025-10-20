@@ -43,7 +43,7 @@ const UserProgress = () => {
       .from('progress_reports')
       .select('*')
       .eq('user_id', user?.id)
-      .order('date', { ascending: true });
+      .order('date', { ascending: false });
 
     setReports(data || []);
   };
@@ -77,23 +77,40 @@ const UserProgress = () => {
     const dateString = format(selectedDate, 'yyyy-MM-dd');
 
     try {
-      const { error } = await supabase
-        .from('progress_reports')
-        .upsert({
-          user_id: user.id,
-          date: dateString,
-          weight: weight ? parseFloat(weight) : null,
-          wc: toiletVisits ? parseFloat(toiletVisits) : null,
-          morning_bm: morningBM,
-          notes,
-          day_of_diet: dayOfDiet ? parseInt(dayOfDiet) : null,
-        }, {
-          onConflict: 'user_id,date'
-        });
+      if (editingId) {
+        // Edit mode: Update existing entry
+        const { error } = await supabase
+          .from('progress_reports')
+          .update({
+            date: dateString,
+            weight: weight ? parseFloat(weight) : null,
+            wc: toiletVisits ? parseFloat(toiletVisits) : null,
+            morning_bm: morningBM,
+            notes,
+            day_of_diet: dayOfDiet ? parseInt(dayOfDiet) : null,
+          })
+          .eq('id', editingId);
 
-      if (error) throw error;
+        if (error) throw error;
+        toast({ title: t('common.success'), description: t('userDashboard.progress.updateSuccess') });
+      } else {
+        // Add mode: Insert new entry
+        const { error } = await supabase
+          .from('progress_reports')
+          .insert({
+            user_id: user.id,
+            date: dateString,
+            weight: weight ? parseFloat(weight) : null,
+            wc: toiletVisits ? parseFloat(toiletVisits) : null,
+            morning_bm: morningBM,
+            notes,
+            day_of_diet: dayOfDiet ? parseInt(dayOfDiet) : null,
+          });
 
-      toast({ title: t('common.success'), description: t('userDashboard.progress.saveSuccess') });
+        if (error) throw error;
+        toast({ title: t('common.success'), description: t('userDashboard.progress.saveSuccess') });
+      }
+
       setShowAddForm(false);
       resetForm();
       fetchReports();
