@@ -64,7 +64,7 @@ const AdminDashboard = () => {
         <p className="text-sm text-muted-foreground">{t('adminDashboard.title')}</p>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="p-4 space-y-2">
         {menuItems.map((item) => (
           <Button
             key={item.id}
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
         ))}
       </nav>
 
-      <div className="p-4 border-t">
+      <div className="px-4 pb-4 border-t pt-4">
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
           {t('adminDashboard.nav.signOut')}
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen w-full bg-background pb-16">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 border-r bg-card">
+      <aside className="hidden md:flex w-64 border-r bg-card fixed left-0 top-0 bottom-16 z-20">
         <SidebarContent />
       </aside>
 
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 pt-16 md:pt-0">
+      <main className="flex-1 pt-16 md:pt-0 md:ml-64">
         {renderView()}
       </main>
     </div>
