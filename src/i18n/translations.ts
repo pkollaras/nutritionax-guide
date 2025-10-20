@@ -304,7 +304,7 @@ export const translations = {
         weightProgressTitle: 'Πρόοδος Βάρους',
         progressHistoryTitle: 'Ιστορικό Προόδου',
         actions: 'Ενέργειες',
-        viewDiet: 'Δείτε Διατροφή',
+        viewDiet: 'Προβολή Διατροφής',
         dietForDay: 'Διατροφή για {{day}}',
         noMeals: 'Δεν υπάρχουν γεύματα για αυτή την ημέρα',
         dateHeader: 'Ημερομηνία',
