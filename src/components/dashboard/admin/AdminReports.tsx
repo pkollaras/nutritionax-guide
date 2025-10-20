@@ -32,7 +32,7 @@ const AdminReports = () => {
       .from('progress_reports')
       .select('*')
       .eq('user_id', userId)
-      .order('date', { ascending: true });
+      .order('date', { ascending: false });
 
     setReports(data || []);
   };
