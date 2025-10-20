@@ -42,15 +42,12 @@ const UserHome = () => {
   const todayName = DAYS[today.getDay()];
 
   useEffect(() => {
-    fetchData();
-    
-    // Check for date change every minute
-    const checkDateChange = () => {
-      const newDate = new Date().toISOString().split('T')[0];
+    const checkAndFetchData = () => {
+      const currentDate = new Date().toISOString().split('T')[0];
       const storedDate = localStorage.getItem('userHomeDateCheck');
       
-      if (storedDate && storedDate !== newDate) {
-        // Day changed - clear fields and reload data
+      // If date changed, clear all fields first
+      if (storedDate && storedDate !== currentDate) {
         setWeight('');
         setToiletVisits('');
         setMorningBM(false);
@@ -62,20 +59,20 @@ const UserHome = () => {
           }
           return prev;
         });
-        
-        // Fetch new day's data (will be empty if no data exists)
-        fetchData();
       }
       
-      localStorage.setItem('userHomeDateCheck', newDate);
+      // Update stored date
+      localStorage.setItem('userHomeDateCheck', currentDate);
+      
+      // Fetch data for today (will be empty if no data exists)
+      fetchData();
     };
     
-    // Initialize date check
-    const currentDate = new Date().toISOString().split('T')[0];
-    localStorage.setItem('userHomeDateCheck', currentDate);
+    // Check immediately on mount
+    checkAndFetchData();
     
     // Check every minute
-    const interval = setInterval(checkDateChange, 60000);
+    const interval = setInterval(checkAndFetchData, 60000);
     
     return () => clearInterval(interval);
   }, [user]);
@@ -110,6 +107,12 @@ const UserHome = () => {
       setMorningBM(reportData.morning_bm || false);
       setNotes(reportData.notes || '');
       setDayOfDiet(reportData.day_of_diet?.toString() || '');
+    } else {
+      // No data for today - clear fields (except dayOfDiet which may auto-increment)
+      setWeight('');
+      setToiletVisits('');
+      setMorningBM(false);
+      setNotes('');
     }
   };
 
