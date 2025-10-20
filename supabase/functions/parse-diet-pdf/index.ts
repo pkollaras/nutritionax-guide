@@ -15,6 +15,27 @@ serve(async (req) => {
     const { pdfBase64, userId } = await req.json();
     console.log('Parsing diet PDF for user:', userId);
 
+    // Security: Verify the authenticated user matches the requested userId
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      throw new Error('Unauthorized');
+    }
+
+    if (user.id !== userId) {
+      throw new Error('Cannot upload diet for another user');
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
@@ -84,11 +105,7 @@ Extract all food items for each meal (Γεύμα) including quantities. Keep the
     const dietPlan = JSON.parse(data.choices[0].message.content);
     console.log('Parsed diet plan:', dietPlan);
 
-    // Save to database
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
+    // Save to database (reuse supabase client from auth check)
     // Delete existing diet plans for this user
     await supabase
       .from('diet_plans')

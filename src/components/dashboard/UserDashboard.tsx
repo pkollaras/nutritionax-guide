@@ -7,13 +7,15 @@ import {
   User,
   LogOut,
   Menu,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import UserHome from './user/UserHome';
 import UserProgress from './user/UserProgress';
 import UserProfile from './user/UserProfile';
+import UserDiet from './user/UserDiet';
 
-type UserView = 'home' | 'progress' | 'profile';
+type UserView = 'home' | 'progress' | 'profile' | 'diet';
 
 const UserDashboard = () => {
   const [currentView, setCurrentView] = useState<UserView>('home');
@@ -21,6 +23,7 @@ const UserDashboard = () => {
 
   const menuItems = [
     { id: 'home' as UserView, label: 'Today', icon: Home },
+    { id: 'diet' as UserView, label: 'My Diet', icon: UtensilsCrossed },
     { id: 'progress' as UserView, label: 'Progress', icon: TrendingUp },
     { id: 'profile' as UserView, label: 'Profile', icon: User },
   ];
@@ -29,6 +32,8 @@ const UserDashboard = () => {
     switch (currentView) {
       case 'home':
         return <UserHome />;
+      case 'diet':
+        return <UserDiet />;
       case 'progress':
         return <UserProgress />;
       case 'profile':
