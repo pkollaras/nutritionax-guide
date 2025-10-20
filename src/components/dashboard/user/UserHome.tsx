@@ -224,19 +224,19 @@ const UserHome = () => {
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
-                      size="sm"
+                      size="icon"
                       onClick={() => handleSkipMeal(mealGroup)}
+                      title={t('userDashboard.home.mealSkipped')}
                     >
-                      <XCircle className="mr-1 h-4 w-4" />
-                      {t('userDashboard.home.mealSkipped')}
+                      <XCircle className="h-4 w-4" />
                     </Button>
                     <Button 
                       variant="outline" 
-                      size="sm"
+                      size="icon"
                       onClick={() => handleReplaceMeal(mealGroup)}
+                      title={t('userDashboard.home.mealReplaced')}
                     >
-                      <RefreshCw className="mr-1 h-4 w-4" />
-                      {t('userDashboard.home.mealReplaced')}
+                      <RefreshCw className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
