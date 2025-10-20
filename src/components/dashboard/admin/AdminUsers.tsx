@@ -48,14 +48,17 @@ const AdminUsers = () => {
     try {
       userSchema.parse(newUser);
 
-      const { error } = await supabase.auth.admin.createUser({
-        email: newUser.email,
-        password: newUser.password,
-        email_confirm: true,
-        user_metadata: { name: newUser.name },
+      const { data, error } = await supabase.functions.invoke('manage-users', {
+        body: {
+          action: 'create',
+          email: newUser.email,
+          password: newUser.password,
+          name: newUser.name,
+        },
       });
 
       if (error) throw error;
+      if (data.error) throw new Error(data.error);
 
       toast({ title: 'Success', description: 'User created successfully' });
       setOpen(false);
@@ -79,13 +82,21 @@ const AdminUsers = () => {
   const handleDeleteUser = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
 
-    const { error } = await supabase.auth.admin.deleteUser(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-users', {
+        body: {
+          action: 'delete',
+          userId,
+        },
+      });
 
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
       toast({ title: 'Success', description: 'User deleted successfully' });
       fetchUsers();
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
   };
 
