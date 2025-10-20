@@ -24,7 +24,6 @@ const AdminUsers = () => {
   const [open, setOpen] = useState(false);
   const [newUser, setNewUser] = useState({ email: '', password: '', name: '' });
   const [errors, setErrors] = useState<any>({});
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchUsers();
