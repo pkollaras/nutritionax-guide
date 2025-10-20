@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      default_guidelines: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       diet_plans: {
         Row: {
           created_at: string | null
@@ -46,7 +67,6 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
-          is_default: boolean | null
           updated_at: string | null
           user_id: string
         }
@@ -54,7 +74,6 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
-          is_default?: boolean | null
           updated_at?: string | null
           user_id: string
         }
@@ -62,7 +81,6 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
-          is_default?: boolean | null
           updated_at?: string | null
           user_id?: string
         }

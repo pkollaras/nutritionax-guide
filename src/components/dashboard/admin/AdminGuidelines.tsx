@@ -1,28 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Star } from 'lucide-react';
+import { Save, Users } from 'lucide-react';
 
 const AdminGuidelines = () => {
   const { user } = useAuth();
-  const [guidelines, setGuidelines] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [guidelineId, setGuidelineId] = useState<string | null>(null);
-  const [isDefault, setIsDefault] = useState(false);
   const { toast } = useToast();
+  
+  // Personal guidelines
+  const [personalGuidelines, setPersonalGuidelines] = useState('');
+  const [personalLoading, setPersonalLoading] = useState(false);
+  const [personalGuidelineId, setPersonalGuidelineId] = useState<string | null>(null);
+  
+  // Default guidelines
+  const [defaultGuidelines, setDefaultGuidelines] = useState('');
+  const [defaultLoading, setDefaultLoading] = useState(false);
+  const [defaultGuidelineId, setDefaultGuidelineId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchGuidelines();
+    fetchPersonalGuidelines();
+    fetchDefaultGuidelines();
   }, []);
 
-  const fetchGuidelines = async () => {
+  const fetchPersonalGuidelines = async () => {
     if (!user) return;
 
     const { data } = await supabase
@@ -34,99 +39,154 @@ const AdminGuidelines = () => {
       .maybeSingle();
 
     if (data) {
-      setGuidelines(data.content);
-      setGuidelineId(data.id);
-      setIsDefault(data.is_default || false);
+      setPersonalGuidelines(data.content);
+      setPersonalGuidelineId(data.id);
     }
   };
 
-  const handleSave = async () => {
+  const fetchDefaultGuidelines = async () => {
+    const { data } = await supabase
+      .from('default_guidelines')
+      .select('*')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (data) {
+      setDefaultGuidelines(data.content);
+      setDefaultGuidelineId(data.id);
+    }
+  };
+
+  const handleSavePersonal = async () => {
     if (!user) return;
     
-    setLoading(true);
+    setPersonalLoading(true);
 
     try {
-      if (guidelineId) {
+      if (personalGuidelineId) {
         const { error } = await supabase
           .from('guidelines')
-          .update({ 
-            content: guidelines,
-            is_default: isDefault 
-          })
-          .eq('id', guidelineId);
+          .update({ content: personalGuidelines })
+          .eq('id', personalGuidelineId);
 
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('guidelines')
           .insert({ 
-            content: guidelines,
-            user_id: user.id,
-            is_default: isDefault
+            content: personalGuidelines,
+            user_id: user.id
           });
+
+        if (error) throw error;
+      }
+
+      toast({ title: 'Success', description: 'Personal guidelines saved successfully' });
+      fetchPersonalGuidelines();
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setPersonalLoading(false);
+    }
+  };
+
+  const handleSaveDefault = async () => {
+    setDefaultLoading(true);
+
+    try {
+      if (defaultGuidelineId) {
+        const { error } = await supabase
+          .from('default_guidelines')
+          .update({ content: defaultGuidelines })
+          .eq('id', defaultGuidelineId);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('default_guidelines')
+          .insert({ content: defaultGuidelines });
 
         if (error) throw error;
       }
 
       toast({ 
         title: 'Success', 
-        description: isDefault 
-          ? 'Guidelines saved as default for new users' 
-          : 'Guidelines saved successfully' 
+        description: 'Default guidelines saved successfully. New users will receive these guidelines.' 
       });
-      fetchGuidelines();
+      fetchDefaultGuidelines();
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
-      setLoading(false);
+      setDefaultLoading(false);
     }
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            General Guidelines
-            {isDefault && (
-              <Badge variant="default" className="gap-1">
-                <Star className="h-3 w-3" />
-                Default for New Users
-              </Badge>
-            )}
-          </h1>
-        </div>
-        <Button onClick={handleSave} disabled={loading}>
-          <Save className="mr-2 h-4 w-4" />
-          {loading ? 'Saving...' : 'Save Guidelines'}
-        </Button>
-      </div>
+      <h1 className="text-3xl font-bold">Guidelines Management</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Your Guidelines</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Textarea
-            value={guidelines}
-            onChange={(e) => setGuidelines(e.target.value)}
-            placeholder="Enter your general dietary guidelines..."
-            rows={20}
-            className="font-mono"
-          />
-          
-          <div className="flex items-center space-x-2 pt-4 border-t">
-            <Switch
-              id="default-toggle"
-              checked={isDefault}
-              onCheckedChange={setIsDefault}
-            />
-            <Label htmlFor="default-toggle" className="cursor-pointer">
-              Set as default guidelines for new users
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="default" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="default" className="gap-2">
+            <Users className="h-4 w-4" />
+            Default Guidelines
+          </TabsTrigger>
+          <TabsTrigger value="personal" className="gap-2">
+            <Save className="h-4 w-4" />
+            My Personal Guidelines
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="default">
+          <Card>
+            <CardHeader>
+              <CardTitle>Default Guidelines for New Users</CardTitle>
+              <CardDescription>
+                These guidelines will be automatically copied to all new users when they sign up.
+                Existing users won't be affected by changes here.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={defaultGuidelines}
+                onChange={(e) => setDefaultGuidelines(e.target.value)}
+                placeholder="Enter the default dietary guidelines that new users will receive..."
+                rows={20}
+                className="font-mono"
+              />
+              <Button onClick={handleSaveDefault} disabled={defaultLoading}>
+                <Save className="mr-2 h-4 w-4" />
+                {defaultLoading ? 'Saving...' : 'Save Default Guidelines'}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="personal">
+          <Card>
+            <CardHeader>
+              <CardTitle>My Personal Guidelines</CardTitle>
+              <CardDescription>
+                These are your personal dietary guidelines, separate from the default guidelines for new users.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={personalGuidelines}
+                onChange={(e) => setPersonalGuidelines(e.target.value)}
+                placeholder="Enter your personal dietary guidelines..."
+                rows={20}
+                className="font-mono"
+              />
+              <Button onClick={handleSavePersonal} disabled={personalLoading}>
+                <Save className="mr-2 h-4 w-4" />
+                {personalLoading ? 'Saving...' : 'Save Personal Guidelines'}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
