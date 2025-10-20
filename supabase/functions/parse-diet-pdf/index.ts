@@ -36,24 +36,12 @@ serve(async (req) => {
       throw new Error('Cannot upload diet for another user');
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not configured');
     }
 
-    // Call Gemini with vision to parse the diet plan from PDF
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a diet plan parser. Extract diet information from Greek diet plans and return JSON.
+    const systemPrompt = `You are a diet plan parser. Extract diet information from Greek diet plans and return JSON.
             
 Map Greek days to English:
 - ΔΕΥΤΕΡΑ = Monday
@@ -73,25 +61,33 @@ Return JSON with this structure:
   ...
 }
 
-Extract all food items for each meal (Γεύμα) including quantities. Keep the original Greek text.`
-          },
+Extract all food items for each meal (Γεύμα) including quantities. Keep the original Greek text.`;
+
+    // Call Google Gemini API directly with vision to parse the diet plan from PDF
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
           {
-            role: 'user',
-            content: [
+            parts: [
               {
-                type: 'text',
-                text: 'Please analyze this diet plan PDF and extract the meal information according to the format specified.'
+                text: `${systemPrompt}\n\nPlease analyze this diet plan PDF and extract the meal information according to the format specified.`
               },
               {
-                type: 'image_url',
-                image_url: {
-                  url: `data:application/pdf;base64,${pdfBase64}`
+                inline_data: {
+                  mime_type: 'application/pdf',
+                  data: pdfBase64
                 }
               }
             ]
           }
         ],
-        response_format: { type: "json_object" }
+        generationConfig: {
+          response_mime_type: 'application/json'
+        }
       }),
     });
 
@@ -102,7 +98,11 @@ Extract all food items for each meal (Γεύμα) including quantities. Keep the
     }
 
     const data = await response.json();
-    const dietPlan = JSON.parse(data.choices[0].message.content);
+    const dietPlanText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!dietPlanText) {
+      throw new Error('No content returned from Gemini');
+    }
+    const dietPlan = JSON.parse(dietPlanText);
     console.log('Parsed diet plan:', dietPlan);
 
     // Save to database (reuse supabase client from auth check)
