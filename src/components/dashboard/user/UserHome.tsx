@@ -29,6 +29,12 @@ const UserHome = () => {
   const [loading, setLoading] = useState(false);
 
   const today = new Date();
+  
+  // English day names for database queries
+  const DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayNameEN = DAYS_EN[today.getDay()];
+  
+  // Translated day names for display
   const DAYS = [
     t('days.sunday'), t('days.monday'), t('days.tuesday'), t('days.wednesday'),
     t('days.thursday'), t('days.friday'), t('days.saturday')
@@ -42,13 +48,13 @@ const UserHome = () => {
   const fetchData = async () => {
     if (!user) return;
 
-    // Fetch today's diet plan
+    // Fetch today's diet plan (use English day name for query)
     const { data: dietData } = await supabase
       .from('diet_plans')
       .select('meals')
       .eq('user_id', user?.id)
-      .eq('day_of_week', todayName)
-      .single();
+      .eq('day_of_week', todayNameEN)
+      .maybeSingle();
 
     if (dietData && Array.isArray(dietData.meals)) {
       setTodayMeals(dietData.meals as unknown as MealGroup[]);

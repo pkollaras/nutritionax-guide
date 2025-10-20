@@ -8,10 +8,13 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Upload } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const DAYS = ['Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο', 'Κυριακή'];
+// English day names for database (must match database values)
+const DAYS_EN = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const AdminDiets = () => {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [dietPlans, setDietPlans] = useState<any>({});
@@ -19,6 +22,12 @@ const AdminDiets = () => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Translated day names for display
+  const DAYS = [
+    t('days.monday'), t('days.tuesday'), t('days.wednesday'), t('days.thursday'),
+    t('days.friday'), t('days.saturday'), t('days.sunday')
+  ];
 
   useEffect(() => {
     fetchUsers();
@@ -66,37 +75,49 @@ const AdminDiets = () => {
 
   const handleSave = async () => {
     if (!selectedUser) {
-      toast({ title: 'Σφάλμα', description: 'Παρακαλώ επιλέξτε χρήστη', variant: 'destructive' });
+      toast({ 
+        title: t('common.error'), 
+        description: t('adminDashboard.diets.selectUser'), 
+        variant: 'destructive' 
+      });
       return;
     }
 
     setLoading(true);
 
     try {
-      for (const day of DAYS) {
-        const meals = dietPlans[day] || [];
+      // Use English day names for database operations
+      for (const dayEN of DAYS_EN) {
+        const meals = dietPlans[dayEN] || [];
 
         await supabase
           .from('diet_plans')
           .upsert({
             user_id: selectedUser,
-            day_of_week: day,
+            day_of_week: dayEN,
             meals,
           }, {
             onConflict: 'user_id,day_of_week'
           });
       }
 
-      toast({ title: 'Επιτυχία', description: 'Το διατροφικό πρόγραμμα αποθηκεύτηκε επιτυχώς' });
+      toast({ 
+        title: t('common.success'), 
+        description: t('adminDashboard.diets.saveSuccess') 
+      });
     } catch (error: any) {
-      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
+      toast({ 
+        title: t('common.error'), 
+        description: error.message, 
+        variant: 'destructive' 
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const updateMeal = (day: string, mealIndex: number, content: string) => {
-    const currentMeals = dietPlans[day] || [
+  const updateMeal = (dayEN: string, mealIndex: number, content: string) => {
+    const currentMeals = dietPlans[dayEN] || [
       { meal_number: 1, items: [] },
       { meal_number: 2, items: [] },
       { meal_number: 3, items: [] },
@@ -112,15 +133,15 @@ const AdminDiets = () => {
       items: items
     };
     
-    setDietPlans({ ...dietPlans, [day]: newMeals });
+    setDietPlans({ ...dietPlans, [dayEN]: newMeals });
   };
 
   const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !selectedUser) {
       toast({ 
-        title: 'Σφάλμα', 
-        description: 'Παρακαλώ επιλέξτε πρώτα χρήστη', 
+        title: t('common.error'), 
+        description: t('adminDashboard.diets.selectUserFirst'), 
         variant: 'destructive' 
       });
       return;
@@ -128,8 +149,8 @@ const AdminDiets = () => {
 
     if (file.type !== 'application/pdf') {
       toast({ 
-        title: 'Σφάλμα', 
-        description: 'Παρακαλώ ανεβάστε αρχείο PDF', 
+        title: t('common.error'), 
+        description: t('adminDashboard.diets.onlyPdf'), 
         variant: 'destructive' 
       });
       return;
@@ -164,8 +185,8 @@ const AdminDiets = () => {
       if (error) throw error;
 
       toast({ 
-        title: 'Επιτυχία', 
-        description: 'Το διατροφικό πρόγραμμα ανέβηκε και αναλύθηκε επιτυχώς' 
+        title: t('common.success'), 
+        description: t('adminDashboard.diets.uploadSuccess') 
       });
       
       // Refresh the diet plans
@@ -178,8 +199,8 @@ const AdminDiets = () => {
     } catch (error: any) {
       console.error('PDF upload error:', error);
       toast({ 
-        title: 'Σφάλμα', 
-        description: error.message || 'Αποτυχία ανάλυσης PDF', 
+        title: t('common.error'), 
+        description: error.message || t('adminDashboard.diets.parseFailed'), 
         variant: 'destructive' 
       });
     } finally {
@@ -190,7 +211,7 @@ const AdminDiets = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Διατροφικά Προγράμματα</h1>
+        <h1 className="text-3xl font-bold">{t('adminDashboard.diets.title')}</h1>
         <div className="flex gap-2">
           <Button 
             onClick={() => fileInputRef.current?.click()} 
@@ -198,7 +219,7 @@ const AdminDiets = () => {
             variant="outline"
           >
             <Upload className="mr-2 h-4 w-4" />
-            {uploading ? 'Ανέβασμα...' : 'Ανέβασμα PDF'}
+            {uploading ? t('common.uploading') : t('adminDashboard.diets.uploadPdf')}
           </Button>
           <Input
             ref={fileInputRef}
@@ -209,19 +230,19 @@ const AdminDiets = () => {
           />
           <Button onClick={handleSave} disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Αποθήκευση...' : 'Αποθήκευση Προγράμματος'}
+            {loading ? t('common.saving') : t('adminDashboard.diets.saveProgram')}
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Επιλογή Χρήστη</CardTitle>
+          <CardTitle>{t('adminDashboard.diets.selectUserTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Select value={selectedUser} onValueChange={setSelectedUser}>
             <SelectTrigger>
-              <SelectValue placeholder="Επιλέξτε χρήστη" />
+              <SelectValue placeholder={t('adminDashboard.diets.selectUserPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
@@ -236,32 +257,35 @@ const AdminDiets = () => {
 
       {selectedUser && (
         <div className="space-y-4">
-          {DAYS.map((day) => (
-            <Card key={day}>
-              <CardHeader>
-                <CardTitle>{day}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {[0, 1, 2, 3, 4].map((mealIndex) => {
-                  const mealGroup = (dietPlans[day] || [])[mealIndex] || { meal_number: mealIndex + 1, items: [] };
-                  // Ensure items is an array before calling join
-                  const mealText = Array.isArray(mealGroup.items) ? mealGroup.items.join('\n') : '';
-                  
-                  return (
-                    <div key={mealIndex} className="space-y-2">
-                      <Label>Γεύμα {mealIndex + 1}</Label>
-                      <Textarea
-                        placeholder={`Εισάγετε τρόφιμα για το γεύμα ${mealIndex + 1}, ένα ανά γραμμή...`}
-                        value={mealText}
-                        onChange={(e) => updateMeal(day, mealIndex, e.target.value)}
-                        rows={5}
-                      />
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          ))}
+          {DAYS.map((day, index) => {
+            const dayEN = DAYS_EN[index];
+            return (
+              <Card key={dayEN}>
+                <CardHeader>
+                  <CardTitle>{day}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[0, 1, 2, 3, 4].map((mealIndex) => {
+                    const mealGroup = (dietPlans[dayEN] || [])[mealIndex] || { meal_number: mealIndex + 1, items: [] };
+                    // Ensure items is an array before calling join
+                    const mealText = Array.isArray(mealGroup.items) ? mealGroup.items.join('\n') : '';
+                    
+                    return (
+                      <div key={mealIndex} className="space-y-2">
+                        <Label>{t('adminDashboard.diets.meal')} {mealIndex + 1}</Label>
+                        <Textarea
+                          placeholder={t('adminDashboard.diets.mealPlaceholder', { number: mealIndex + 1 })}
+                          value={mealText}
+                          onChange={(e) => updateMeal(dayEN, mealIndex, e.target.value)}
+                          rows={5}
+                        />
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
