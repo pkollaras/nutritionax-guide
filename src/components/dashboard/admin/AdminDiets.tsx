@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Save } from 'lucide-react';
+import { Save, Upload } from 'lucide-react';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -15,6 +16,8 @@ const AdminDiets = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [dietPlans, setDietPlans] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -83,14 +86,91 @@ const AdminDiets = () => {
     setDietPlans({ ...dietPlans, [day]: newMeals });
   };
 
+  const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedUser) {
+      toast({ 
+        title: 'Error', 
+        description: 'Please select a user first', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      toast({ 
+        title: 'Error', 
+        description: 'Please upload a PDF file', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Read file as text (we'll use a simple extraction)
+      const fileText = await file.text();
+      
+      // Call edge function to parse PDF
+      const { data, error } = await supabase.functions.invoke('parse-diet-pdf', {
+        body: { 
+          pdfText: fileText,
+          userId: selectedUser 
+        }
+      });
+
+      if (error) throw error;
+
+      toast({ 
+        title: 'Success', 
+        description: 'Diet plan uploaded and parsed successfully' 
+      });
+      
+      // Refresh the diet plans
+      fetchDietPlan(selectedUser);
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('PDF upload error:', error);
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to parse PDF', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Diet Plans</h1>
-        <Button onClick={handleSave} disabled={loading}>
-          <Save className="mr-2 h-4 w-4" />
-          {loading ? 'Saving...' : 'Save Plan'}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => fileInputRef.current?.click()} 
+            disabled={!selectedUser || uploading}
+            variant="outline"
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            {uploading ? 'Uploading...' : 'Upload PDF'}
+          </Button>
+          <Input
+            ref={fileInputRef}
+            type="file"
+            accept="application/pdf"
+            onChange={handlePdfUpload}
+            className="hidden"
+          />
+          <Button onClick={handleSave} disabled={loading}>
+            <Save className="mr-2 h-4 w-4" />
+            {loading ? 'Saving...' : 'Save Plan'}
+          </Button>
+        </div>
       </div>
 
       <Card>
