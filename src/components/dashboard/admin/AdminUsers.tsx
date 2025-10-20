@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Key } from 'lucide-react';
 import { z } from 'zod';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -25,6 +25,10 @@ const AdminUsers = () => {
   const [open, setOpen] = useState(false);
   const [newUser, setNewUser] = useState({ email: '', password: '', name: '', sendEmail: true });
   const [errors, setErrors] = useState<any>({});
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -109,6 +113,48 @@ const AdminUsers = () => {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    
+    if (newPassword.length < 6) {
+      setPasswordError('Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-users', {
+        body: {
+          action: 'update-password',
+          userId: selectedUser.id,
+          newPassword: newPassword,
+        },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      toast({ 
+        title: 'Επιτυχία', 
+        description: 'Ο κωδικός άλλαξε επιτυχώς' 
+      });
+      
+      setPasswordDialogOpen(false);
+      setNewPassword('');
+      setSelectedUser(null);
+    } catch (error: any) {
+      toast({ 
+        title: 'Σφάλμα', 
+        description: error.message, 
+        variant: 'destructive' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -186,13 +232,25 @@ const AdminUsers = () => {
                 <CardTitle>{user.name}</CardTitle>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDeleteUser(user.id)}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    setSelectedUser(user);
+                    setPasswordDialogOpen(true);
+                  }}
+                >
+                  <Key className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteUser(user.id)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
@@ -210,6 +268,33 @@ const AdminUsers = () => {
           </Card>
         )}
       </div>
+
+      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Αλλαγή Κωδικού για {selectedUser?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">Νέος Κωδικός</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Τουλάχιστον 6 χαρακτήρες"
+              />
+              {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Αλλαγή...' : 'Αλλαγή Κωδικού'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

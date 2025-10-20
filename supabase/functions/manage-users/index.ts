@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     }
 
     // Parse the request body
-    const { action, email, password, name, userId, sendEmail } = await req.json();
+    const { action, email, password, name, userId, sendEmail, newPassword } = await req.json();
 
     if (action === 'create') {
       // Create a new user
@@ -139,6 +139,42 @@ Deno.serve(async (req) => {
       }
 
       console.log('User deleted successfully:', userId);
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } else if (action === 'update-password') {
+      // Validate input
+      if (!userId || !newPassword) {
+        return new Response(
+          JSON.stringify({ error: 'Missing userId or newPassword' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (newPassword.length < 6) {
+        return new Response(
+          JSON.stringify({ error: 'Password must be at least 6 characters' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Update user password using admin API
+      const { data: updatedUser, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        { password: newPassword }
+      );
+
+      if (updateError) {
+        console.error('Error updating password:', updateError);
+        return new Response(
+          JSON.stringify({ error: updateError.message }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('Password updated successfully for user:', userId);
+      
       return new Response(
         JSON.stringify({ success: true }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
