@@ -94,7 +94,8 @@ const AdminReports = () => {
                     <TableHead>Date</TableHead>
                     <TableHead>Day</TableHead>
                     <TableHead>Weight (kg)</TableHead>
-                    <TableHead>WC (cm)</TableHead>
+                    <TableHead>Toilet Visits</TableHead>
+                    <TableHead>Morning BM</TableHead>
                     <TableHead>Notes</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -104,7 +105,8 @@ const AdminReports = () => {
                       <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
                       <TableCell>Day {report.day_of_diet}</TableCell>
                       <TableCell>{report.weight}</TableCell>
-                      <TableCell>{report.wc}</TableCell>
+                      <TableCell>{report.wc || 0} times</TableCell>
+                      <TableCell>{report.morning_bm ? '✓ Yes' : '✗ No'}</TableCell>
                       <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
                     </TableRow>
                   ))}

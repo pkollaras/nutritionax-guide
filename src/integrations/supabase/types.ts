@@ -116,6 +116,7 @@ export type Database = {
           date: string
           day_of_diet: number | null
           id: string
+          morning_bm: boolean | null
           notes: string | null
           updated_at: string | null
           user_id: string
@@ -127,6 +128,7 @@ export type Database = {
           date: string
           day_of_diet?: number | null
           id?: string
+          morning_bm?: boolean | null
           notes?: string | null
           updated_at?: string | null
           user_id: string
@@ -138,6 +140,7 @@ export type Database = {
           date?: string
           day_of_diet?: number | null
           id?: string
+          morning_bm?: boolean | null
           notes?: string | null
           updated_at?: string | null
           user_id?: string

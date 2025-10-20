@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +22,8 @@ const UserHome = () => {
   const { toast } = useToast();
   const [todayMeals, setTodayMeals] = useState<MealGroup[]>([]);
   const [weight, setWeight] = useState('');
+  const [toiletVisits, setToiletVisits] = useState('');
+  const [morningBM, setMorningBM] = useState(false);
   const [notes, setNotes] = useState('');
   const [dayOfDiet, setDayOfDiet] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -58,6 +61,8 @@ const UserHome = () => {
 
     if (reportData) {
       setWeight(reportData.weight?.toString() || '');
+      setToiletVisits(reportData.wc?.toString() || '');
+      setMorningBM(reportData.morning_bm || false);
       setNotes(reportData.notes || '');
       setDayOfDiet(reportData.day_of_diet || 1);
     } else {
@@ -88,6 +93,8 @@ const UserHome = () => {
           user_id: user.id,
           date: todayDate,
           weight: weight ? parseFloat(weight) : null,
+          wc: toiletVisits ? parseFloat(toiletVisits) : null,
+          morning_bm: morningBM,
           notes,
           day_of_diet: dayOfDiet,
         }, {
@@ -150,6 +157,30 @@ const UserHome = () => {
               onChange={(e) => setWeight(e.target.value)}
               placeholder="75.5"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="toiletVisits">Toilet Visits (per day)</Label>
+            <Input
+              id="toiletVisits"
+              type="number"
+              min="0"
+              max="20"
+              value={toiletVisits}
+              onChange={(e) => setToiletVisits(e.target.value)}
+              placeholder="Number of times"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="morningBM"
+              checked={morningBM}
+              onCheckedChange={(checked) => setMorningBM(checked === true)}
+            />
+            <Label htmlFor="morningBM" className="cursor-pointer">
+              Had bowel movement in the morning
+            </Label>
           </div>
 
           <div className="space-y-2">
