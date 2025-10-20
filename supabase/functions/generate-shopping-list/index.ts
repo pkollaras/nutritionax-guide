@@ -217,10 +217,12 @@ ${JSON.stringify(allMeals, null, 2)}
 
     // Calculate week start date (Monday of current week)
     const now = new Date();
-    const dayOfWeek = now.getDay();
-    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Sunday = 0, Monday = 1
+    const dayOfWeek = now.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+    // Calculate days since last Monday
+    const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() + diff);
+    weekStart.setDate(now.getDate() - daysSinceMonday);
+    weekStart.setHours(0, 0, 0, 0);
     const weekStartDate = weekStart.toISOString().split('T')[0];
 
     // Save to database

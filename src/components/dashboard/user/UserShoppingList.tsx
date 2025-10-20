@@ -43,12 +43,14 @@ const UserShoppingList = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Calculate current week start date
+      // Calculate current week start date (Monday)
       const now = new Date();
-      const dayOfWeek = now.getDay();
-      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const dayOfWeek = now.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+      // Calculate days since last Monday
+      const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
       const weekStart = new Date(now);
-      weekStart.setDate(now.getDate() + diff);
+      weekStart.setDate(now.getDate() - daysSinceMonday);
+      weekStart.setHours(0, 0, 0, 0);
       const weekStartDate = weekStart.toISOString().split('T')[0];
 
       // Fetch shopping list for current week
