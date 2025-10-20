@@ -134,8 +134,7 @@ const UserHome = () => {
   const confirmSkipMeal = () => {
     if (!selectedMeal) return;
     
-    const mealItems = selectedMeal.items.join(', ');
-    const noteText = `Παράκαμψη γεύματος ${selectedMeal.meal_number} (${mealItems})`;
+    const noteText = `Παρακάμφθηκε το γεύμα ${selectedMeal.meal_number}`;
     
     setNotes(prev => prev ? `${prev}\n${noteText}` : noteText);
     
@@ -156,8 +155,7 @@ const UserHome = () => {
   const confirmReplaceMeal = () => {
     if (!selectedMeal || !replacementText.trim()) return;
     
-    const mealItems = selectedMeal.items.join(', ');
-    const noteText = `Αντικατάσταση γεύματος ${selectedMeal.meal_number} (${mealItems}) → με (${replacementText})`;
+    const noteText = `Αντικαταστάθηκε το γεύμα ${selectedMeal.meal_number} με (${replacementText})`;
     
     setNotes(prev => prev ? `${prev}\n${noteText}` : noteText);
     
