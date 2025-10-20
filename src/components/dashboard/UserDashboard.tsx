@@ -59,10 +59,7 @@ const UserDashboard = () => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-primary">{t('auth.title')}</h1>
-          <LanguageSwitcher />
-        </div>
+        <h1 className="text-2xl font-bold text-primary mb-2">{t('auth.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('userDashboard.title')}</p>
       </div>
 
@@ -80,7 +77,10 @@ const UserDashboard = () => {
         ))}
       </nav>
 
-      <div className="px-4 pb-4 border-t pt-4">
+      <div className="px-4 pb-4 border-t pt-4 space-y-2">
+        <div className="flex justify-center">
+          <LanguageSwitcher />
+        </div>
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
           {t('userDashboard.nav.signOut')}
