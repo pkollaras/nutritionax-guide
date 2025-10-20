@@ -18,7 +18,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Save } from 'lucide-react';
+import { Save, XCircle, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MealGroup {
@@ -227,6 +227,7 @@ const UserHome = () => {
                       size="sm"
                       onClick={() => handleSkipMeal(mealGroup)}
                     >
+                      <XCircle className="mr-1 h-4 w-4" />
                       {t('userDashboard.home.mealSkipped')}
                     </Button>
                     <Button 
@@ -234,6 +235,7 @@ const UserHome = () => {
                       size="sm"
                       onClick={() => handleReplaceMeal(mealGroup)}
                     >
+                      <RefreshCw className="mr-1 h-4 w-4" />
                       {t('userDashboard.home.mealReplaced')}
                     </Button>
                   </div>
