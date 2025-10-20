@@ -43,7 +43,23 @@ const AdminDiets = () => {
 
     const plansObj: any = {};
     data?.forEach((plan) => {
-      plansObj[plan.day_of_week] = plan.meals;
+      const meals = plan.meals as any;
+      
+      // Handle both old format (string array) and new format (MealGroup array)
+      if (Array.isArray(meals) && meals.length > 0) {
+        if (typeof meals[0] === 'string') {
+          // Old format: convert strings to MealGroup objects
+          plansObj[plan.day_of_week] = meals.map((mealText: string, index: number) => ({
+            meal_number: index + 1,
+            items: [mealText]
+          }));
+        } else {
+          // New format: already MealGroup objects
+          plansObj[plan.day_of_week] = meals;
+        }
+      } else {
+        plansObj[plan.day_of_week] = [];
+      }
     });
     setDietPlans(plansObj);
   };
@@ -228,7 +244,8 @@ const AdminDiets = () => {
               <CardContent className="space-y-4">
                 {[0, 1, 2, 3, 4].map((mealIndex) => {
                   const mealGroup = (dietPlans[day] || [])[mealIndex] || { meal_number: mealIndex + 1, items: [] };
-                  const mealText = mealGroup.items.join('\n');
+                  // Ensure items is an array before calling join
+                  const mealText = Array.isArray(mealGroup.items) ? mealGroup.items.join('\n') : '';
                   
                   return (
                     <div key={mealIndex} className="space-y-2">
