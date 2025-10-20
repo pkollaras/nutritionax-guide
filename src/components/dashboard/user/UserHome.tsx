@@ -30,10 +30,13 @@ const UserHome = () => {
   }, []);
 
   const fetchData = async () => {
-    // Fetch guidelines
+    if (!user) return;
+
+    // Fetch user's guidelines
     const { data: guideData } = await supabase
       .from('guidelines')
       .select('content')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();

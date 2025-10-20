@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 
 const AdminGuidelines = () => {
+  const { user } = useAuth();
   const [guidelines, setGuidelines] = useState('');
   const [loading, setLoading] = useState(false);
   const [guidelineId, setGuidelineId] = useState<string | null>(null);
@@ -17,9 +19,12 @@ const AdminGuidelines = () => {
   }, []);
 
   const fetchGuidelines = async () => {
+    if (!user) return;
+
     const { data } = await supabase
       .from('guidelines')
       .select('*')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
@@ -31,6 +36,8 @@ const AdminGuidelines = () => {
   };
 
   const handleSave = async () => {
+    if (!user) return;
+    
     setLoading(true);
 
     try {
@@ -44,7 +51,10 @@ const AdminGuidelines = () => {
       } else {
         const { error } = await supabase
           .from('guidelines')
-          .insert({ content: guidelines });
+          .insert({ 
+            content: guidelines,
+            user_id: user.id 
+          });
 
         if (error) throw error;
       }
@@ -70,13 +80,13 @@ const AdminGuidelines = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Edit Global Guidelines</CardTitle>
+          <CardTitle>Edit Your Guidelines</CardTitle>
         </CardHeader>
         <CardContent>
           <Textarea
             value={guidelines}
             onChange={(e) => setGuidelines(e.target.value)}
-            placeholder="Enter general dietary guidelines that will be visible to all users..."
+            placeholder="Enter your general dietary guidelines..."
             rows={20}
             className="font-mono"
           />
