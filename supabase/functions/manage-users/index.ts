@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.1';
+import { Resend } from 'npm:resend@4.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
     }
 
     // Parse the request body
-    const { action, email, password, name, userId } = await req.json();
+    const { action, email, password, name, userId, sendEmail } = await req.json();
 
     if (action === 'create') {
       // Create a new user
@@ -80,6 +81,47 @@ Deno.serve(async (req) => {
       }
 
       console.log('User created successfully:', newUser.user.id);
+
+      // Send welcome email if requested
+      if (sendEmail) {
+        try {
+          const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+          await resend.emails.send({
+            from: 'Nutritionax <onboarding@resend.dev>',
+            to: [email],
+            subject: 'Καλώς ήρθατε στο Nutritionax',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #333;">Καλώς ήρθατε στο Nutritionax!</h1>
+                <p style="font-size: 16px; line-height: 1.6;">
+                  Ο λογαριασμός σας έχει ανοίξει. Σε λίγο θα είναι διαθέσιμη και η δίαιτά σας.
+                </p>
+                <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>Μπορείτε να συνδεθείτε στο:</strong><br>
+                    <a href="https://nutritionax.mini-site.gr/" style="color: #0066cc;">https://nutritionax.mini-site.gr/</a>
+                  </p>
+                  <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>Email:</strong> ${email}
+                  </p>
+                  <p style="font-size: 16px; margin: 10px 0;">
+                    <strong>Κωδικός:</strong> ${password}
+                  </p>
+                </div>
+                <p style="font-size: 14px; color: #666; margin-top: 30px;">
+                  Με εκτίμηση,<br>
+                  Το Nutritionax Team
+                </p>
+              </div>
+            `,
+          });
+          console.log('Welcome email sent successfully to:', email);
+        } catch (emailError: any) {
+          console.error('Error sending welcome email:', emailError);
+          // Don't fail user creation if email fails
+        }
+      }
+
       return new Response(
         JSON.stringify({ success: true, user: newUser.user }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

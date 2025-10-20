@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2 } from 'lucide-react';
@@ -22,7 +23,7 @@ const AdminUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ email: '', password: '', name: '' });
+  const [newUser, setNewUser] = useState({ email: '', password: '', name: '', sendEmail: true });
   const [errors, setErrors] = useState<any>({});
 
   useEffect(() => {
@@ -56,15 +57,21 @@ const AdminUsers = () => {
           email: newUser.email,
           password: newUser.password,
           name: newUser.name,
+          sendEmail: newUser.sendEmail,
         },
       });
 
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      toast({ title: 'Επιτυχία', description: 'Ο χρήστης δημιουργήθηκε επιτυχώς' });
+      toast({ 
+        title: 'Επιτυχία', 
+        description: newUser.sendEmail 
+          ? 'Ο χρήστης δημιουργήθηκε επιτυχώς και το email εστάλη' 
+          : 'Ο χρήστης δημιουργήθηκε επιτυχώς'
+      });
       setOpen(false);
-      setNewUser({ email: '', password: '', name: '' });
+      setNewUser({ email: '', password: '', name: '', sendEmail: true });
       fetchUsers();
     } catch (error: any) {
       if (error instanceof z.ZodError) {
@@ -148,6 +155,19 @@ const AdminUsers = () => {
                   onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                 />
                 {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="sendEmail"
+                  checked={newUser.sendEmail}
+                  onCheckedChange={(checked) => 
+                    setNewUser({ ...newUser, sendEmail: checked as boolean })
+                  }
+                />
+                <Label htmlFor="sendEmail" className="text-sm font-normal cursor-pointer">
+                  Αποστολή email ενημέρωσης
+                </Label>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
