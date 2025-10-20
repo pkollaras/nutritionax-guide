@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { CalendarIcon, Plus, Save } from 'lucide-react';
+import { CalendarIcon, Plus, Save, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +28,7 @@ const UserProgress = () => {
   const [notes, setNotes] = useState('');
   const [dayOfDiet, setDayOfDiet] = useState('');
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -43,6 +44,28 @@ const UserProgress = () => {
       .order('date', { ascending: true });
 
     setReports(data || []);
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setWeight('');
+    setToiletVisits('');
+    setMorningBM(false);
+    setNotes('');
+    setDayOfDiet('');
+    setSelectedDate(new Date());
+  };
+
+  const handleEdit = (report: any) => {
+    setEditingId(report.id);
+    setSelectedDate(new Date(report.date));
+    setWeight(report.weight?.toString() || '');
+    setToiletVisits(report.wc?.toString() || '');
+    setMorningBM(report.morning_bm || false);
+    setNotes(report.notes || '');
+    setDayOfDiet(report.day_of_diet?.toString() || '');
+    setShowAddForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSave = async () => {
@@ -70,12 +93,7 @@ const UserProgress = () => {
 
       toast({ title: 'Success', description: 'Progress saved successfully' });
       setShowAddForm(false);
-      setWeight('');
-      setToiletVisits('');
-      setMorningBM(false);
-      setNotes('');
-      setDayOfDiet('');
-      setSelectedDate(new Date());
+      resetForm();
       fetchReports();
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -94,16 +112,16 @@ const UserProgress = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Progress</h1>
-        <Button onClick={() => setShowAddForm(!showAddForm)}>
+        <Button onClick={() => { resetForm(); setShowAddForm(!showAddForm); }}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Progress Entry
+          {showAddForm ? 'Close Form' : 'Add Progress Entry'}
         </Button>
       </div>
 
       {showAddForm && (
         <Card>
           <CardHeader>
-            <CardTitle>Add Progress Entry</CardTitle>
+            <CardTitle>{editingId ? 'Edit Progress Entry' : 'Add Progress Entry'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -204,7 +222,7 @@ const UserProgress = () => {
                 <Save className="mr-2 h-4 w-4" />
                 {loading ? 'Saving...' : 'Save Progress'}
               </Button>
-              <Button onClick={() => setShowAddForm(false)} variant="outline">
+              <Button onClick={() => { setShowAddForm(false); resetForm(); }} variant="outline">
                 Cancel
               </Button>
             </div>
@@ -245,6 +263,7 @@ const UserProgress = () => {
                     <TableHead>Toilet Visits</TableHead>
                     <TableHead>Morning BM</TableHead>
                     <TableHead>Notes</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -256,6 +275,15 @@ const UserProgress = () => {
                       <TableCell>{report.wc || 0} times</TableCell>
                       <TableCell>{report.morning_bm ? '✓ Yes' : '✗ No'}</TableCell>
                       <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEdit(report)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
