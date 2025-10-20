@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Loader2, UtensilsCrossed, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, UtensilsCrossed, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -24,7 +23,6 @@ const UserDiet = () => {
   const { t } = useLanguage();
   const [dietPlans, setDietPlans] = useState<DietPlan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
 
   // English day names for database (must match database values)
@@ -73,63 +71,6 @@ const UserDiet = () => {
     }
   };
 
-  const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-
-    if (file.size > 20 * 1024 * 1024) {
-      toast({
-        title: t('userDashboard.diet.fileTooBig'),
-        description: t('userDashboard.diet.fileTooBigDesc'),
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      // Convert PDF to base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          const base64 = result.split(',')[1];
-          resolve(base64);
-        };
-        reader.onerror = reject;
-      });
-
-      reader.readAsDataURL(file);
-      const pdfBase64 = await base64Promise;
-
-      // Call edge function to parse PDF with Gemini Vision
-      const { data, error } = await supabase.functions.invoke('parse-diet-pdf', {
-        body: { pdfBase64, userId: user.id },
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: t('common.success'),
-        description: t('userDashboard.diet.uploadSuccess'),
-      });
-
-      // Refresh the diet plan
-      await fetchDietPlan();
-    } catch (error) {
-      console.error('Error uploading PDF:', error);
-      toast({
-        title: t('userDashboard.diet.uploadFailed'),
-        description: error instanceof Error ? error.message : t('userDashboard.diet.processingFailed'),
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
-      // Reset the input
-      event.target.value = '';
-    }
-  };
 
   const toggleDay = (dayIndex: number) => {
     const dayKey = `day-${dayIndex}`;
@@ -153,39 +94,11 @@ const UserDiet = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <UtensilsCrossed className="h-8 w-8 text-primary" />
-            {t('userDashboard.diet.title')}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t('userDashboard.diet.subtitle')}
-          </p>
-        </div>
-
-        <div>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handlePdfUpload}
-            disabled={uploading}
-            className="hidden"
-            id="pdf-upload"
-          />
-          <label htmlFor="pdf-upload">
-            <Button disabled={uploading} asChild>
-              <span>
-                {uploading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="mr-2 h-4 w-4" />
-                )}
-                {uploading ? t('common.uploading') : t('userDashboard.diet.uploadPdf')}
-              </span>
-            </Button>
-          </label>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <UtensilsCrossed className="h-8 w-8 text-primary" />
+          {t('userDashboard.diet.title')}
+        </h1>
       </div>
 
       {dietPlans.length === 0 ? (
