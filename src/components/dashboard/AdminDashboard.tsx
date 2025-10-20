@@ -23,8 +23,14 @@ type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'settin
 
 const AdminDashboard = () => {
   const [currentView, setCurrentView] = useState<AdminView>('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { signOut } = useAuth();
   const { t } = useLanguage();
+
+  const handleViewChange = (view: AdminView) => {
+    setCurrentView(view);
+    setMobileMenuOpen(false); // Close mobile menu when changing view
+  };
 
   const menuItems = [
     { id: 'home' as AdminView, label: t('adminDashboard.nav.dashboard'), icon: LayoutDashboard },
@@ -67,7 +73,7 @@ const AdminDashboard = () => {
             key={item.id}
             variant={currentView === item.id ? 'default' : 'ghost'}
             className="w-full justify-start"
-            onClick={() => setCurrentView(item.id)}
+            onClick={() => handleViewChange(item.id)}
           >
             <item.icon className="mr-2 h-4 w-4" />
             {item.label}
@@ -76,9 +82,7 @@ const AdminDashboard = () => {
       </nav>
 
       <div className="px-4 pb-4 border-t pt-4 space-y-2">
-        <div className="flex justify-center">
-          <LanguageSwitcher />
-        </div>
+        <LanguageSwitcher />
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
           {t('adminDashboard.nav.signOut')}
@@ -96,7 +100,7 @@ const AdminDashboard = () => {
 
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center px-4 z-10">
-        <Sheet>
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
               <Menu className="h-6 w-6" />
