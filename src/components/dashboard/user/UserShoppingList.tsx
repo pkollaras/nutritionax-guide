@@ -59,7 +59,7 @@ const UserShoppingList = () => {
         .select('*')
         .eq('user_id', user.id)
         .eq('week_start_date', weekStartDate)
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         setShoppingList({
