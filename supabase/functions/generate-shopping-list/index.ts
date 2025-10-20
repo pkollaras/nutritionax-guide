@@ -254,8 +254,8 @@ ${JSON.stringify(allMeals, null, 2)}
 
     return new Response(
       JSON.stringify({
-        ...parsedData,
-        id: savedList.id,
+        categories: parsedData.categories || [],
+        summary: parsedData.summary || '',
         weekStartDate: savedList.week_start_date,
         createdAt: savedList.created_at
       }),
