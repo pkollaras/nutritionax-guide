@@ -25,7 +25,7 @@ const UserHome = () => {
   const [toiletVisits, setToiletVisits] = useState('');
   const [morningBM, setMorningBM] = useState(false);
   const [notes, setNotes] = useState('');
-  const [dayOfDiet, setDayOfDiet] = useState(1);
+  const [dayOfDiet, setDayOfDiet] = useState('');
   const [loading, setLoading] = useState(false);
 
   const today = new Date();
@@ -64,19 +64,7 @@ const UserHome = () => {
       setToiletVisits(reportData.wc?.toString() || '');
       setMorningBM(reportData.morning_bm || false);
       setNotes(reportData.notes || '');
-      setDayOfDiet(reportData.day_of_diet || 1);
-    } else {
-      // Calculate day of diet based on previous reports
-      const { data: allReports } = await supabase
-        .from('progress_reports')
-        .select('day_of_diet')
-        .eq('user_id', user?.id)
-        .order('date', { ascending: false })
-        .limit(1);
-
-      if (allReports && allReports.length > 0) {
-        setDayOfDiet((allReports[0].day_of_diet || 0) + 1);
-      }
+      setDayOfDiet(reportData.day_of_diet?.toString() || '');
     }
   };
 
@@ -96,7 +84,7 @@ const UserHome = () => {
           wc: toiletVisits ? parseFloat(toiletVisits) : null,
           morning_bm: morningBM,
           notes,
-          day_of_diet: dayOfDiet,
+          day_of_diet: dayOfDiet ? parseInt(dayOfDiet) : null,
         }, {
           onConflict: 'user_id,date'
         });
@@ -116,7 +104,7 @@ const UserHome = () => {
       <div>
         <h1 className="text-3xl font-bold">{todayName}</h1>
         <p className="text-muted-foreground">
-          {today.toLocaleDateString()} • Day {dayOfDiet} of Diet
+          {today.toLocaleDateString()} • {dayOfDiet ? `Day ${dayOfDiet} of Diet` : 'Diet Tracking'}
         </p>
       </div>
 
@@ -156,6 +144,18 @@ const UserHome = () => {
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               placeholder="75.5"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dayOfDiet">Day of Diet</Label>
+            <Input
+              id="dayOfDiet"
+              type="number"
+              min="1"
+              value={dayOfDiet}
+              onChange={(e) => setDayOfDiet(e.target.value)}
+              placeholder="1"
             />
           </div>
 
