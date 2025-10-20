@@ -27,7 +27,7 @@ const AdminGuidelines = () => {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (data) {
       setGuidelines(data.content);
