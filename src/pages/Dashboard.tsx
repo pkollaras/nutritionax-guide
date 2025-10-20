@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import UserDashboard from '@/components/dashboard/UserDashboard';
 
 const Dashboard = () => {
   const { user, userRole, loading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,7 +19,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Φόρτωση...</p>
+        <p className="text-lg">{t('dashboard.loading')}</p>
       </div>
     );
   }

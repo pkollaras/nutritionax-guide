@@ -1,23 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { z } from 'zod';
-
-const loginSchema = z.object({
-  email: z.string().email('Μη έγκυρη διεύθυνση email'),
-  password: z.string().min(6, 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες'),
-});
 
 const Auth = () => {
   const navigate = useNavigate();
   const { user, signIn } = useAuth();
+  const { t } = useLanguage();
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState<any>({});
   const [loading, setLoading] = useState(false);
+
+  const loginSchema = z.object({
+    email: z.string().email(t('auth.invalidEmail')),
+    password: z.string().min(6, t('auth.minPassword')),
+  });
 
   useEffect(() => {
     if (user) {
@@ -51,15 +54,18 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-primary/10 p-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">Nutritionax</CardTitle>
-          <CardDescription>Συνδεθείτε για πρόσβαση στον λογαριασμό σας</CardDescription>
+          <CardTitle className="text-3xl font-bold text-primary">{t('auth.title')}</CardTitle>
+          <CardDescription>{t('auth.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="login-email">Email</Label>
+              <Label htmlFor="login-email">{t('auth.email')}</Label>
               <Input
                 id="login-email"
                 type="email"
@@ -71,7 +77,7 @@ const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="login-password">Κωδικός</Label>
+              <Label htmlFor="login-password">{t('auth.password')}</Label>
               <Input
                 id="login-password"
                 type="password"
@@ -82,7 +88,7 @@ const Auth = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Σύνδεση...' : 'Σύνδεση'}
+              {loading ? t('auth.signingIn') : t('auth.signIn')}
             </Button>
           </form>
         </CardContent>

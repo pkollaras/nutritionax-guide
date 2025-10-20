@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   LayoutDashboard,
   Users,
@@ -11,6 +12,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import AdminHome from './admin/AdminHome';
 import AdminUsers from './admin/AdminUsers';
 import AdminDiets from './admin/AdminDiets';
@@ -22,14 +24,15 @@ type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'settin
 const AdminDashboard = () => {
   const [currentView, setCurrentView] = useState<AdminView>('home');
   const { signOut } = useAuth();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { id: 'home' as AdminView, label: 'Αρχική', icon: LayoutDashboard },
-    { id: 'users' as AdminView, label: 'Χρήστες', icon: Users },
-    { id: 'diets' as AdminView, label: 'Διατροφές', icon: FileText },
-    { id: 'guidelines' as AdminView, label: 'Οδηγίες', icon: BookOpen },
-    { id: 'reports' as AdminView, label: 'Αναφορές', icon: FileText },
-    { id: 'settings' as AdminView, label: 'Ρυθμίσεις', icon: Settings },
+    { id: 'home' as AdminView, label: t('adminDashboard.nav.dashboard'), icon: LayoutDashboard },
+    { id: 'users' as AdminView, label: t('adminDashboard.nav.users'), icon: Users },
+    { id: 'diets' as AdminView, label: t('adminDashboard.nav.diets'), icon: FileText },
+    { id: 'guidelines' as AdminView, label: t('adminDashboard.nav.guidelines'), icon: BookOpen },
+    { id: 'reports' as AdminView, label: t('adminDashboard.nav.reports'), icon: FileText },
+    { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
   ];
 
   const renderView = () => {
@@ -54,8 +57,11 @@ const AdminDashboard = () => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b">
-        <h1 className="text-2xl font-bold text-primary">Nutritionax</h1>
-        <p className="text-sm text-muted-foreground">Πίνακας Διαχείρισης</p>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold text-primary">{t('auth.title')}</h1>
+          <LanguageSwitcher />
+        </div>
+        <p className="text-sm text-muted-foreground">{t('adminDashboard.title')}</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
@@ -75,7 +81,7 @@ const AdminDashboard = () => {
       <div className="p-4 border-t">
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          Αποσύνδεση
+          {t('adminDashboard.nav.signOut')}
         </Button>
       </div>
     </div>

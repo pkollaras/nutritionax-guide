@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Home,
   TrendingUp,
@@ -12,6 +13,7 @@ import {
   ShoppingCart,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserHome from './user/UserHome';
 import UserProgress from './user/UserProgress';
 import UserProfile from './user/UserProfile';
@@ -24,14 +26,15 @@ type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines' | 'shopp
 const UserDashboard = () => {
   const [currentView, setCurrentView] = useState<UserView>('home');
   const { signOut } = useAuth();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { id: 'home' as UserView, label: 'Σήμερα', icon: Home },
-    { id: 'guidelines' as UserView, label: 'Οδηγίες', icon: FileText },
-    { id: 'diet' as UserView, label: 'Η Διατροφή μου', icon: UtensilsCrossed },
-    { id: 'shopping' as UserView, label: 'Λίστα Αγορών', icon: ShoppingCart },
-    { id: 'progress' as UserView, label: 'Πρόοδος', icon: TrendingUp },
-    { id: 'profile' as UserView, label: 'Προφίλ', icon: User },
+    { id: 'home' as UserView, label: t('userDashboard.nav.today'), icon: Home },
+    { id: 'guidelines' as UserView, label: t('userDashboard.nav.guidelines'), icon: FileText },
+    { id: 'diet' as UserView, label: t('userDashboard.nav.diet'), icon: UtensilsCrossed },
+    { id: 'shopping' as UserView, label: t('userDashboard.nav.shoppingList'), icon: ShoppingCart },
+    { id: 'progress' as UserView, label: t('userDashboard.nav.progress'), icon: TrendingUp },
+    { id: 'profile' as UserView, label: t('userDashboard.nav.profile'), icon: User },
   ];
 
   const renderView = () => {
@@ -56,8 +59,11 @@ const UserDashboard = () => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b">
-        <h1 className="text-2xl font-bold text-primary">Nutritionax</h1>
-        <p className="text-sm text-muted-foreground">Το Διατροφικό σας Πρόγραμμα</p>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold text-primary">{t('auth.title')}</h1>
+          <LanguageSwitcher />
+        </div>
+        <p className="text-sm text-muted-foreground">{t('userDashboard.title')}</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
@@ -77,7 +83,7 @@ const UserDashboard = () => {
       <div className="p-4 border-t">
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          Αποσύνδεση
+          {t('userDashboard.nav.signOut')}
         </Button>
       </div>
     </div>
