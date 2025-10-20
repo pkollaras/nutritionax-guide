@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import Footer from '@/components/Footer';
 import { z } from 'zod';
 
 const Auth = () => {
@@ -96,7 +95,6 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
-      <Footer />
     </div>
   );
 };
