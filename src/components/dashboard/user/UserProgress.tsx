@@ -15,10 +15,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { CalendarIcon, Plus, Save, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const UserProgress = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [reports, setReports] = useState<any[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -91,12 +93,12 @@ const UserProgress = () => {
 
       if (error) throw error;
 
-      toast({ title: 'Επιτυχία', description: 'Η πρόοδος αποθηκεύτηκε επιτυχώς' });
+      toast({ title: t('common.success'), description: t('userDashboard.progress.saveSuccess') });
       setShowAddForm(false);
       resetForm();
       fetchReports();
     } catch (error: any) {
-      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
+      toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -111,21 +113,21 @@ const UserProgress = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Πρόοδος</h1>
+        <h1 className="text-3xl font-bold">{t('userDashboard.progress.title')}</h1>
         <Button onClick={() => { resetForm(); setShowAddForm(!showAddForm); }}>
           <Plus className="mr-2 h-4 w-4" />
-          {showAddForm ? 'Κλείσιμο Φόρμας' : 'Προσθήκη Καταχώρισης'}
+          {showAddForm ? t('userDashboard.progress.closeForm') : t('userDashboard.progress.addEntry')}
         </Button>
       </div>
 
       {showAddForm && (
         <Card>
           <CardHeader>
-            <CardTitle>{editingId ? 'Επεξεργασία Καταχώρισης' : 'Προσθήκη Καταχώρισης'}</CardTitle>
+            <CardTitle>{editingId ? t('userDashboard.progress.editEntry') : t('userDashboard.progress.addNewEntry')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Επιλογή Ημερομηνίας</Label>
+              <Label>{t('userDashboard.progress.selectDate')}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -136,7 +138,7 @@ const UserProgress = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, 'PPP') : <span>Επιλέξτε ημερομηνία</span>}
+                    {selectedDate ? format(selectedDate, 'PPP') : <span>{t('userDashboard.progress.pickDate')}</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -151,7 +153,7 @@ const UserProgress = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="weight">Βάρος (kg)</Label>
+              <Label htmlFor="weight">{t('userDashboard.progress.weight')}</Label>
               <Input
                 id="weight"
                 type="number"
@@ -163,7 +165,7 @@ const UserProgress = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dayOfDiet">Ημέρα Διατροφής</Label>
+              <Label htmlFor="dayOfDiet">{t('userDashboard.progress.dietDay')}</Label>
               <Input
                 id="dayOfDiet"
                 type="number"
@@ -175,7 +177,7 @@ const UserProgress = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="toiletVisits">Επισκέψεις στην Τουαλέτα</Label>
+              <Label htmlFor="toiletVisits">{t('userDashboard.progress.toiletVisits')}</Label>
               <Input
                 id="toiletVisits"
                 type="number"
@@ -194,12 +196,12 @@ const UserProgress = () => {
                 onCheckedChange={(checked) => setMorningBM(checked === true)}
               />
               <Label htmlFor="morningBM" className="cursor-pointer">
-                Είχα κένωση το πρωί
+                {t('userDashboard.progress.morningBM')}
               </Label>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Σημειώσεις / Αποκλίσεις / Σχόλια</Label>
+              <Label htmlFor="notes">{t('userDashboard.progress.notes')}</Label>
               <Textarea
                 id="notes"
                 value={notes}
@@ -211,10 +213,10 @@ const UserProgress = () => {
             <div className="flex gap-2">
               <Button onClick={handleSave} className="flex-1" disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />
-                {loading ? 'Αποθήκευση...' : 'Αποθήκευση Προόδου'}
+                {loading ? t('common.saving') : t('userDashboard.progress.saveProgress')}
               </Button>
               <Button onClick={() => { setShowAddForm(false); resetForm(); }} variant="outline">
-                Ακύρωση
+                {t('common.cancel')}
               </Button>
             </div>
           </CardContent>
@@ -225,7 +227,7 @@ const UserProgress = () => {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Weight Progress</CardTitle>
+              <CardTitle>{t('userDashboard.progress.weightProgress')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -242,29 +244,29 @@ const UserProgress = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>History</CardTitle>
+              <CardTitle>{t('userDashboard.progress.history')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Day</TableHead>
-                    <TableHead>Weight</TableHead>
-                    <TableHead>Toilet Visits</TableHead>
-                    <TableHead>Morning BM</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('userDashboard.progress.date')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.day')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.weight')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.toiletVisits')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.morningBM')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.notes')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reports.map((report) => (
                     <TableRow key={report.id}>
                       <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
-                      <TableCell>Day {report.day_of_diet}</TableCell>
+                      <TableCell>{t('userDashboard.progress.dayNumber', { day: report.day_of_diet })}</TableCell>
                       <TableCell>{report.weight} kg</TableCell>
-                      <TableCell>{report.wc || 0} times</TableCell>
-                      <TableCell>{report.morning_bm ? '✓ Yes' : '✗ No'}</TableCell>
+                      <TableCell>{report.wc || 0} {t('userDashboard.progress.times')}</TableCell>
+                      <TableCell>{report.morning_bm ? t('userDashboard.progress.yes') : t('userDashboard.progress.no')}</TableCell>
                       <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
                       <TableCell>
                         <Button 
@@ -285,7 +287,7 @@ const UserProgress = () => {
       ) : (
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground">
-            No progress data yet. Start tracking your daily progress!
+            {t('userDashboard.progress.noData')}
           </CardContent>
         </Card>
       )}

@@ -7,10 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Upload } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 const AdminGuidelines = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<Array<{
     id: string;
     name: string;
@@ -58,16 +58,16 @@ const AdminGuidelines = () => {
     if (!file) return;
     if (!selectedUserId) {
       toast({
-        title: 'Σφάλμα',
-        description: 'Παρακαλώ επιλέξτε πρώτα χρήστη',
+        title: t('common.error'),
+        description: t('adminDashboard.guidelines.selectUserFirst'),
         variant: 'destructive'
       });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: 'Σφάλμα',
-        description: 'Το μέγεθος αρχείου πρέπει να είναι μικρότερο από 10MB',
+        title: t('common.error'),
+        description: t('adminDashboard.guidelines.fileTooLarge'),
         variant: 'destructive'
       });
       return;
@@ -90,8 +90,8 @@ const AdminGuidelines = () => {
         if (data?.content) {
           setUserGuidelines(data.content);
           toast({
-            title: 'Επιτυχία',
-            description: 'Το PDF αναλύθηκε επιτυχώς. Μπορείτε τώρα να επεξεργαστείτε και να αποθηκεύσετε τις οδηγίες.'
+            title: t('common.success'),
+            description: t('adminDashboard.guidelines.pdfParsedSuccess')
           });
         }
       };
@@ -99,8 +99,8 @@ const AdminGuidelines = () => {
     } catch (error: any) {
       console.error('PDF upload error:', error);
       toast({
-        title: 'Σφάλμα',
-        description: error.message || 'Αποτυχία ανάλυσης PDF',
+        title: t('common.error'),
+        description: error.message || t('adminDashboard.guidelines.pdfParseFailed'),
         variant: 'destructive'
       });
     } finally {
@@ -111,8 +111,8 @@ const AdminGuidelines = () => {
   const handleSaveUserGuidelines = async () => {
     if (!selectedUserId) {
       toast({
-        title: 'Σφάλμα',
-        description: 'Παρακαλώ επιλέξτε πρώτα χρήστη',
+        title: t('common.error'),
+        description: t('adminDashboard.guidelines.selectUserFirst'),
         variant: 'destructive'
       });
       return;
@@ -136,13 +136,13 @@ const AdminGuidelines = () => {
         if (error) throw error;
       }
       toast({
-        title: 'Επιτυχία',
-        description: 'Οι οδηγίες χρήστη αποθηκεύτηκαν επιτυχώς'
+        title: t('common.success'),
+        description: t('adminDashboard.guidelines.saveSuccess')
       });
       fetchUserGuidelines(selectedUserId);
     } catch (error: any) {
       toast({
-        title: 'Σφάλμα',
+        title: t('common.error'),
         description: error.message,
         variant: 'destructive'
       });
@@ -151,21 +151,21 @@ const AdminGuidelines = () => {
     }
   };
   return <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Οδηγίες Χρηστών</h1>
+      <h1 className="text-3xl font-bold">{t('adminDashboard.guidelines.title')}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Διαχείριση Οδηγιών Χρηστών</CardTitle>
+          <CardTitle>{t('adminDashboard.guidelines.manageTitle')}</CardTitle>
           <CardDescription>
-            Επιλέξτε χρήστη και διαχειριστείτε τις προσωπικές διατροφικές οδηγίες του. Μπορείτε να γράψετε απευθείας ή να ανεβάσετε PDF για εξαγωγή περιεχομένου.
+            {t('adminDashboard.guidelines.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Επιλογή Χρήστη</label>
+            <label className="text-sm font-medium mb-2 block">{t('adminDashboard.guidelines.selectUser')}</label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger>
-                <SelectValue placeholder="Επιλέξτε χρήστη..." />
+                <SelectValue placeholder={t('adminDashboard.guidelines.selectUserPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {users.map(user => <SelectItem key={user.id} value={user.id}>
@@ -182,16 +182,16 @@ const AdminGuidelines = () => {
                   <Button variant="outline" disabled={uploading} asChild>
                     <span>
                       <Upload className="mr-2 h-4 w-4" />
-                      {uploading ? 'Ανέβασμα...' : 'Ανέβασμα PDF'}
+                      {uploading ? t('common.uploading') : t('adminDashboard.guidelines.uploadPdf')}
                     </span>
                   </Button>
                 </label>
               </div>
               
-              <Textarea value={userGuidelines} onChange={e => setUserGuidelines(e.target.value)} placeholder="Εισάγετε διατροφικές οδηγίες για αυτόν τον χρήστη ή ανεβάστε PDF..." rows={20} className="font-mono" />
+              <Textarea value={userGuidelines} onChange={e => setUserGuidelines(e.target.value)} placeholder={t('adminDashboard.guidelines.guidelinesPlaceholder')} rows={20} className="font-mono" />
               <Button onClick={handleSaveUserGuidelines} disabled={userLoading}>
                 <Save className="mr-2 h-4 w-4" />
-                {userLoading ? 'Αποθήκευση...' : 'Αποθήκευση Οδηγιών Χρήστη'}
+                {userLoading ? t('common.saving') : t('adminDashboard.guidelines.saveGuidelines')}
               </Button>
             </>}
         </CardContent>

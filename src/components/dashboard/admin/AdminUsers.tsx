@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const userSchema = z.object({
   email: z.string().email('Μη έγκυρο email'),
@@ -16,6 +17,8 @@ const userSchema = z.object({
 });
 
 const AdminUsers = () => {
+  const { toast } = useToast();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -103,12 +106,12 @@ const AdminUsers = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Χρήστες</h1>
+        <h1 className="text-3xl font-bold">{t('adminDashboard.users.title')}</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Προσθήκη Χρήστη
+              {t('adminDashboard.users.addUser')}
             </Button>
           </DialogTrigger>
           <DialogContent>

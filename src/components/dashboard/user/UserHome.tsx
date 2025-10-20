@@ -9,8 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
-
-const DAYS = ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MealGroup {
   meal_number: number;
@@ -20,6 +19,7 @@ interface MealGroup {
 const UserHome = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [todayMeals, setTodayMeals] = useState<MealGroup[]>([]);
   const [weight, setWeight] = useState('');
   const [toiletVisits, setToiletVisits] = useState('');
@@ -29,6 +29,10 @@ const UserHome = () => {
   const [loading, setLoading] = useState(false);
 
   const today = new Date();
+  const DAYS = [
+    t('days.sunday'), t('days.monday'), t('days.tuesday'), t('days.wednesday'),
+    t('days.thursday'), t('days.friday'), t('days.saturday')
+  ];
   const todayName = DAYS[today.getDay()];
 
   useEffect(() => {
@@ -91,9 +95,9 @@ const UserHome = () => {
 
       if (error) throw error;
 
-      toast({ title: 'Επιτυχία', description: 'Η πρόοδος αποθηκεύτηκε επιτυχώς' });
+      toast({ title: t('common.success'), description: t('userDashboard.home.saveSuccess') });
     } catch (error: any) {
-      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
+      toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -104,19 +108,19 @@ const UserHome = () => {
       <div>
         <h1 className="text-3xl font-bold">{todayName}</h1>
         <p className="text-muted-foreground">
-          {today.toLocaleDateString()} • {dayOfDiet ? `Ημέρα ${dayOfDiet} Διατροφής` : 'Παρακολούθηση Διατροφής'}
+          {today.toLocaleDateString()} • {dayOfDiet ? t('userDashboard.home.dayOfDiet', { day: dayOfDiet }) : t('userDashboard.home.dietTracking')}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Γεύματα Σήμερα</CardTitle>
+          <CardTitle>{t('userDashboard.home.mealsToday')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {todayMeals.length > 0 ? (
             todayMeals.map((mealGroup) => (
               <div key={mealGroup.meal_number}>
-                <h3 className="font-semibold mb-2">Γεύμα {mealGroup.meal_number}</h3>
+                <h3 className="font-semibold mb-2">{t('userDashboard.home.meal')} {mealGroup.meal_number}</h3>
                 <ul className="text-sm space-y-1 list-disc list-inside">
                   {mealGroup.items.map((item, idx) => (
                     <li key={idx}>{item}</li>
@@ -125,18 +129,18 @@ const UserHome = () => {
               </div>
             ))
           ) : (
-            <p className="text-sm text-muted-foreground">Δεν υπάρχουν γεύματα για σήμερα</p>
+            <p className="text-sm text-muted-foreground">{t('userDashboard.home.noMealsToday')}</p>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Πρόοδος Σήμερα</CardTitle>
+          <CardTitle>{t('userDashboard.home.progressToday')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="weight">Βάρος (kg)</Label>
+            <Label htmlFor="weight">{t('userDashboard.home.weight')}</Label>
             <Input
               id="weight"
               type="number"
@@ -148,7 +152,7 @@ const UserHome = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dayOfDiet">Ημέρα Διατροφής</Label>
+            <Label htmlFor="dayOfDiet">{t('userDashboard.home.dayOfDietLabel')}</Label>
             <Input
               id="dayOfDiet"
               type="number"
@@ -160,7 +164,7 @@ const UserHome = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="toiletVisits">Επισκέψεις στην Τουαλέτα (ανά ημέρα)</Label>
+            <Label htmlFor="toiletVisits">{t('userDashboard.home.toiletVisits')}</Label>
             <Input
               id="toiletVisits"
               type="number"
@@ -168,7 +172,7 @@ const UserHome = () => {
               max="20"
               value={toiletVisits}
               onChange={(e) => setToiletVisits(e.target.value)}
-              placeholder="Αριθμός φορών"
+              placeholder={t('userDashboard.home.numberOfTimes')}
             />
           </div>
 
@@ -179,24 +183,24 @@ const UserHome = () => {
               onCheckedChange={(checked) => setMorningBM(checked === true)}
             />
             <Label htmlFor="morningBM" className="cursor-pointer">
-              Είχα κένωση το πρωί
+              {t('userDashboard.home.morningBowelMovement')}
             </Label>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Σημειώσεις / Αποκλίσεις / Σχόλια</Label>
+            <Label htmlFor="notes">{t('userDashboard.home.notes')}</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Παρατηρήσεις, αποκλίσεις από το πρόγραμμα ή σχόλια..."
+              placeholder={t('userDashboard.home.notesPlaceholder')}
               rows={5}
             />
           </div>
 
           <Button onClick={handleSave} className="w-full" disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Αποθήκευση...' : 'Αποθήκευση Προόδου'}
+            {loading ? t('common.saving') : t('userDashboard.home.saveProgress')}
           </Button>
         </CardContent>
       </Card>

@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, Loader2, UtensilsCrossed, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useLanguage } from '@/contexts/LanguageContext';
 interface MealGroup {
   meal_number: number;
   items: string[];
@@ -15,17 +16,17 @@ interface DietPlan {
   meals: MealGroup[];
 }
 const UserDiet = () => {
-  const {
-    user
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { t } = useLanguage();
   const [dietPlans, setDietPlans] = useState<DietPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
-  const days = ['Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο', 'Κυριακή'];
+  const days = [
+    t('days.monday'), t('days.tuesday'), t('days.wednesday'), t('days.thursday'),
+    t('days.friday'), t('days.saturday'), t('days.sunday')
+  ];
   useEffect(() => {
     if (user) {
       fetchDietPlan();
@@ -49,8 +50,8 @@ const UserDiet = () => {
     } catch (error) {
       console.error('Error fetching diet plan:', error);
       toast({
-        title: 'Σφάλμα',
-        description: 'Αποτυχία φόρτωσης του διατροφικού σας προγράμματος',
+        title: t('common.error'),
+        description: t('userDashboard.diet.fetchFailed'),
         variant: 'destructive'
       });
     } finally {
@@ -62,8 +63,8 @@ const UserDiet = () => {
     if (!file || !user) return;
     if (file.size > 20 * 1024 * 1024) {
       toast({
-        title: 'Το αρχείο είναι πολύ μεγάλο',
-        description: 'Παρακαλώ επιλέξτε αρχείο PDF μικρότερο από 20MB',
+        title: t('userDashboard.diet.fileTooBig'),
+        description: t('userDashboard.diet.fileTooBigDesc'),
         variant: 'destructive'
       });
       return;
@@ -95,8 +96,8 @@ const UserDiet = () => {
       });
       if (error) throw error;
       toast({
-        title: 'Επιτυχία!',
-        description: 'Το διατροφικό σας πρόγραμμα ανέβηκε και επεξεργάστηκε'
+        title: t('common.success'),
+        description: t('userDashboard.diet.uploadSuccess')
       });
 
       // Refresh the diet plan
@@ -104,8 +105,8 @@ const UserDiet = () => {
     } catch (error) {
       console.error('Error uploading PDF:', error);
       toast({
-        title: 'Το ανέβασμα απέτυχε',
-        description: error instanceof Error ? error.message : 'Αποτυχία επεξεργασίας του διατροφικού σας προγράμματος',
+        title: t('userDashboard.diet.uploadFailed'),
+        description: error instanceof Error ? error.message : t('userDashboard.diet.processingFailed'),
         variant: 'destructive'
       });
     } finally {
@@ -133,10 +134,10 @@ const UserDiet = () => {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <UtensilsCrossed className="h-8 w-8 text-primary" />
-            Το Διατροφικό μου Πρόγραμμα
+            {t('userDashboard.diet.title')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Ανεβάστε το διατροφικό σας πρόγραμμα σε PDF για να δείτε τα εβδομαδιαία γεύματα
+            {t('userDashboard.diet.subtitle')}
           </p>
         </div>
         
@@ -149,9 +150,9 @@ const UserDiet = () => {
       {dietPlans.length === 0 ? <Card className="text-center py-12">
           <CardHeader>
             <UtensilsCrossed className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <CardTitle>Δεν Υπάρχει Διατροφικό Πρόγραμμα Ακόμα</CardTitle>
+            <CardTitle>{t('userDashboard.diet.noDietPlan')}</CardTitle>
             <CardDescription className="text-base">
-              Ανεβάστε το διατροφικό σας πρόγραμμα σε PDF για να ξεκινήσετε. Το σύστημα θα το αναλύσει αυτόματα και θα εμφανίσει τα καθημερινά σας γεύματα.
+              {t('userDashboard.diet.noDietPlanDesc')}
             </CardDescription>
           </CardHeader>
         </Card> : <div className="space-y-3">
@@ -169,7 +170,7 @@ const UserDiet = () => {
                       <div className="flex items-center gap-2">
                         <CardTitle className="text-xl">
                           {day}
-                          {isToday && <span className="ml-2 text-sm font-normal text-primary">(Σήμερα)</span>}
+                          {isToday && <span className="ml-2 text-sm font-normal text-primary">({t('userDashboard.diet.today')})</span>}
                         </CardTitle>
                       </div>
                       {isOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
@@ -183,7 +184,7 @@ const UserDiet = () => {
                                 <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
                                   {mealGroup.meal_number || index + 1}
                                 </div>
-                                <h4 className="font-semibold text-base">Γεύμα {mealGroup.meal_number || index + 1}</h4>
+                                <h4 className="font-semibold text-base">{t('userDashboard.diet.meal')} {mealGroup.meal_number || index + 1}</h4>
                               </div>
                               <div className="ml-10 space-y-1">
                                 {mealGroup.items.map((item, itemIndex) => <p key={itemIndex} className="text-sm leading-relaxed">
@@ -191,7 +192,7 @@ const UserDiet = () => {
                                   </p>)}
                               </div>
                             </div>)}
-                        </div> : <p className="text-muted-foreground text-sm">Δεν υπάρχουν γεύματα για αυτή την ημέρα</p>}
+                        </div> : <p className="text-muted-foreground text-sm">{t('userDashboard.diet.noMeals')}</p>}
                     </CardContent>
                   </CollapsibleContent>
                 </Collapsible>

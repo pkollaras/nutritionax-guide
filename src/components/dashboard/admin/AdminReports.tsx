@@ -4,8 +4,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AdminReports = () => {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [reports, setReports] = useState<any[]>([]);
@@ -42,16 +44,16 @@ const AdminReports = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Αναφορές</h1>
+      <h1 className="text-3xl font-bold">{t('adminDashboard.reports.title')}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Επιλογή Χρήστη</CardTitle>
+          <CardTitle>{t('adminDashboard.reports.selectUser')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Select value={selectedUser} onValueChange={setSelectedUser}>
             <SelectTrigger>
-              <SelectValue placeholder="Επιλέξτε χρήστη" />
+              <SelectValue placeholder={t('adminDashboard.reports.selectUserPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (

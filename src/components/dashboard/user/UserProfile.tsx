@@ -7,10 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Mail } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const UserProfile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -43,9 +45,9 @@ const UserProfile = () => {
 
       if (error) throw error;
 
-      toast({ title: 'Επιτυχία', description: 'Το προφίλ ενημερώθηκε επιτυχώς' });
+      toast({ title: t('common.success'), description: t('userDashboard.profile.saveSuccess') });
     } catch (error: any) {
-      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
+      toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -53,15 +55,15 @@ const UserProfile = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Προφίλ</h1>
+      <h1 className="text-3xl font-bold">{t('userDashboard.profile.title')}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Προσωπικές Πληροφορίες</CardTitle>
+          <CardTitle>{t('userDashboard.profile.personalInfo')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Ονοματεπώνυμο</Label>
+            <Label htmlFor="name">{t('userDashboard.profile.fullName')}</Label>
             <Input
               id="name"
               value={name}
@@ -70,7 +72,7 @@ const UserProfile = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('userDashboard.profile.email')}</Label>
             <Input
               id="email"
               value={user?.email || ''}
@@ -80,14 +82,14 @@ const UserProfile = () => {
 
           <Button onClick={handleSave} disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Αποθήκευση...' : 'Αποθήκευση Αλλαγών'}
+            {loading ? t('common.saving') : t('userDashboard.profile.saveChanges')}
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Επικοινωνία με Nutritionax</CardTitle>
+          <CardTitle>{t('userDashboard.profile.contactNutritionax')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Button variant="outline" asChild>

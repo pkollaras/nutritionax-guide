@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getTranslation } from '@/i18n/translations';
 
 interface AuthContextType {
   user: User | null;
@@ -145,13 +146,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await supabase.auth.signOut();
       setUserRole(null);
+      const lang = localStorage.getItem('nutritionax-language') as 'el' | 'en' || 'el';
       toast({
-        title: "Signed Out",
-        description: "You have been signed out successfully.",
+        title: getTranslation(lang, 'auth.signedOut'),
+        description: getTranslation(lang, 'auth.signedOutSuccess'),
       });
     } catch (error: any) {
+      const lang = localStorage.getItem('nutritionax-language') as 'el' | 'en' || 'el';
       toast({
-        title: "Error",
+        title: getTranslation(lang, 'common.error'),
         description: error.message,
         variant: "destructive",
       });

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ShoppingCart, Loader2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ShoppingItem {
   name: string;
@@ -25,6 +26,7 @@ interface ShoppingListData {
 
 const UserShoppingList = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [shoppingList, setShoppingList] = useState<ShoppingListData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,7 @@ const UserShoppingList = () => {
       if (data.error) {
         setError(data.message || data.error);
         toast({
-          title: 'Σφάλμα',
+          title: t('common.error'),
           description: data.message || data.error,
           variant: 'destructive',
         });
@@ -58,15 +60,15 @@ const UserShoppingList = () => {
 
       setShoppingList(data);
       toast({
-        title: 'Επιτυχία!',
-        description: 'Η λίστα αγορών δημιουργήθηκε επιτυχώς',
+        title: t('common.success'),
+        description: t('userDashboard.shoppingList.generateSuccess'),
       });
     } catch (err: any) {
       console.error('Error generating shopping list:', err);
       setError(err.message || 'Failed to generate shopping list');
       toast({
-        title: 'Σφάλμα',
-        description: err.message || 'Αποτυχία δημιουργίας λίστας αγορών',
+        title: t('common.error'),
+        description: err.message || t('userDashboard.shoppingList.generateFailed'),
         variant: 'destructive',
       });
     } finally {
@@ -88,10 +90,10 @@ const UserShoppingList = () => {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <ShoppingCart className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Λίστα Αγορών</h1>
+          <h1 className="text-3xl font-bold">{t('userDashboard.shoppingList.title')}</h1>
         </div>
         <p className="text-muted-foreground">
-          Δημιουργήστε τη λίστα αγορών της εβδομάδας από το πρόγραμμα διατροφής σας
+          {t('userDashboard.shoppingList.subtitle')}
         </p>
       </div>
 
@@ -99,9 +101,9 @@ const UserShoppingList = () => {
       {!shoppingList && !error && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Δημιουργία Λίστας</CardTitle>
+            <CardTitle>{t('userDashboard.shoppingList.generateTitle')}</CardTitle>
             <CardDescription>
-              Το σύστημα θα αναλύσει τη διατροφή σας και θα δημιουργήσει μια πλήρη λίστα αγορών για την εβδομάδα
+              {t('userDashboard.shoppingList.generateDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -114,12 +116,12 @@ const UserShoppingList = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Δημιουργία Λίστας...
+                  {t('userDashboard.shoppingList.generating')}
                 </>
               ) : (
                 <>
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  Δημιουργία Λίστας Αγορών
+                  {t('userDashboard.shoppingList.generateButton')}
                 </>
               )}
             </Button>
@@ -133,7 +135,7 @@ const UserShoppingList = () => {
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
-              <CardTitle className="text-destructive">Σφάλμα</CardTitle>
+              <CardTitle className="text-destructive">{t('common.error')}</CardTitle>
             </div>
             <CardDescription>{error}</CardDescription>
           </CardHeader>
@@ -142,7 +144,7 @@ const UserShoppingList = () => {
               onClick={generateShoppingList}
               variant="outline"
             >
-              Προσπάθεια Ξανά
+              {t('userDashboard.shoppingList.tryAgain')}
             </Button>
           </CardContent>
         </Card>
@@ -154,13 +156,13 @@ const UserShoppingList = () => {
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Λίστα Αγορών Εβδομάδας</CardTitle>
+                <CardTitle>{t('userDashboard.shoppingList.weeklyList')}</CardTitle>
                 <Button 
                   onClick={generateShoppingList}
                   variant="outline"
                   size="sm"
                 >
-                  Ανανέωση
+                  {t('userDashboard.shoppingList.refresh')}
                 </Button>
               </div>
               {shoppingList.summary && (
