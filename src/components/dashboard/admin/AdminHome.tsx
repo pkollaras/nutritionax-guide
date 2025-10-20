@@ -17,19 +17,34 @@ const AdminHome = () => {
   }, []);
 
   const fetchStats = async () => {
+    // Get all admin user IDs
+    const { data: adminRoles } = await supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'admin');
+
+    const adminUserIds = adminRoles?.map(r => r.user_id) || [];
+
+    // Get total users excluding admins
     const { data: users } = await supabase
       .from('profiles')
-      .select('id');
+      .select('id')
+      .not('id', 'in', `(${adminUserIds.length > 0 ? adminUserIds.join(',') : 'null'})`);
 
     const today = new Date().toISOString().split('T')[0];
+    
+    // Get today's reports excluding admins
     const { data: todayReports } = await supabase
       .from('progress_reports')
       .select('user_id')
-      .eq('date', today);
+      .eq('date', today)
+      .not('user_id', 'in', `(${adminUserIds.length > 0 ? adminUserIds.join(',') : 'null'})`);
 
+    // Get latest weights excluding admins
     const { data: latestWeights } = await supabase
       .from('progress_reports')
       .select('weight')
+      .not('user_id', 'in', `(${adminUserIds.length > 0 ? adminUserIds.join(',') : 'null'})`)
       .order('date', { ascending: false })
       .limit(10);
 
