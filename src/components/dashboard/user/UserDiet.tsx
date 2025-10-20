@@ -164,8 +164,8 @@ const UserDiet = () => {
         const isToday = day === today;
         return <Card key={day} className={isToday ? 'border-primary' : ''}>
                 <Collapsible open={isOpen} onOpenChange={() => toggleDay(day)}>
-                  <CardHeader className="cursor-pointer" onClick={() => toggleDay(day)}>
-                    <CollapsibleTrigger className="flex items-center justify-between w-full">
+                  <CardHeader>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full cursor-pointer">
                       <div className="flex items-center gap-2">
                         <CardTitle className="text-xl">
                           {day}
