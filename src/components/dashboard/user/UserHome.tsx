@@ -5,6 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +37,10 @@ const UserHome = () => {
   const [notes, setNotes] = useState('');
   const [dayOfDiet, setDayOfDiet] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState<MealGroup | null>(null);
+  const [showSkipDialog, setShowSkipDialog] = useState(false);
+  const [showReplaceDialog, setShowReplaceDialog] = useState(false);
+  const [replacementText, setReplacementText] = useState('');
 
   const today = new Date();
   
@@ -112,6 +126,51 @@ const UserHome = () => {
     // If no data exists, fields remain empty (from the date change clear)
   };
 
+  const handleSkipMeal = (meal: MealGroup) => {
+    setSelectedMeal(meal);
+    setShowSkipDialog(true);
+  };
+
+  const confirmSkipMeal = () => {
+    if (!selectedMeal) return;
+    
+    const mealItems = selectedMeal.items.join(', ');
+    const noteText = `Παράκαμψη γεύματος ${selectedMeal.meal_number} (${mealItems})`;
+    
+    setNotes(prev => prev ? `${prev}\n${noteText}` : noteText);
+    
+    setShowSkipDialog(false);
+    setSelectedMeal(null);
+    
+    toast({ 
+      title: t('common.success'), 
+      description: t('userDashboard.home.mealActionRecorded')
+    });
+  };
+
+  const handleReplaceMeal = (meal: MealGroup) => {
+    setSelectedMeal(meal);
+    setShowReplaceDialog(true);
+  };
+
+  const confirmReplaceMeal = () => {
+    if (!selectedMeal || !replacementText.trim()) return;
+    
+    const mealItems = selectedMeal.items.join(', ');
+    const noteText = `Αντικατάσταση γεύματος ${selectedMeal.meal_number} (${mealItems}) → με (${replacementText})`;
+    
+    setNotes(prev => prev ? `${prev}\n${noteText}` : noteText);
+    
+    setShowReplaceDialog(false);
+    setSelectedMeal(null);
+    setReplacementText('');
+    
+    toast({ 
+      title: t('common.success'), 
+      description: t('userDashboard.home.mealActionRecorded')
+    });
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
@@ -159,8 +218,26 @@ const UserHome = () => {
         <CardContent className="space-y-4">
           {todayMeals.length > 0 ? (
             todayMeals.map((mealGroup) => (
-              <div key={mealGroup.meal_number}>
-                <h3 className="font-semibold mb-2">{t('userDashboard.home.meal')} {mealGroup.meal_number}</h3>
+              <div key={mealGroup.meal_number} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">{t('userDashboard.home.meal')} {mealGroup.meal_number}</h3>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleSkipMeal(mealGroup)}
+                    >
+                      {t('userDashboard.home.mealSkipped')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleReplaceMeal(mealGroup)}
+                    >
+                      {t('userDashboard.home.mealReplaced')}
+                    </Button>
+                  </div>
+                </div>
                 <ul className="text-sm space-y-1 list-disc list-inside">
                   {mealGroup.items.map((item, idx) => (
                     <li key={idx}>{item}</li>
@@ -244,6 +321,61 @@ const UserHome = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Skip Meal Dialog */}
+      <AlertDialog open={showSkipDialog} onOpenChange={setShowSkipDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedMeal && `Παρακάμψατε το Γεύμα ${selectedMeal.meal_number};`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedMeal && `Το γεύμα περιείχε: ${selectedMeal.items.join(', ')}`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSkipMeal}>
+              {t('userDashboard.home.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Replace Meal Dialog */}
+      <AlertDialog open={showReplaceDialog} onOpenChange={setShowReplaceDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedMeal && `Αντικαταστήσατε το Γεύμα ${selectedMeal.meal_number};`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedMeal && `Το γεύμα περιείχε: ${selectedMeal.items.join(', ')}`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="replacement">{t('userDashboard.home.replaceWithLabel')}</Label>
+            <Input
+              id="replacement"
+              value={replacementText}
+              onChange={(e) => setReplacementText(e.target.value)}
+              placeholder={t('userDashboard.home.replaceWithPlaceholder')}
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setReplacementText('')}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmReplaceMeal}
+              disabled={!replacementText.trim()}
+            >
+              {t('userDashboard.home.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
