@@ -109,8 +109,23 @@ Extract all food items for each meal (Γεύμα) including quantities. Keep the
     if (!dietPlanText) {
       throw new Error('No content returned from Gemini');
     }
-    const dietPlan = JSON.parse(dietPlanText);
-    console.log('Parsed diet plan:', dietPlan);
+    let dietPlan = JSON.parse(dietPlanText);
+    console.log('Raw parsed response:', dietPlan);
+    
+    // Handle case where Gemini returns an array
+    if (Array.isArray(dietPlan)) {
+      if (dietPlan.length === 0) {
+        throw new Error('Gemini returned empty array');
+      }
+      dietPlan = dietPlan[0]; // Extract the first element
+      console.log('Extracted diet plan from array:', dietPlan);
+    }
+    
+    // Validate the structure
+    if (!dietPlan || typeof dietPlan !== 'object') {
+      throw new Error('Invalid diet plan format');
+    }
+    console.log('Final diet plan structure:', Object.keys(dietPlan));
 
     // Save to database (reuse supabase client from auth check)
     // Delete existing diet plans for this user
@@ -136,6 +151,7 @@ Extract all food items for each meal (Γεύμα) including quantities. Keep the
           console.error(`Error inserting ${day}:`, error);
           throw error;
         }
+        console.log(`Successfully inserted ${day} with ${dietPlan[day].length} meals`);
       }
     }
 
