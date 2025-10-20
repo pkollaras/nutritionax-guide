@@ -20,7 +20,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const UserProgress = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [reports, setReports] = useState<any[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -119,6 +119,12 @@ const UserProgress = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDayName = (date: string) => {
+    const dayIndex = new Date(date).getDay();
+    const dayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return t(`days.${dayKeys[dayIndex]}`);
   };
 
   const chartData = reports.map((report) => ({
@@ -268,6 +274,7 @@ const UserProgress = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('userDashboard.progress.date')}</TableHead>
+                    <TableHead>{t('userDashboard.progress.dayOfWeek')}</TableHead>
                     <TableHead>{t('userDashboard.progress.day')}</TableHead>
                     <TableHead>{t('userDashboard.progress.weight')}</TableHead>
                     <TableHead>{t('userDashboard.progress.toiletVisits')}</TableHead>
@@ -280,6 +287,7 @@ const UserProgress = () => {
                   {reports.map((report) => (
                     <TableRow key={report.id}>
                       <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
+                      <TableCell>{getDayName(report.date)}</TableCell>
                       <TableCell>{t('userDashboard.progress.dayNumber', { day: report.day_of_diet })}</TableCell>
                       <TableCell>{report.weight} kg</TableCell>
                       <TableCell>{report.wc || 0} {t('userDashboard.progress.times')}</TableCell>
