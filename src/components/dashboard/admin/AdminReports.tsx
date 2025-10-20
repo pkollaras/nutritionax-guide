@@ -80,8 +80,8 @@ const AdminReports = () => {
   }));
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">{t('adminDashboard.reports.title')}</h1>
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <h1 className="text-2xl sm:text-3xl font-bold">{t('adminDashboard.reports.title')}</h1>
 
       <Card>
         <CardHeader>
@@ -109,12 +109,18 @@ const AdminReports = () => {
             <CardHeader>
               <CardTitle>{t('adminDashboard.reports.weightProgressTitle')}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-2 sm:p-6">
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2} />
                 </LineChart>
@@ -127,59 +133,132 @@ const AdminReports = () => {
               <CardTitle>{t('adminDashboard.reports.progressHistoryTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('adminDashboard.reports.dateHeader')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.dayOfWeek')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.dayHeader')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.weightHeader')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.toiletVisitsHeader')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.morningBMHeader')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.notesHeader')}</TableHead>
-                    <TableHead>{t('adminDashboard.reports.actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {reports.map((report) => (
-                    <TableRow key={report.id}>
-                      <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
-                      <TableCell>{getDayName(report.date)}</TableCell>
-                      <TableCell>{t('adminDashboard.reports.dayNumber', { day: report.day_of_diet })}</TableCell>
-                      <TableCell>{report.weight} kg</TableCell>
-                      <TableCell>{report.wc || 0} {t('adminDashboard.reports.times')}</TableCell>
-                      <TableCell>{report.morning_bm ? t('adminDashboard.reports.yes') : t('adminDashboard.reports.no')}</TableCell>
-                      <TableCell className="max-w-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate">{report.notes}</span>
-                          {shouldShowViewAllButton(report.notes) && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedNotes(report.notes);
-                                setNotesDialogOpen(true);
-                              }}
-                            >
-                              {t('common.viewAll')}
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDiet(report.date)}
-                        >
-                          <UtensilsCrossed className="h-4 w-4" />
-                          {t('adminDashboard.reports.viewDiet')}
-                        </Button>
-                      </TableCell>
+              {/* Desktop Table - Hidden on mobile */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t('adminDashboard.reports.dateHeader')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.dayOfWeek')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.dayHeader')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.weightHeader')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.toiletVisitsHeader')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.morningBMHeader')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.notesHeader')}</TableHead>
+                      <TableHead>{t('adminDashboard.reports.actions')}</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {reports.map((report) => (
+                      <TableRow key={report.id}>
+                        <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{getDayName(report.date)}</TableCell>
+                        <TableCell>{t('adminDashboard.reports.dayNumber', { day: report.day_of_diet })}</TableCell>
+                        <TableCell>{report.weight} kg</TableCell>
+                        <TableCell>{report.wc || 0} {t('adminDashboard.reports.times')}</TableCell>
+                        <TableCell>{report.morning_bm ? t('adminDashboard.reports.yes') : t('adminDashboard.reports.no')}</TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate">{report.notes}</span>
+                            {shouldShowViewAllButton(report.notes) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedNotes(report.notes);
+                                  setNotesDialogOpen(true);
+                                }}
+                              >
+                                {t('common.viewAll')}
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDiet(report.date)}
+                          >
+                            <UtensilsCrossed className="h-4 w-4" />
+                            {t('adminDashboard.reports.viewDiet')}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile Cards - Hidden on desktop */}
+              <div className="md:hidden space-y-4">
+                {reports.map((report) => (
+                  <Card key={report.id} className="border-2">
+                    <CardContent className="pt-6">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">
+                              {new Date(report.date).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {getDayName(report.date)}
+                            </p>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewDiet(report.date)}
+                          >
+                            <UtensilsCrossed className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">{t('adminDashboard.reports.dayHeader')}:</span>
+                            <span className="ml-2 font-medium">{report.day_of_diet || '-'}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">{t('adminDashboard.reports.weightHeader')}:</span>
+                            <span className="ml-2 font-medium">{report.weight} kg</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">WC:</span>
+                            <span className="ml-2 font-medium">{report.wc || 0}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">{t('adminDashboard.reports.morningBMHeader')}:</span>
+                            <span className="ml-2 font-medium">
+                              {report.morning_bm ? '✓' : '✗'}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {report.notes && (
+                          <div className="text-sm pt-2 border-t">
+                            <p className="text-muted-foreground mb-1">{t('adminDashboard.reports.notesHeader')}:</p>
+                            <p className="line-clamp-2">{report.notes}</p>
+                            {shouldShowViewAllButton(report.notes) && (
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="px-0 h-auto mt-1"
+                                onClick={() => {
+                                  setSelectedNotes(report.notes);
+                                  setNotesDialogOpen(true);
+                                }}
+                              >
+                                {t('common.viewAll')}
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </>
