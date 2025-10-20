@@ -80,9 +80,22 @@ const AdminDiets = () => {
   };
 
   const updateMeal = (day: string, mealIndex: number, content: string) => {
-    const currentMeals = dietPlans[day] || ['', '', '', '', ''];
+    const currentMeals = dietPlans[day] || [
+      { meal_number: 1, items: [] },
+      { meal_number: 2, items: [] },
+      { meal_number: 3, items: [] },
+      { meal_number: 4, items: [] },
+      { meal_number: 5, items: [] }
+    ];
     const newMeals = [...currentMeals];
-    newMeals[mealIndex] = content;
+    
+    // Split content by lines to create items array
+    const items = content.split('\n').filter(line => line.trim() !== '');
+    newMeals[mealIndex] = {
+      meal_number: mealIndex + 1,
+      items: items
+    };
+    
     setDietPlans({ ...dietPlans, [day]: newMeals });
   };
 
@@ -213,17 +226,22 @@ const AdminDiets = () => {
                 <CardTitle>{day}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {[0, 1, 2, 3, 4].map((mealIndex) => (
-                  <div key={mealIndex} className="space-y-2">
-                    <Label>Meal {mealIndex + 1}</Label>
-                    <Textarea
-                      placeholder={`Describe meal ${mealIndex + 1}...`}
-                      value={(dietPlans[day] || [])[mealIndex] || ''}
-                      onChange={(e) => updateMeal(day, mealIndex, e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                ))}
+                {[0, 1, 2, 3, 4].map((mealIndex) => {
+                  const mealGroup = (dietPlans[day] || [])[mealIndex] || { meal_number: mealIndex + 1, items: [] };
+                  const mealText = mealGroup.items.join('\n');
+                  
+                  return (
+                    <div key={mealIndex} className="space-y-2">
+                      <Label>Meal {mealIndex + 1}</Label>
+                      <Textarea
+                        placeholder={`Enter food items for meal ${mealIndex + 1}, one per line...`}
+                        value={mealText}
+                        onChange={(e) => updateMeal(day, mealIndex, e.target.value)}
+                        rows={5}
+                      />
+                    </div>
+                  );
+                })}
               </CardContent>
             </Card>
           ))}

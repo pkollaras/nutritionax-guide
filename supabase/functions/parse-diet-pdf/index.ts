@@ -49,7 +49,9 @@ serve(async (req) => {
     }
 
     const systemPrompt = `You are a diet plan parser. Extract diet information from Greek diet plans and return JSON.
-            
+
+IMPORTANT: Group food items by their meal designation (Γεύμα 1, Γεύμα 2, etc.).
+
 Map Greek days to English:
 - ΔΕΥΤΕΡΑ = Monday
 - ΤΡΙΤΗ = Tuesday  
@@ -63,12 +65,23 @@ Map Greek days to English:
 
 Return JSON with this structure:
 {
-  "Monday": ["meal1 text", "meal2 text", "meal3 text", "meal4 text", "meal5 text"],
-  "Tuesday": ["meal1 text", ...],
+  "Monday": [
+    {
+      "meal_number": 1,
+      "items": ["food item 1 with quantity", "food item 2 with quantity", ...]
+    },
+    {
+      "meal_number": 2,
+      "items": ["food item 1 with quantity", ...]
+    }
+  ],
+  "Tuesday": [...],
   ...
 }
 
-Extract all food items for each meal (Γεύμα) including quantities. Keep the original Greek text.`;
+Each meal (Γεύμα) should have its own object with all food items that belong to it.
+Keep the original Greek text for food items with quantities.
+If no meal designation is clear, group items logically (typically 3-6 items per meal).`;
 
     // Call Google Gemini API directly with vision to parse the diet plan from PDF
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {

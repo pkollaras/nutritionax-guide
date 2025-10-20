@@ -7,9 +7,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, Loader2, UtensilsCrossed, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
+interface MealGroup {
+  meal_number: number;
+  items: string[];
+}
+
 interface DietPlan {
   day_of_week: string;
-  meals: string[];
+  meals: MealGroup[];
 }
 
 const UserDiet = () => {
@@ -40,10 +45,10 @@ const UserDiet = () => {
 
       if (error) throw error;
 
-      // Cast meals from Json to string[]
+      // Cast meals from Json to MealGroup[]
       const typedData = (data || []).map(plan => ({
         day_of_week: plan.day_of_week,
-        meals: plan.meals as string[]
+        meals: plan.meals as unknown as MealGroup[]
       }));
 
       setDietPlans(typedData);
@@ -219,14 +224,21 @@ const UserDiet = () => {
                   <CollapsibleContent>
                     <CardContent>
                       {dayPlan ? (
-                        <div className="space-y-4">
-                          {dayPlan.meals.map((meal, index) => (
-                            <div key={index} className="flex gap-3">
-                              <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
-                                {index + 1}
+                        <div className="space-y-6">
+                          {dayPlan.meals.map((mealGroup, index) => (
+                            <div key={index} className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+                                  {mealGroup.meal_number || index + 1}
+                                </div>
+                                <h4 className="font-semibold text-base">Meal {mealGroup.meal_number || index + 1}</h4>
                               </div>
-                              <div className="flex-1">
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{meal}</p>
+                              <div className="ml-10 space-y-1">
+                                {mealGroup.items.map((item, itemIndex) => (
+                                  <p key={itemIndex} className="text-sm leading-relaxed">
+                                    • {item}
+                                  </p>
+                                ))}
                               </div>
                             </div>
                           ))}
