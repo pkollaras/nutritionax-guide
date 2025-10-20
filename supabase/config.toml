@@ -84,3 +84,6 @@ verify_jwt = true
 
 [functions.parse-diet-pdf]
 verify_jwt = true
+
+[functions.parse-guidelines-pdf]
+verify_jwt = true
