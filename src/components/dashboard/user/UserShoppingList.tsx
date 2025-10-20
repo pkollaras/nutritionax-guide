@@ -10,6 +10,7 @@ interface ShoppingItem {
   name: string;
   quantity: string;
   notes?: string;
+  checked?: boolean;
 }
 
 interface CategoryData {
@@ -128,6 +129,40 @@ const UserShoppingList = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCheckItem = async (categoryIndex: number, itemIndex: number, checked: boolean) => {
+    if (!shoppingList) return;
+
+    // Update local state
+    const updatedCategories = [...shoppingList.categories];
+    updatedCategories[categoryIndex].items[itemIndex].checked = checked;
+    
+    setShoppingList({
+      ...shoppingList,
+      categories: updatedCategories
+    });
+
+    // Save to database
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('shopping_lists')
+        .update({ items: updatedCategories as any })
+        .eq('user_id', user.id)
+        .eq('week_start_date', shoppingList.weekStartDate);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error updating item:', err);
+      toast({
+        title: t('common.error'),
+        description: 'Αποτυχία αποθήκευσης',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -267,12 +302,14 @@ const UserShoppingList = () => {
                       <li key={itemIdx} className="flex items-start gap-3 p-2 rounded hover:bg-muted/50">
                         <input 
                           type="checkbox" 
-                          className="mt-1 h-4 w-4 rounded border-gray-300"
+                          className="mt-1 h-4 w-4 rounded border-gray-300 cursor-pointer"
                           id={`item-${idx}-${itemIdx}`}
+                          checked={item.checked || false}
+                          onChange={(e) => handleCheckItem(idx, itemIdx, e.target.checked)}
                         />
                         <label 
                           htmlFor={`item-${idx}-${itemIdx}`}
-                          className="flex-1 cursor-pointer"
+                          className={`flex-1 cursor-pointer ${item.checked ? 'line-through text-muted-foreground' : ''}`}
                         >
                           <span className="font-medium">{item.name}</span>
                           {' - '}
