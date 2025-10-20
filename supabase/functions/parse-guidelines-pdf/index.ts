@@ -40,13 +40,27 @@ serve(async (req) => {
       );
     }
 
-    // Check if user is admin
-    const { data: roleData } = await supabase
+    // Create service role client to bypass RLS for admin check
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Check if user is admin using service role client
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('role', 'admin')
       .maybeSingle();
+
+    if (roleError) {
+      console.error('Error checking admin role:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'Error verifying admin status' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!roleData) {
       return new Response(
