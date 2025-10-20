@@ -6,6 +6,49 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function callGeminiWithFallback(
+  endpoint: string,
+  body: any,
+  primaryKey: string,
+  secondaryKey: string | null
+): Promise<Response> {
+  console.log('Attempting Gemini API call with primary key...');
+  
+  const primaryResponse = await fetch(endpoint.replace('{KEY}', primaryKey), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (primaryResponse.ok || !secondaryKey) {
+    if (primaryResponse.ok) {
+      console.log('Primary key successful');
+    }
+    return primaryResponse;
+  }
+
+  const status = primaryResponse.status;
+  if (status === 429 || status === 403) {
+    console.log(`Primary key rate limited (${status}), trying secondary key...`);
+    
+    const secondaryResponse = await fetch(endpoint.replace('{KEY}', secondaryKey), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (secondaryResponse.ok) {
+      console.log('Secondary key successful');
+    } else {
+      console.log(`Secondary key also failed: ${secondaryResponse.status}`);
+    }
+    
+    return secondaryResponse;
+  }
+
+  return primaryResponse;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -44,6 +87,8 @@ serve(async (req) => {
     }
 
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    const GEMINI_API_KEY_2 = Deno.env.get('GEMINI_API_KEY_2');
+    
     if (!GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY is not configured');
     }
@@ -83,13 +128,10 @@ Each meal (Γεύμα) should have its own object with all food items that belon
 Keep the original Greek text for food items with quantities.
 If no meal designation is clear, group items logically (typically 3-6 items per meal).`;
 
-    // Call Google Gemini API directly with vision to parse the diet plan from PDF
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    // Call Google Gemini API with fallback
+    const response = await callGeminiWithFallback(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={KEY}',
+      {
         contents: [
           {
             parts: [
@@ -108,13 +150,23 @@ If no meal designation is clear, group items logically (typically 3-6 items per 
         generationConfig: {
           response_mime_type: 'application/json'
         }
-      }),
-    });
+      },
+      GEMINI_API_KEY,
+      GEMINI_API_KEY_2 || null
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
+      const status = response.status;
+      
+      console.error('Gemini API error:', status, errorText);
+      
+      let errorMessage = `Gemini API error: ${status}`;
+      if (status === 429 || status === 403) {
+        errorMessage = 'Rate limit exceeded on all available API keys. Please try again later.';
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();

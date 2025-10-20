@@ -6,6 +6,49 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function callGeminiWithFallback(
+  endpoint: string,
+  body: any,
+  primaryKey: string,
+  secondaryKey: string | null
+): Promise<Response> {
+  console.log('Attempting Gemini API call with primary key...');
+  
+  const primaryResponse = await fetch(endpoint.replace('{KEY}', primaryKey), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (primaryResponse.ok || !secondaryKey) {
+    if (primaryResponse.ok) {
+      console.log('Primary key successful');
+    }
+    return primaryResponse;
+  }
+
+  const status = primaryResponse.status;
+  if (status === 429 || status === 403) {
+    console.log(`Primary key rate limited (${status}), trying secondary key...`);
+    
+    const secondaryResponse = await fetch(endpoint.replace('{KEY}', secondaryKey), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (secondaryResponse.ok) {
+      console.log('Secondary key successful');
+    } else {
+      console.log(`Secondary key also failed: ${secondaryResponse.status}`);
+    }
+    
+    return secondaryResponse;
+  }
+
+  return primaryResponse;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -96,8 +139,10 @@ ${JSON.stringify(allMeals, null, 2)}
 
 Απάντησε ΜΟΝΟ με το JSON object, χωρίς επιπλέον κείμενο.`;
 
-    // Call Gemini API
+    // Call Gemini API with fallback
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    const GEMINI_API_KEY_2 = Deno.env.get('GEMINI_API_KEY_2');
+
     if (!GEMINI_API_KEY) {
       return new Response(
         JSON.stringify({ error: 'Gemini API key not configured' }),
@@ -105,30 +150,34 @@ ${JSON.stringify(allMeals, null, 2)}
       );
     }
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+    const geminiResponse = await callGeminiWithFallback(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={KEY}',
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 2048,
-          }
-        })
-      }
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 2048,
+        }
+      },
+      GEMINI_API_KEY,
+      GEMINI_API_KEY_2 || null
     );
 
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
-      console.error('Gemini API error:', errorText);
+      const status = geminiResponse.status;
+      
+      console.error('Gemini API error:', status, errorText);
+      
+      let errorMessage = 'AI service unavailable';
+      if (status === 429 || status === 403) {
+        errorMessage = 'Rate limit exceeded on all available API keys. Please try again later.';
+      }
+      
       return new Response(
-        JSON.stringify({ error: 'AI service unavailable' }),
+        JSON.stringify({ error: errorMessage }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
