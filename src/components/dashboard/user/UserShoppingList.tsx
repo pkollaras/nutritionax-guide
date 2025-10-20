@@ -117,6 +117,10 @@ const UserShoppingList = () => {
       }
 
       setShoppingList(data);
+      
+      // Reload from database to ensure we have the latest saved data
+      await loadExistingShoppingList();
+      
       toast({
         title: t('common.success'),
         description: t('userDashboard.shoppingList.generateSuccess'),
