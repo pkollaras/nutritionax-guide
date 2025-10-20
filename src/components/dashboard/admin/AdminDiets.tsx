@@ -159,6 +159,19 @@ const AdminDiets = () => {
     setUploading(true);
 
     try {
+      // Refresh session to ensure we have a valid token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast({
+          title: t('common.error'),
+          description: 'Session expired. Please log in again',
+          variant: 'destructive',
+        });
+        window.location.href = '/auth';
+        return;
+      }
+      
       // Convert PDF to base64
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
@@ -182,7 +195,19 @@ const AdminDiets = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check for auth errors
+        if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+          toast({
+            title: t('common.error'),
+            description: 'Session expired. Please log in again',
+            variant: 'destructive',
+          });
+          window.location.href = '/auth';
+          return;
+        }
+        throw error;
+      }
 
       toast({ 
         title: t('common.success'), 

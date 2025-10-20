@@ -25,6 +25,8 @@ export const translations = {
       signIn: 'Σύνδεση',
       signingIn: 'Σύνδεση...',
       signOut: 'Αποσύνδεση',
+      signedOut: 'Αποσυνδεθήκατε',
+      signedOutSuccess: 'Αποσυνδεθήκατε επιτυχώς',
       invalidEmail: 'Μη έγκυρη διεύθυνση email',
       minPassword: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες',
     },
@@ -89,6 +91,7 @@ export const translations = {
         yes: '✓ Ναι',
         no: '✗ Όχι',
         noEntries: 'Δεν υπάρχουν καταχωρίσεις ακόμα',
+        noData: 'Δεν υπάρχουν δεδομένα ακόμα',
         actions: 'Ενέργειες',
       },
       diet: {
@@ -160,6 +163,7 @@ export const translations = {
         noDietDesc: 'Ανεβάστε το διατροφικό σας πρόγραμμα πρώτα',
         generationFailed: 'Αποτυχία δημιουργίας λίστας αγορών',
         listGenerated: 'Η λίστα αγορών δημιουργήθηκε επιτυχώς',
+        tryAgain: 'Δοκιμάστε Ξανά',
       },
     },
     adminDashboard: {
@@ -329,6 +333,8 @@ export const translations = {
       signIn: 'Sign In',
       signingIn: 'Signing in...',
       signOut: 'Sign Out',
+      signedOut: 'Signed Out',
+      signedOutSuccess: 'You have been signed out successfully',
       invalidEmail: 'Invalid email address',
       minPassword: 'Password must be at least 6 characters',
     },
@@ -393,6 +399,7 @@ export const translations = {
         yes: '✓ Yes',
         no: '✗ No',
         noEntries: 'No progress entries yet',
+        noData: 'No data yet',
         actions: 'Actions',
       },
       diet: {
@@ -464,6 +471,7 @@ export const translations = {
         noDietDesc: 'Please upload your diet plan first',
         generationFailed: 'Failed to generate shopping list',
         listGenerated: 'Shopping list generated successfully',
+        tryAgain: 'Try Again',
       },
     },
     adminDashboard: {

@@ -144,13 +144,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      
+      // 403 errors are expected when session is already expired
+      // Treat as successful logout since session is gone anyway
+      if (error && error.status !== 403) {
+        throw error;
+      }
+      
       setUserRole(null);
       const lang = localStorage.getItem('nutritionax-language') as 'el' | 'en' || 'el';
+      
       toast({
         title: getTranslation(lang, 'auth.signedOut'),
         description: getTranslation(lang, 'auth.signedOutSuccess'),
       });
+      
+      // Redirect to auth page after logout
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 500);
+      
     } catch (error: any) {
       const lang = localStorage.getItem('nutritionax-language') as 'el' | 'en' || 'el';
       toast({
