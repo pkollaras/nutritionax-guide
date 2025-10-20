@@ -104,6 +104,10 @@ export const translations = {
         noData: 'Δεν υπάρχουν δεδομένα ακόμα',
         actions: 'Ενέργειες',
         notesTitle: 'Σημειώσεις / Αποκλίσεις / Σχόλια',
+        viewDietPlan: 'Προβολή Προγράμματος',
+        dietPlanFor: 'Πρόγραμμα Διατροφής για',
+        noDietForDay: 'Δεν βρέθηκε πρόγραμμα διατροφής για αυτή την ημέρα',
+        dietFetchError: 'Αδυναμία φόρτωσης προγράμματος διατροφής',
       },
       diet: {
         title: 'Το Διατροφικό μου Πρόγραμμα',
@@ -435,6 +439,10 @@ export const translations = {
         noData: 'No data yet',
         actions: 'Actions',
         notesTitle: 'Notes / Deviations / Comments',
+        viewDietPlan: 'View Diet Plan',
+        dietPlanFor: 'Diet Plan for',
+        noDietForDay: 'No diet plan found for this day',
+        dietFetchError: 'Could not load diet plan',
       },
       diet: {
         title: 'My Diet Plan',

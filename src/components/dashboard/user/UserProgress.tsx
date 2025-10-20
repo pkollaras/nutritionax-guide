@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { CalendarIcon, Plus, Save, Pencil } from 'lucide-react';
+import { CalendarIcon, Plus, Save, Pencil, UtensilsCrossed } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -34,6 +34,8 @@ const UserProgress = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedNotes, setSelectedNotes] = useState('');
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [showDietDialog, setShowDietDialog] = useState(false);
+  const [selectedDayDiet, setSelectedDayDiet] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -71,6 +73,35 @@ const UserProgress = () => {
     setDayOfDiet(report.day_of_diet?.toString() || '');
     setShowAddForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const fetchDietForDate = async (date: Date) => {
+    if (!user) return;
+    
+    const dayIndex = date.getDay();
+    const daysEN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayEN = daysEN[dayIndex];
+    
+    try {
+      const { data, error } = await supabase
+        .from('diet_plans')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('day_of_week', dayEN)
+        .maybeSingle();
+      
+      if (error) throw error;
+      
+      setSelectedDayDiet(data);
+      setShowDietDialog(true);
+    } catch (error) {
+      console.error('Error fetching diet:', error);
+      toast({ 
+        title: t('common.error'), 
+        description: t('userDashboard.progress.dietFetchError'),
+        variant: 'destructive' 
+      });
+    }
   };
 
   const handleSave = async () => {
@@ -180,6 +211,18 @@ const UserProgress = () => {
                   />
                 </PopoverContent>
               </Popover>
+              
+              {selectedDate && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full mt-2"
+                  onClick={() => fetchDietForDate(selectedDate)}
+                >
+                  <UtensilsCrossed className="mr-2 h-4 w-4" />
+                  {t('userDashboard.progress.viewDietPlan')}
+                </Button>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -425,6 +468,47 @@ const UserProgress = () => {
             <DialogTitle>{t('userDashboard.progress.notesTitle')}</DialogTitle>
           </DialogHeader>
           <div className="whitespace-pre-wrap">{selectedNotes}</div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDietDialog} onOpenChange={setShowDietDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDate && (
+                <>
+                  {t('userDashboard.progress.dietPlanFor')} {format(selectedDate, 'EEEE, d MMMM yyyy')}
+                </>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedDayDiet ? (
+            <div className="space-y-6">
+              {selectedDayDiet.meals.map((mealGroup: any, mealIndex: number) => (
+                <div key={mealIndex} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+                      {mealGroup.meal_number || mealIndex + 1}
+                    </div>
+                    <h4 className="font-semibold text-base">
+                      {t('userDashboard.diet.meal')} {mealGroup.meal_number || mealIndex + 1}
+                    </h4>
+                  </div>
+                  <div className="ml-10 space-y-1">
+                    {mealGroup.items.map((item: string, itemIndex: number) => (
+                      <p key={itemIndex} className="text-sm leading-relaxed">
+                        • {item}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-8">
+              {t('userDashboard.progress.noDietForDay')}
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </div>
