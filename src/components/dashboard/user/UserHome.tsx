@@ -92,8 +92,24 @@ const UserHome = () => {
       setTodayMeals(dietData.meals as unknown as MealGroup[]);
     }
 
-    // Don't fetch today's progress - start with empty form
-    // User can view historical data in the "Progress" tab
+    // Fetch today's progress report if exists
+    const todayDate = today.toISOString().split('T')[0];
+    const { data: reportData } = await supabase
+      .from('progress_reports')
+      .select('*')
+      .eq('user_id', user?.id)
+      .eq('date', todayDate)
+      .maybeSingle();
+
+    if (reportData) {
+      // Load existing data for today
+      setWeight(reportData.weight?.toString() || '');
+      setToiletVisits(reportData.wc?.toString() || '');
+      setMorningBM(reportData.morning_bm || false);
+      setNotes(reportData.notes || '');
+      setDayOfDiet(reportData.day_of_diet?.toString() || '');
+    }
+    // If no data exists, fields remain empty (from the date change clear)
   };
 
   const handleSave = async () => {
