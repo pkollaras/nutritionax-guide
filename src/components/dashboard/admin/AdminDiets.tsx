@@ -109,13 +109,25 @@ const AdminDiets = () => {
     setUploading(true);
 
     try {
-      // Read file as text (we'll use a simple extraction)
-      const fileText = await file.text();
+      // Convert PDF to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Remove the data URL prefix to get just the base64 string
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+      });
       
-      // Call edge function to parse PDF
+      reader.readAsDataURL(file);
+      const pdfBase64 = await base64Promise;
+      
+      // Call edge function to parse PDF with Gemini Vision
       const { data, error } = await supabase.functions.invoke('parse-diet-pdf', {
         body: { 
-          pdfText: fileText,
+          pdfBase64,
           userId: selectedUser 
         }
       });

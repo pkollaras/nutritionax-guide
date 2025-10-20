@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { pdfText, userId } = await req.json();
+    const { pdfBase64, userId } = await req.json();
     console.log('Parsing diet PDF for user:', userId);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -20,7 +20,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Call Gemini to parse the diet plan
+    // Call Gemini with vision to parse the diet plan from PDF
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -56,7 +56,18 @@ Extract all food items for each meal (Γεύμα) including quantities. Keep the
           },
           {
             role: 'user',
-            content: pdfText
+            content: [
+              {
+                type: 'text',
+                text: 'Please analyze this diet plan PDF and extract the meal information according to the format specified.'
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:application/pdf;base64,${pdfBase64}`
+                }
+              }
+            ]
           }
         ],
         response_format: { type: "json_object" }
