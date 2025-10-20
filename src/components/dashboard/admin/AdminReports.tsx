@@ -42,16 +42,16 @@ const AdminReports = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Reports</h1>
+      <h1 className="text-3xl font-bold">Αναφορές</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Select User</CardTitle>
+          <CardTitle>Επιλογή Χρήστη</CardTitle>
         </CardHeader>
         <CardContent>
           <Select value={selectedUser} onValueChange={setSelectedUser}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a user" />
+              <SelectValue placeholder="Επιλέξτε χρήστη" />
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
@@ -68,7 +68,7 @@ const AdminReports = () => {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Weight Progress</CardTitle>
+              <CardTitle>Πρόοδος Βάρους</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -85,28 +85,28 @@ const AdminReports = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Progress History</CardTitle>
+              <CardTitle>Ιστορικό Προόδου</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Day</TableHead>
-                    <TableHead>Weight (kg)</TableHead>
-                    <TableHead>Toilet Visits</TableHead>
-                    <TableHead>Morning BM</TableHead>
-                    <TableHead>Notes</TableHead>
+                    <TableHead>Ημερομηνία</TableHead>
+                    <TableHead>Ημέρα</TableHead>
+                    <TableHead>Βάρος (kg)</TableHead>
+                    <TableHead>Επισκέψεις στην Τουαλέτα</TableHead>
+                    <TableHead>Πρωινή Κένωση</TableHead>
+                    <TableHead>Σημειώσεις</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reports.map((report) => (
                     <TableRow key={report.id}>
                       <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>
-                      <TableCell>Day {report.day_of_diet}</TableCell>
+                      <TableCell>Ημέρα {report.day_of_diet}</TableCell>
                       <TableCell>{report.weight}</TableCell>
-                      <TableCell>{report.wc || 0} times</TableCell>
-                      <TableCell>{report.morning_bm ? '✓ Yes' : '✗ No'}</TableCell>
+                      <TableCell>{report.wc || 0} φορές</TableCell>
+                      <TableCell>{report.morning_bm ? '✓ Ναι' : '✗ Όχι'}</TableCell>
                       <TableCell className="max-w-xs truncate">{report.notes}</TableCell>
                     </TableRow>
                   ))}
@@ -120,7 +120,7 @@ const AdminReports = () => {
       {selectedUser && reports.length === 0 && (
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground">
-            No progress reports found for this user.
+            Δεν βρέθηκαν αναφορές προόδου για αυτόν τον χρήστη.
           </CardContent>
         </Card>
       )}

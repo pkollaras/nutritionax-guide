@@ -26,12 +26,12 @@ const UserDashboard = () => {
   const { signOut } = useAuth();
 
   const menuItems = [
-    { id: 'home' as UserView, label: 'Today', icon: Home },
-    { id: 'guidelines' as UserView, label: 'Guidelines', icon: FileText },
-    { id: 'diet' as UserView, label: 'My Diet', icon: UtensilsCrossed },
-    { id: 'shopping' as UserView, label: 'Shopping List', icon: ShoppingCart },
-    { id: 'progress' as UserView, label: 'Progress', icon: TrendingUp },
-    { id: 'profile' as UserView, label: 'Profile', icon: User },
+    { id: 'home' as UserView, label: 'Σήμερα', icon: Home },
+    { id: 'guidelines' as UserView, label: 'Οδηγίες', icon: FileText },
+    { id: 'diet' as UserView, label: 'Η Διατροφή μου', icon: UtensilsCrossed },
+    { id: 'shopping' as UserView, label: 'Λίστα Αγορών', icon: ShoppingCart },
+    { id: 'progress' as UserView, label: 'Πρόοδος', icon: TrendingUp },
+    { id: 'profile' as UserView, label: 'Προφίλ', icon: User },
   ];
 
   const renderView = () => {
@@ -57,7 +57,7 @@ const UserDashboard = () => {
     <div className="flex flex-col h-full">
       <div className="p-6 border-b">
         <h1 className="text-2xl font-bold text-primary">Nutritionax</h1>
-        <p className="text-sm text-muted-foreground">Your Diet Plan</p>
+        <p className="text-sm text-muted-foreground">Το Διατροφικό σας Πρόγραμμα</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
@@ -77,7 +77,7 @@ const UserDashboard = () => {
       <div className="p-4 border-t">
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+          Αποσύνδεση
         </Button>
       </div>
     </div>

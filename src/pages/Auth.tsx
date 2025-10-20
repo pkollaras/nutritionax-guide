@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { z } from 'zod';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email('Μη έγκυρη διεύθυνση email'),
+  password: z.string().min(6, 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες'),
 });
 
 const Auth = () => {
@@ -54,7 +54,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold text-primary">Nutritionax</CardTitle>
-          <CardDescription>Sign in to access your account</CardDescription>
+          <CardDescription>Συνδεθείτε για πρόσβαση στον λογαριασμό σας</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -71,7 +71,7 @@ const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="login-password">Password</Label>
+              <Label htmlFor="login-password">Κωδικός</Label>
               <Input
                 id="login-password"
                 type="password"
@@ -82,7 +82,7 @@ const Auth = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Σύνδεση...' : 'Σύνδεση'}
             </Button>
           </form>
         </CardContent>

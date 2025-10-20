@@ -34,7 +34,7 @@ const UserGuidelines = () => {
   if (loading) {
     return (
       <div className="p-6">
-        <p className="text-muted-foreground">Loading guidelines...</p>
+        <p className="text-muted-foreground">Φόρτωση οδηγιών...</p>
       </div>
     );
   }
@@ -42,21 +42,21 @@ const UserGuidelines = () => {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">General Guidelines</h1>
-        <p className="text-muted-foreground">Your personalized dietary guidelines</p>
+        <h1 className="text-3xl font-bold">Γενικές Οδηγίες</h1>
+        <p className="text-muted-foreground">Οι εξατομικευμένες διατροφικές σας οδηγίες</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Guidelines</CardTitle>
+          <CardTitle>Οδηγίες</CardTitle>
         </CardHeader>
         <CardContent>
           {guidelines ? (
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{guidelines}</p>
           ) : (
             <div className="text-muted-foreground text-sm space-y-2">
-              <p>You haven't set up your personal guidelines yet.</p>
-              <p className="text-xs">These are the default guidelines provided by your administrator. You can customize them anytime in your profile settings.</p>
+              <p>Δεν έχετε ορίσει τις προσωπικές σας οδηγίες ακόμα.</p>
+              <p className="text-xs">Αυτές είναι οι προεπιλεγμένες οδηγίες από τον διαχειριστή σας. Μπορείτε να τις προσαρμόσετε ανά πάσα στιγμή στις ρυθμίσεις του προφίλ σας.</p>
             </div>
           )}
         </CardContent>

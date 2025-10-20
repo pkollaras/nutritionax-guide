@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS = ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'];
 
 interface MealGroup {
   meal_number: number;
@@ -91,9 +91,9 @@ const UserHome = () => {
 
       if (error) throw error;
 
-      toast({ title: 'Success', description: 'Progress saved successfully' });
+      toast({ title: 'Επιτυχία', description: 'Η πρόοδος αποθηκεύτηκε επιτυχώς' });
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -104,19 +104,19 @@ const UserHome = () => {
       <div>
         <h1 className="text-3xl font-bold">{todayName}</h1>
         <p className="text-muted-foreground">
-          {today.toLocaleDateString()} • {dayOfDiet ? `Day ${dayOfDiet} of Diet` : 'Diet Tracking'}
+          {today.toLocaleDateString()} • {dayOfDiet ? `Ημέρα ${dayOfDiet} Διατροφής` : 'Παρακολούθηση Διατροφής'}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Today's Meals</CardTitle>
+          <CardTitle>Γεύματα Σήμερα</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {todayMeals.length > 0 ? (
             todayMeals.map((mealGroup) => (
               <div key={mealGroup.meal_number}>
-                <h3 className="font-semibold mb-2">Meal {mealGroup.meal_number}</h3>
+                <h3 className="font-semibold mb-2">Γεύμα {mealGroup.meal_number}</h3>
                 <ul className="text-sm space-y-1 list-disc list-inside">
                   {mealGroup.items.map((item, idx) => (
                     <li key={idx}>{item}</li>
@@ -125,18 +125,18 @@ const UserHome = () => {
               </div>
             ))
           ) : (
-            <p className="text-sm text-muted-foreground">No meals planned for today</p>
+            <p className="text-sm text-muted-foreground">Δεν υπάρχουν γεύματα για σήμερα</p>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Today's Progress</CardTitle>
+          <CardTitle>Πρόοδος Σήμερα</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="weight">Weight (kg)</Label>
+            <Label htmlFor="weight">Βάρος (kg)</Label>
             <Input
               id="weight"
               type="number"
@@ -148,7 +148,7 @@ const UserHome = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dayOfDiet">Day of Diet</Label>
+            <Label htmlFor="dayOfDiet">Ημέρα Διατροφής</Label>
             <Input
               id="dayOfDiet"
               type="number"
@@ -160,7 +160,7 @@ const UserHome = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="toiletVisits">Toilet Visits (per day)</Label>
+            <Label htmlFor="toiletVisits">Επισκέψεις στην Τουαλέτα (ανά ημέρα)</Label>
             <Input
               id="toiletVisits"
               type="number"
@@ -168,7 +168,7 @@ const UserHome = () => {
               max="20"
               value={toiletVisits}
               onChange={(e) => setToiletVisits(e.target.value)}
-              placeholder="Number of times"
+              placeholder="Αριθμός φορών"
             />
           </div>
 
@@ -179,24 +179,24 @@ const UserHome = () => {
               onCheckedChange={(checked) => setMorningBM(checked === true)}
             />
             <Label htmlFor="morningBM" className="cursor-pointer">
-              Had bowel movement in the morning
+              Είχα κένωση το πρωί
             </Label>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes / Deviations / Comments</Label>
+            <Label htmlFor="notes">Σημειώσεις / Αποκλίσεις / Σχόλια</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any observations, deviations from the plan, or comments..."
+              placeholder="Παρατηρήσεις, αποκλίσεις από το πρόγραμμα ή σχόλια..."
               rows={5}
             />
           </div>
 
           <Button onClick={handleSave} className="w-full" disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Saving...' : 'Save Progress'}
+            {loading ? 'Αποθήκευση...' : 'Αποθήκευση Προόδου'}
           </Button>
         </CardContent>
       </Card>

@@ -10,9 +10,9 @@ import { Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 
 const userSchema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Μη έγκυρο email'),
+  password: z.string().min(6, 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες'),
+  name: z.string().min(2, 'Το όνομα πρέπει να έχει τουλάχιστον 2 χαρακτήρες'),
 });
 
 const AdminUsers = () => {
@@ -34,7 +34,7 @@ const AdminUsers = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
     } else {
       setUsers(data || []);
     }
@@ -60,7 +60,7 @@ const AdminUsers = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      toast({ title: 'Success', description: 'User created successfully' });
+      toast({ title: 'Επιτυχία', description: 'Ο χρήστης δημιουργήθηκε επιτυχώς' });
       setOpen(false);
       setNewUser({ email: '', password: '', name: '' });
       fetchUsers();
@@ -72,7 +72,7 @@ const AdminUsers = () => {
         });
         setErrors(fieldErrors);
       } else {
-        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
       }
     } finally {
       setLoading(false);
@@ -80,7 +80,7 @@ const AdminUsers = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτόν τον χρήστη;')) return;
 
     try {
       const { data, error } = await supabase.functions.invoke('manage-users', {
@@ -93,31 +93,31 @@ const AdminUsers = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      toast({ title: 'Success', description: 'User deleted successfully' });
+      toast({ title: 'Επιτυχία', description: 'Ο χρήστης διαγράφηκε επιτυχώς' });
       fetchUsers();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
     }
   };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Users</h1>
+        <h1 className="text-3xl font-bold">Χρήστες</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add User
+              Προσθήκη Χρήστη
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
+              <DialogTitle>Προσθήκη Νέου Χρήστη</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleAddUser} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">Ονοματεπώνυμο</Label>
                 <Input
                   id="name"
                   value={newUser.name}
@@ -138,7 +138,7 @@ const AdminUsers = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Κωδικός</Label>
                 <Input
                   id="password"
                   type="password"
@@ -149,7 +149,7 @@ const AdminUsers = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Creating...' : 'Create User'}
+                {loading ? 'Δημιουργία...' : 'Δημιουργία Χρήστη'}
               </Button>
             </form>
           </DialogContent>
@@ -174,7 +174,7 @@ const AdminUsers = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Joined: {new Date(user.created_at).toLocaleDateString()}
+                Εγγράφηκε: {new Date(user.created_at).toLocaleDateString()}
               </p>
             </CardContent>
           </Card>
@@ -183,7 +183,7 @@ const AdminUsers = () => {
         {users.length === 0 && (
           <Card>
             <CardContent className="pt-6 text-center text-muted-foreground">
-              No users found. Add your first user to get started.
+              Δεν βρέθηκαν χρήστες. Προσθέστε τον πρώτο χρήστη για να ξεκινήσετε.
             </CardContent>
           </Card>
         )}

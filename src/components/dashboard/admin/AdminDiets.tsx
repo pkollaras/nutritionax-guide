@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Upload } from 'lucide-react';
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS = ['Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο', 'Κυριακή'];
 
 const AdminDiets = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -66,7 +66,7 @@ const AdminDiets = () => {
 
   const handleSave = async () => {
     if (!selectedUser) {
-      toast({ title: 'Error', description: 'Please select a user', variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: 'Παρακαλώ επιλέξτε χρήστη', variant: 'destructive' });
       return;
     }
 
@@ -87,9 +87,9 @@ const AdminDiets = () => {
           });
       }
 
-      toast({ title: 'Success', description: 'Diet plan saved successfully' });
+      toast({ title: 'Επιτυχία', description: 'Το διατροφικό πρόγραμμα αποθηκεύτηκε επιτυχώς' });
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -119,8 +119,8 @@ const AdminDiets = () => {
     const file = event.target.files?.[0];
     if (!file || !selectedUser) {
       toast({ 
-        title: 'Error', 
-        description: 'Please select a user first', 
+        title: 'Σφάλμα', 
+        description: 'Παρακαλώ επιλέξτε πρώτα χρήστη', 
         variant: 'destructive' 
       });
       return;
@@ -128,8 +128,8 @@ const AdminDiets = () => {
 
     if (file.type !== 'application/pdf') {
       toast({ 
-        title: 'Error', 
-        description: 'Please upload a PDF file', 
+        title: 'Σφάλμα', 
+        description: 'Παρακαλώ ανεβάστε αρχείο PDF', 
         variant: 'destructive' 
       });
       return;
@@ -164,8 +164,8 @@ const AdminDiets = () => {
       if (error) throw error;
 
       toast({ 
-        title: 'Success', 
-        description: 'Diet plan uploaded and parsed successfully' 
+        title: 'Επιτυχία', 
+        description: 'Το διατροφικό πρόγραμμα ανέβηκε και αναλύθηκε επιτυχώς' 
       });
       
       // Refresh the diet plans
@@ -178,8 +178,8 @@ const AdminDiets = () => {
     } catch (error: any) {
       console.error('PDF upload error:', error);
       toast({ 
-        title: 'Error', 
-        description: error.message || 'Failed to parse PDF', 
+        title: 'Σφάλμα', 
+        description: error.message || 'Αποτυχία ανάλυσης PDF', 
         variant: 'destructive' 
       });
     } finally {
@@ -190,7 +190,7 @@ const AdminDiets = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Diet Plans</h1>
+        <h1 className="text-3xl font-bold">Διατροφικά Προγράμματα</h1>
         <div className="flex gap-2">
           <Button 
             onClick={() => fileInputRef.current?.click()} 
@@ -198,7 +198,7 @@ const AdminDiets = () => {
             variant="outline"
           >
             <Upload className="mr-2 h-4 w-4" />
-            {uploading ? 'Uploading...' : 'Upload PDF'}
+            {uploading ? 'Ανέβασμα...' : 'Ανέβασμα PDF'}
           </Button>
           <Input
             ref={fileInputRef}
@@ -209,19 +209,19 @@ const AdminDiets = () => {
           />
           <Button onClick={handleSave} disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Saving...' : 'Save Plan'}
+            {loading ? 'Αποθήκευση...' : 'Αποθήκευση Προγράμματος'}
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Select User</CardTitle>
+          <CardTitle>Επιλογή Χρήστη</CardTitle>
         </CardHeader>
         <CardContent>
           <Select value={selectedUser} onValueChange={setSelectedUser}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a user" />
+              <SelectValue placeholder="Επιλέξτε χρήστη" />
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
@@ -249,9 +249,9 @@ const AdminDiets = () => {
                   
                   return (
                     <div key={mealIndex} className="space-y-2">
-                      <Label>Meal {mealIndex + 1}</Label>
+                      <Label>Γεύμα {mealIndex + 1}</Label>
                       <Textarea
-                        placeholder={`Enter food items for meal ${mealIndex + 1}, one per line...`}
+                        placeholder={`Εισάγετε τρόφιμα για το γεύμα ${mealIndex + 1}, ένα ανά γραμμή...`}
                         value={mealText}
                         onChange={(e) => updateMeal(day, mealIndex, e.target.value)}
                         rows={5}

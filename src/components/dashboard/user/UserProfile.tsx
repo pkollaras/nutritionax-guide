@@ -43,9 +43,9 @@ const UserProfile = () => {
 
       if (error) throw error;
 
-      toast({ title: 'Success', description: 'Profile updated successfully' });
+      toast({ title: 'Επιτυχία', description: 'Το προφίλ ενημερώθηκε επιτυχώς' });
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -53,15 +53,15 @@ const UserProfile = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Profile</h1>
+      <h1 className="text-3xl font-bold">Προφίλ</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
+          <CardTitle>Προσωπικές Πληροφορίες</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Ονοματεπώνυμο</Label>
             <Input
               id="name"
               value={name}
@@ -80,14 +80,14 @@ const UserProfile = () => {
 
           <Button onClick={handleSave} disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Saving...' : 'Save Changes'}
+            {loading ? 'Αποθήκευση...' : 'Αποθήκευση Αλλαγών'}
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Contact Nutritionax</CardTitle>
+          <CardTitle>Επικοινωνία με Nutritionax</CardTitle>
         </CardHeader>
         <CardContent>
           <Button variant="outline" asChild>

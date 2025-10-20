@@ -58,16 +58,16 @@ const AdminGuidelines = () => {
     if (!file) return;
     if (!selectedUserId) {
       toast({
-        title: 'Error',
-        description: 'Please select a user first',
+        title: 'Σφάλμα',
+        description: 'Παρακαλώ επιλέξτε πρώτα χρήστη',
         variant: 'destructive'
       });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: 'Error',
-        description: 'File size must be less than 10MB',
+        title: 'Σφάλμα',
+        description: 'Το μέγεθος αρχείου πρέπει να είναι μικρότερο από 10MB',
         variant: 'destructive'
       });
       return;
@@ -90,8 +90,8 @@ const AdminGuidelines = () => {
         if (data?.content) {
           setUserGuidelines(data.content);
           toast({
-            title: 'Success',
-            description: 'PDF parsed successfully. You can now edit and save the guidelines.'
+            title: 'Επιτυχία',
+            description: 'Το PDF αναλύθηκε επιτυχώς. Μπορείτε τώρα να επεξεργαστείτε και να αποθηκεύσετε τις οδηγίες.'
           });
         }
       };
@@ -99,8 +99,8 @@ const AdminGuidelines = () => {
     } catch (error: any) {
       console.error('PDF upload error:', error);
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to parse PDF',
+        title: 'Σφάλμα',
+        description: error.message || 'Αποτυχία ανάλυσης PDF',
         variant: 'destructive'
       });
     } finally {
@@ -111,8 +111,8 @@ const AdminGuidelines = () => {
   const handleSaveUserGuidelines = async () => {
     if (!selectedUserId) {
       toast({
-        title: 'Error',
-        description: 'Please select a user first',
+        title: 'Σφάλμα',
+        description: 'Παρακαλώ επιλέξτε πρώτα χρήστη',
         variant: 'destructive'
       });
       return;
@@ -136,13 +136,13 @@ const AdminGuidelines = () => {
         if (error) throw error;
       }
       toast({
-        title: 'Success',
-        description: 'User guidelines saved successfully'
+        title: 'Επιτυχία',
+        description: 'Οι οδηγίες χρήστη αποθηκεύτηκαν επιτυχώς'
       });
       fetchUserGuidelines(selectedUserId);
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: 'Σφάλμα',
         description: error.message,
         variant: 'destructive'
       });
@@ -151,21 +151,21 @@ const AdminGuidelines = () => {
     }
   };
   return <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">User Guidelines</h1>
+      <h1 className="text-3xl font-bold">Οδηγίες Χρηστών</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Manage User Guidelines</CardTitle>
+          <CardTitle>Διαχείριση Οδηγιών Χρηστών</CardTitle>
           <CardDescription>
-            Select a user and manage their personal dietary guidelines. You can type directly or upload a PDF to extract the content.
+            Επιλέξτε χρήστη και διαχειριστείτε τις προσωπικές διατροφικές οδηγίες του. Μπορείτε να γράψετε απευθείας ή να ανεβάσετε PDF για εξαγωγή περιεχομένου.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Select User</label>
+            <label className="text-sm font-medium mb-2 block">Επιλογή Χρήστη</label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger>
-                <SelectValue placeholder="Choose a user..." />
+                <SelectValue placeholder="Επιλέξτε χρήστη..." />
               </SelectTrigger>
               <SelectContent>
                 {users.map(user => <SelectItem key={user.id} value={user.id}>
@@ -178,13 +178,20 @@ const AdminGuidelines = () => {
           {selectedUserId && <>
               <div className="flex gap-2">
                 <Input type="file" accept=".pdf" onChange={handlePdfUpload} disabled={uploading} className="hidden" id="guidelines-pdf-upload" />
-                
+                <label htmlFor="guidelines-pdf-upload">
+                  <Button variant="outline" disabled={uploading} asChild>
+                    <span>
+                      <Upload className="mr-2 h-4 w-4" />
+                      {uploading ? 'Ανέβασμα...' : 'Ανέβασμα PDF'}
+                    </span>
+                  </Button>
+                </label>
               </div>
               
-              <Textarea value={userGuidelines} onChange={e => setUserGuidelines(e.target.value)} placeholder="Enter dietary guidelines for this user or upload a PDF..." rows={20} className="font-mono" />
+              <Textarea value={userGuidelines} onChange={e => setUserGuidelines(e.target.value)} placeholder="Εισάγετε διατροφικές οδηγίες για αυτόν τον χρήστη ή ανεβάστε PDF..." rows={20} className="font-mono" />
               <Button onClick={handleSaveUserGuidelines} disabled={userLoading}>
                 <Save className="mr-2 h-4 w-4" />
-                {userLoading ? 'Saving...' : 'Save User Guidelines'}
+                {userLoading ? 'Αποθήκευση...' : 'Αποθήκευση Οδηγιών Χρήστη'}
               </Button>
             </>}
         </CardContent>

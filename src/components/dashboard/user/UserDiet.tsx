@@ -25,7 +25,7 @@ const UserDiet = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const days = ['Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο', 'Κυριακή'];
   useEffect(() => {
     if (user) {
       fetchDietPlan();
@@ -49,8 +49,8 @@ const UserDiet = () => {
     } catch (error) {
       console.error('Error fetching diet plan:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load your diet plan',
+        title: 'Σφάλμα',
+        description: 'Αποτυχία φόρτωσης του διατροφικού σας προγράμματος',
         variant: 'destructive'
       });
     } finally {
@@ -62,8 +62,8 @@ const UserDiet = () => {
     if (!file || !user) return;
     if (file.size > 20 * 1024 * 1024) {
       toast({
-        title: 'File too large',
-        description: 'Please select a PDF file smaller than 20MB',
+        title: 'Το αρχείο είναι πολύ μεγάλο',
+        description: 'Παρακαλώ επιλέξτε αρχείο PDF μικρότερο από 20MB',
         variant: 'destructive'
       });
       return;
@@ -95,8 +95,8 @@ const UserDiet = () => {
       });
       if (error) throw error;
       toast({
-        title: 'Success!',
-        description: 'Your diet plan has been uploaded and processed'
+        title: 'Επιτυχία!',
+        description: 'Το διατροφικό σας πρόγραμμα ανέβηκε και επεξεργάστηκε'
       });
 
       // Refresh the diet plan
@@ -104,8 +104,8 @@ const UserDiet = () => {
     } catch (error) {
       console.error('Error uploading PDF:', error);
       toast({
-        title: 'Upload failed',
-        description: error instanceof Error ? error.message : 'Failed to process your diet plan PDF',
+        title: 'Το ανέβασμα απέτυχε',
+        description: error instanceof Error ? error.message : 'Αποτυχία επεξεργασίας του διατροφικού σας προγράμματος',
         variant: 'destructive'
       });
     } finally {
@@ -133,10 +133,10 @@ const UserDiet = () => {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <UtensilsCrossed className="h-8 w-8 text-primary" />
-            My Diet Plan
+            Το Διατροφικό μου Πρόγραμμα
           </h1>
           <p className="text-muted-foreground mt-1">
-            Upload your diet plan PDF to see your weekly meals
+            Ανεβάστε το διατροφικό σας πρόγραμμα σε PDF για να δείτε τα εβδομαδιαία γεύματα
           </p>
         </div>
         
@@ -149,9 +149,9 @@ const UserDiet = () => {
       {dietPlans.length === 0 ? <Card className="text-center py-12">
           <CardHeader>
             <UtensilsCrossed className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <CardTitle>No Diet Plan Yet</CardTitle>
+            <CardTitle>Δεν Υπάρχει Διατροφικό Πρόγραμμα Ακόμα</CardTitle>
             <CardDescription className="text-base">
-              Upload your diet plan PDF to get started. The system will automatically parse it and show your daily meals.
+              Ανεβάστε το διατροφικό σας πρόγραμμα σε PDF για να ξεκινήσετε. Το σύστημα θα το αναλύσει αυτόματα και θα εμφανίσει τα καθημερινά σας γεύματα.
             </CardDescription>
           </CardHeader>
         </Card> : <div className="space-y-3">
@@ -169,7 +169,7 @@ const UserDiet = () => {
                       <div className="flex items-center gap-2">
                         <CardTitle className="text-xl">
                           {day}
-                          {isToday && <span className="ml-2 text-sm font-normal text-primary">(Today)</span>}
+                          {isToday && <span className="ml-2 text-sm font-normal text-primary">(Σήμερα)</span>}
                         </CardTitle>
                       </div>
                       {isOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
@@ -183,7 +183,7 @@ const UserDiet = () => {
                                 <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
                                   {mealGroup.meal_number || index + 1}
                                 </div>
-                                <h4 className="font-semibold text-base">Meal {mealGroup.meal_number || index + 1}</h4>
+                                <h4 className="font-semibold text-base">Γεύμα {mealGroup.meal_number || index + 1}</h4>
                               </div>
                               <div className="ml-10 space-y-1">
                                 {mealGroup.items.map((item, itemIndex) => <p key={itemIndex} className="text-sm leading-relaxed">
@@ -191,7 +191,7 @@ const UserDiet = () => {
                                   </p>)}
                               </div>
                             </div>)}
-                        </div> : <p className="text-muted-foreground text-sm">No meals planned for this day</p>}
+                        </div> : <p className="text-muted-foreground text-sm">Δεν υπάρχουν γεύματα για αυτή την ημέρα</p>}
                     </CardContent>
                   </CollapsibleContent>
                 </Collapsible>

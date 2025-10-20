@@ -24,12 +24,12 @@ const AdminDashboard = () => {
   const { signOut } = useAuth();
 
   const menuItems = [
-    { id: 'home' as AdminView, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'users' as AdminView, label: 'Users', icon: Users },
-    { id: 'diets' as AdminView, label: 'Diets', icon: FileText },
-    { id: 'guidelines' as AdminView, label: 'Guidelines', icon: BookOpen },
-    { id: 'reports' as AdminView, label: 'Reports', icon: FileText },
-    { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
+    { id: 'home' as AdminView, label: 'Αρχική', icon: LayoutDashboard },
+    { id: 'users' as AdminView, label: 'Χρήστες', icon: Users },
+    { id: 'diets' as AdminView, label: 'Διατροφές', icon: FileText },
+    { id: 'guidelines' as AdminView, label: 'Οδηγίες', icon: BookOpen },
+    { id: 'reports' as AdminView, label: 'Αναφορές', icon: FileText },
+    { id: 'settings' as AdminView, label: 'Ρυθμίσεις', icon: Settings },
   ];
 
   const renderView = () => {
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
       case 'reports':
         return <AdminReports />;
       case 'settings':
-        return <div className="p-6"><h2 className="text-2xl font-bold">Settings</h2></div>;
+        return <div className="p-6"><h2 className="text-2xl font-bold">Ρυθμίσεις</h2></div>;
       default:
         return <AdminHome />;
     }
@@ -55,7 +55,7 @@ const AdminDashboard = () => {
     <div className="flex flex-col h-full">
       <div className="p-6 border-b">
         <h1 className="text-2xl font-bold text-primary">Nutritionax</h1>
-        <p className="text-sm text-muted-foreground">Admin Dashboard</p>
+        <p className="text-sm text-muted-foreground">Πίνακας Διαχείρισης</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
@@ -75,7 +75,7 @@ const AdminDashboard = () => {
       <div className="p-4 border-t">
         <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+          Αποσύνδεση
         </Button>
       </div>
     </div>

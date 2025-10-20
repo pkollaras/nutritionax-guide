@@ -91,12 +91,12 @@ const UserProgress = () => {
 
       if (error) throw error;
 
-      toast({ title: 'Success', description: 'Progress saved successfully' });
+      toast({ title: 'Επιτυχία', description: 'Η πρόοδος αποθηκεύτηκε επιτυχώς' });
       setShowAddForm(false);
       resetForm();
       fetchReports();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Σφάλμα', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -111,119 +111,110 @@ const UserProgress = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Progress</h1>
+        <h1 className="text-3xl font-bold">Πρόοδος</h1>
         <Button onClick={() => { resetForm(); setShowAddForm(!showAddForm); }}>
           <Plus className="mr-2 h-4 w-4" />
-          {showAddForm ? 'Close Form' : 'Add Progress Entry'}
+          {showAddForm ? 'Κλείσιμο Φόρμας' : 'Προσθήκη Καταχώρισης'}
         </Button>
       </div>
 
       {showAddForm && (
         <Card>
           <CardHeader>
-            <CardTitle>{editingId ? 'Edit Progress Entry' : 'Add Progress Entry'}</CardTitle>
+            <CardTitle>{editingId ? 'Επεξεργασία Καταχώρισης' : 'Προσθήκη Καταχώρισης'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Date</Label>
+              <Label>Επιλογή Ημερομηνίας</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
+                      'w-full justify-start text-left font-normal',
+                      !selectedDate && 'text-muted-foreground'
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    {selectedDate ? format(selectedDate, 'PPP') : <span>Επιλέξτε ημερομηνία</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    disabled={(date) => date > new Date()}
+                    onSelect={(date) => date && setSelectedDate(date)}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="dayOfDiet">Day of Diet</Label>
-                <Input
-                  id="dayOfDiet"
-                  type="number"
-                  min="1"
-                  value={dayOfDiet}
-                  onChange={(e) => setDayOfDiet(e.target.value)}
-                  placeholder="1"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="weight">Weight (kg)</Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  step="0.1"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="75.5"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="toiletVisits">Toilet Visits (per day)</Label>
-                <Input
-                  id="toiletVisits"
-                  type="number"
-                  min="0"
-                  max="20"
-                  value={toiletVisits}
-                  onChange={(e) => setToiletVisits(e.target.value)}
-                  placeholder="Number of times"
-                />
-              </div>
-
-              <div className="flex items-end pb-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="morningBM"
-                    checked={morningBM}
-                    onCheckedChange={(checked) => setMorningBM(checked === true)}
-                  />
-                  <Label htmlFor="morningBM" className="cursor-pointer">
-                    Morning BM
-                  </Label>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="weight">Βάρος (kg)</Label>
+              <Input
+                id="weight"
+                type="number"
+                step="0.1"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="75.5"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes / Deviations / Comments</Label>
+              <Label htmlFor="dayOfDiet">Ημέρα Διατροφής</Label>
+              <Input
+                id="dayOfDiet"
+                type="number"
+                min="1"
+                value={dayOfDiet}
+                onChange={(e) => setDayOfDiet(e.target.value)}
+                placeholder="1"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="toiletVisits">Επισκέψεις στην Τουαλέτα</Label>
+              <Input
+                id="toiletVisits"
+                type="number"
+                min="0"
+                max="20"
+                value={toiletVisits}
+                onChange={(e) => setToiletVisits(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="morningBM"
+                checked={morningBM}
+                onCheckedChange={(checked) => setMorningBM(checked === true)}
+              />
+              <Label htmlFor="morningBM" className="cursor-pointer">
+                Είχα κένωση το πρωί
+              </Label>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="notes">Σημειώσεις / Αποκλίσεις / Σχόλια</Label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any observations, deviations from the plan, or comments..."
-                rows={3}
+                rows={5}
               />
             </div>
 
             <div className="flex gap-2">
               <Button onClick={handleSave} className="flex-1" disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />
-                {loading ? 'Saving...' : 'Save Progress'}
+                {loading ? 'Αποθήκευση...' : 'Αποθήκευση Προόδου'}
               </Button>
               <Button onClick={() => { setShowAddForm(false); resetForm(); }} variant="outline">
-                Cancel
+                Ακύρωση
               </Button>
             </div>
           </CardContent>
