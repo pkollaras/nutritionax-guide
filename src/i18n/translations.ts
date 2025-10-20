@@ -164,6 +164,11 @@ export const translations = {
         generationFailed: 'Αποτυχία δημιουργίας λίστας αγορών',
         listGenerated: 'Η λίστα αγορών δημιουργήθηκε επιτυχώς',
         tryAgain: 'Δοκιμάστε Ξανά',
+        loading: 'Φόρτωση λίστας αγορών...',
+        generatedOn: 'Δημιουργήθηκε στις',
+        weeklyList: 'Εβδομαδιαία Λίστα Αγορών',
+        refresh: 'Ανανέωση',
+        generateSuccess: 'Η λίστα αγορών δημιουργήθηκε επιτυχώς!',
       },
     },
     adminDashboard: {
@@ -472,6 +477,11 @@ export const translations = {
         generationFailed: 'Failed to generate shopping list',
         listGenerated: 'Shopping list generated successfully',
         tryAgain: 'Try Again',
+        loading: 'Loading shopping list...',
+        generatedOn: 'Generated on',
+        weeklyList: 'Weekly Shopping List',
+        refresh: 'Refresh',
+        generateSuccess: 'Shopping list generated successfully!',
       },
     },
     adminDashboard: {

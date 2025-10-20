@@ -158,7 +158,7 @@ ${JSON.stringify(allMeals, null, 2)}
         }],
         generationConfig: {
           temperature: 0.4,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 4096,
         }
       },
       GEMINI_API_KEY,
@@ -189,12 +189,28 @@ ${JSON.stringify(allMeals, null, 2)}
     let parsedData;
     try {
       // Remove markdown code blocks if present
-      const cleanedResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let cleanedResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      // If response is truncated, try to find the last complete JSON object
+      if (!cleanedResponse.endsWith('}') && !cleanedResponse.endsWith(']')) {
+        console.warn('Response appears truncated, attempting to recover...');
+        // Find the last complete object/array closing
+        const lastBrace = cleanedResponse.lastIndexOf('}');
+        const lastBracket = cleanedResponse.lastIndexOf(']');
+        const cutPoint = Math.max(lastBrace, lastBracket);
+        if (cutPoint > 0) {
+          cleanedResponse = cleanedResponse.substring(0, cutPoint + 1);
+        }
+      }
+      
       parsedData = JSON.parse(cleanedResponse);
     } catch (parseError) {
       console.error('Failed to parse AI response:', aiResponse);
       return new Response(
-        JSON.stringify({ error: 'Failed to parse AI response' }),
+        JSON.stringify({ 
+          error: 'Failed to parse AI response. The shopping list might be too long. Please try again.',
+          rawResponse: aiResponse.substring(0, 500)
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

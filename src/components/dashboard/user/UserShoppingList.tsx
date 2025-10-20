@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart, Loader2, AlertCircle } from 'lucide-react';
@@ -28,14 +28,69 @@ const UserShoppingList = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [fetchingExisting, setFetchingExisting] = useState(true);
   const [shoppingList, setShoppingList] = useState<ShoppingListData | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadExistingShoppingList();
+  }, []);
+
+  const loadExistingShoppingList = async () => {
+    setFetchingExisting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Calculate current week start date
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() + diff);
+      const weekStartDate = weekStart.toISOString().split('T')[0];
+
+      // Fetch shopping list for current week
+      const { data, error } = await supabase
+        .from('shopping_lists')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('week_start_date', weekStartDate)
+        .single();
+
+      if (data && !error) {
+        setShoppingList({
+          categories: (data.items as unknown) as CategoryData[],
+          summary: (data.generated_content as unknown) as string,
+          weekStartDate: data.week_start_date,
+          createdAt: data.created_at
+        });
+      }
+    } catch (err) {
+      console.error('Error loading shopping list:', err);
+    } finally {
+      setFetchingExisting(false);
+    }
+  };
 
   const generateShoppingList = async () => {
     setLoading(true);
     setError(null);
     
     try {
+      // Refresh session to ensure we have a valid token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast({
+          title: t('common.error'),
+          description: 'Session expired. Please log in again',
+          variant: 'destructive',
+        });
+        window.location.href = '/auth';
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -97,8 +152,20 @@ const UserShoppingList = () => {
         </p>
       </div>
 
+      {/* Loading State */}
+      {fetchingExisting && (
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>{t('userDashboard.shoppingList.loading')}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Generate Button */}
-      {!shoppingList && !error && (
+      {!shoppingList && !error && !fetchingExisting && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>{t('userDashboard.shoppingList.generateTitle')}</CardTitle>
@@ -169,6 +236,17 @@ const UserShoppingList = () => {
                 <CardDescription className="mt-2">
                   {shoppingList.summary}
                 </CardDescription>
+              )}
+              {shoppingList.createdAt && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('userDashboard.shoppingList.generatedOn')}: {' '}
+                  {new Date(shoppingList.createdAt).toLocaleDateString('el-GR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </p>
               )}
             </CardHeader>
           </Card>
