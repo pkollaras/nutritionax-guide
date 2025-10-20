@@ -9,6 +9,7 @@ import {
   Menu,
   UtensilsCrossed,
   FileText,
+  ShoppingCart,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import UserHome from './user/UserHome';
@@ -16,8 +17,9 @@ import UserProgress from './user/UserProgress';
 import UserProfile from './user/UserProfile';
 import UserDiet from './user/UserDiet';
 import UserGuidelines from './user/UserGuidelines';
+import UserShoppingList from './user/UserShoppingList';
 
-type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines';
+type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines' | 'shopping';
 
 const UserDashboard = () => {
   const [currentView, setCurrentView] = useState<UserView>('home');
@@ -27,6 +29,7 @@ const UserDashboard = () => {
     { id: 'home' as UserView, label: 'Today', icon: Home },
     { id: 'guidelines' as UserView, label: 'Guidelines', icon: FileText },
     { id: 'diet' as UserView, label: 'My Diet', icon: UtensilsCrossed },
+    { id: 'shopping' as UserView, label: 'Shopping List', icon: ShoppingCart },
     { id: 'progress' as UserView, label: 'Progress', icon: TrendingUp },
     { id: 'profile' as UserView, label: 'Profile', icon: User },
   ];
@@ -39,6 +42,8 @@ const UserDashboard = () => {
         return <UserGuidelines />;
       case 'diet':
         return <UserDiet />;
+      case 'shopping':
+        return <UserShoppingList />;
       case 'progress':
         return <UserProgress />;
       case 'profile':

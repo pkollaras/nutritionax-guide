@@ -87,3 +87,6 @@ verify_jwt = true
 
 [functions.parse-guidelines-pdf]
 verify_jwt = true
+
+[functions.generate-shopping-list]
+verify_jwt = true

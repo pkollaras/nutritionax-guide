@@ -146,6 +146,36 @@ export type Database = {
         }
         Relationships: []
       }
+      shopping_lists: {
+        Row: {
+          created_at: string | null
+          generated_content: string
+          id: string
+          items: Json
+          updated_at: string | null
+          user_id: string
+          week_start_date: string
+        }
+        Insert: {
+          created_at?: string | null
+          generated_content: string
+          id?: string
+          items?: Json
+          updated_at?: string | null
+          user_id: string
+          week_start_date: string
+        }
+        Update: {
+          created_at?: string | null
+          generated_content?: string
+          id?: string
+          items?: Json
+          updated_at?: string | null
+          user_id?: string
+          week_start_date?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
