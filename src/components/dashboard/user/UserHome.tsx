@@ -11,13 +11,16 @@ import { Save } from 'lucide-react';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+interface MealGroup {
+  meal_number: number;
+  items: string[];
+}
+
 const UserHome = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [guidelines, setGuidelines] = useState('');
-  const [todayMeals, setTodayMeals] = useState<string[]>([]);
+  const [todayMeals, setTodayMeals] = useState<MealGroup[]>([]);
   const [weight, setWeight] = useState('');
-  const [wc, setWc] = useState('');
   const [notes, setNotes] = useState('');
   const [dayOfDiet, setDayOfDiet] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -32,17 +35,6 @@ const UserHome = () => {
   const fetchData = async () => {
     if (!user) return;
 
-    // Fetch user's guidelines
-    const { data: guideData } = await supabase
-      .from('guidelines')
-      .select('content')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (guideData) setGuidelines(guideData.content);
-
     // Fetch today's diet plan
     const { data: dietData } = await supabase
       .from('diet_plans')
@@ -52,7 +44,7 @@ const UserHome = () => {
       .single();
 
     if (dietData && Array.isArray(dietData.meals)) {
-      setTodayMeals(dietData.meals.filter((m): m is string => typeof m === 'string'));
+      setTodayMeals(dietData.meals as unknown as MealGroup[]);
     }
 
     // Fetch today's progress report
@@ -66,7 +58,6 @@ const UserHome = () => {
 
     if (reportData) {
       setWeight(reportData.weight?.toString() || '');
-      setWc(reportData.wc?.toString() || '');
       setNotes(reportData.notes || '');
       setDayOfDiet(reportData.day_of_diet || 1);
     } else {
@@ -97,7 +88,6 @@ const UserHome = () => {
           user_id: user.id,
           date: todayDate,
           weight: weight ? parseFloat(weight) : null,
-          wc: wc ? parseFloat(wc) : null,
           notes,
           day_of_diet: dayOfDiet,
         }, {
@@ -125,33 +115,19 @@ const UserHome = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>General Guidelines</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {guidelines ? (
-            <p className="whitespace-pre-wrap text-sm">{guidelines}</p>
-          ) : (
-            <div className="text-muted-foreground text-sm space-y-2">
-              <p>You haven't set up your personal guidelines yet.</p>
-              <p className="text-xs">These are the default guidelines provided by your administrator. You can customize them anytime in your profile settings.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Today's Meals</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {todayMeals.length > 0 ? (
-            todayMeals.map((meal, index) => (
-              meal && (
-                <div key={index}>
-                  <h3 className="font-semibold mb-2">Meal {index + 1}</h3>
-                  <p className="text-sm whitespace-pre-wrap">{meal}</p>
-                </div>
-              )
+            todayMeals.map((mealGroup) => (
+              <div key={mealGroup.meal_number}>
+                <h3 className="font-semibold mb-2">Meal {mealGroup.meal_number}</h3>
+                <ul className="text-sm space-y-1 list-disc list-inside">
+                  {mealGroup.items.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             ))
           ) : (
             <p className="text-sm text-muted-foreground">No meals planned for today</p>
@@ -164,30 +140,16 @@ const UserHome = () => {
           <CardTitle>Today's Progress</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="weight">Weight (kg)</Label>
-              <Input
-                id="weight"
-                type="number"
-                step="0.1"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                placeholder="75.5"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="wc">Waist Circumference (cm)</Label>
-              <Input
-                id="wc"
-                type="number"
-                step="0.1"
-                value={wc}
-                onChange={(e) => setWc(e.target.value)}
-                placeholder="85.0"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="weight">Weight (kg)</Label>
+            <Input
+              id="weight"
+              type="number"
+              step="0.1"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              placeholder="75.5"
+            />
           </div>
 
           <div className="space-y-2">

@@ -8,14 +8,16 @@ import {
   LogOut,
   Menu,
   UtensilsCrossed,
+  FileText,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import UserHome from './user/UserHome';
 import UserProgress from './user/UserProgress';
 import UserProfile from './user/UserProfile';
 import UserDiet from './user/UserDiet';
+import UserGuidelines from './user/UserGuidelines';
 
-type UserView = 'home' | 'progress' | 'profile' | 'diet';
+type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines';
 
 const UserDashboard = () => {
   const [currentView, setCurrentView] = useState<UserView>('home');
@@ -23,6 +25,7 @@ const UserDashboard = () => {
 
   const menuItems = [
     { id: 'home' as UserView, label: 'Today', icon: Home },
+    { id: 'guidelines' as UserView, label: 'Guidelines', icon: FileText },
     { id: 'diet' as UserView, label: 'My Diet', icon: UtensilsCrossed },
     { id: 'progress' as UserView, label: 'Progress', icon: TrendingUp },
     { id: 'profile' as UserView, label: 'Profile', icon: User },
@@ -32,6 +35,8 @@ const UserDashboard = () => {
     switch (currentView) {
       case 'home':
         return <UserHome />;
+      case 'guidelines':
+        return <UserGuidelines />;
       case 'diet':
         return <UserDiet />;
       case 'progress':
