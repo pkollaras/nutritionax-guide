@@ -128,7 +128,14 @@ const UserHome = () => {
           <CardTitle>General Guidelines</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="whitespace-pre-wrap text-sm">{guidelines}</p>
+          {guidelines ? (
+            <p className="whitespace-pre-wrap text-sm">{guidelines}</p>
+          ) : (
+            <div className="text-muted-foreground text-sm space-y-2">
+              <p>You haven't set up your personal guidelines yet.</p>
+              <p className="text-xs">These are the default guidelines provided by your administrator. You can customize them anytime in your profile settings.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -46,6 +46,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          is_default: boolean | null
           updated_at: string | null
           user_id: string
         }
@@ -53,6 +54,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          is_default?: boolean | null
           updated_at?: string | null
           user_id: string
         }
@@ -60,6 +62,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          is_default?: boolean | null
           updated_at?: string | null
           user_id?: string
         }
@@ -151,6 +154,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      copy_default_guidelines: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
