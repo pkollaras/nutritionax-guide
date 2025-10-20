@@ -32,7 +32,14 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    if (user.id !== userId) {
+    // Check if user is admin
+    const { data: isAdmin } = await supabase.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin'
+    });
+
+    // Allow admins to upload for any user, but regular users can only upload for themselves
+    if (user.id !== userId && !isAdmin) {
       throw new Error('Cannot upload diet for another user');
     }
 
