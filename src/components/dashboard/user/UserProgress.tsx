@@ -131,6 +131,16 @@ const UserProgress = () => {
   const handleSave = async () => {
     if (!user || !selectedDate) return;
 
+    // Validation: At least one field must be filled
+    if (!weight && !toiletVisits && !dayOfDiet && !notes && !morningBM) {
+      toast({
+        title: t('common.error'),
+        description: "Παρακαλώ συμπληρώστε τουλάχιστον ένα πεδίο",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     const dateString = format(selectedDate, 'yyyy-MM-dd');
 
@@ -189,11 +199,13 @@ const UserProgress = () => {
     return text && text.length > 50;
   };
 
-  const chartData = reports.map((report) => ({
-    date: new Date(report.date).toLocaleDateString(),
-    weight: report.weight,
-    wc: report.wc,
-  }));
+  const chartData = reports
+    .filter(report => report.weight !== null)
+    .map((report) => ({
+      date: new Date(report.date).toLocaleDateString(),
+      weight: report.weight,
+      wc: report.wc,
+    }));
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -231,6 +243,7 @@ const UserProgress = () => {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && setSelectedDate(date)}
+                    disabled={(date) => date > new Date()}
                     initialFocus
                   />
                 </PopoverContent>
@@ -255,6 +268,8 @@ const UserProgress = () => {
                 id="weight"
                 type="number"
                 step="0.1"
+                min="30"
+                max="300"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="75.5"
