@@ -90,7 +90,7 @@ const UserDashboard = () => {
   );
 
   return (
-    <div className="flex h-screen w-full bg-background">
+    <div className="flex min-h-screen w-full bg-background pb-16">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 border-r bg-card">
         <SidebarContent />
@@ -112,7 +112,7 @@ const UserDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto pt-16 md:pt-0">
+      <main className="flex-1 pt-16 md:pt-0">
         {renderView()}
       </main>
     </div>
