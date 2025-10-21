@@ -45,7 +45,7 @@ const CTASection = () => {
 
               {/* Features List */}
               <ul className="space-y-3 mb-6 text-left">
-                {(t('landing.cta.pricing.features') as unknown as string[]).map((feature, index) => (
+                {Object.values(t('landing.cta.pricing.features') as unknown as Record<string, string>).map((feature, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <span className="text-foreground">{feature}</span>
