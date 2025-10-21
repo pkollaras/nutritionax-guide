@@ -67,9 +67,9 @@ const LandingNavbar = () => {
 
         <div className="flex items-center gap-4">
           <LanguageSwitcher />
-          <Button asChild variant="outline" size="sm">
-            <Link to="/auth">{t('landing.nav.signup')}</Link>
-          </Button>
+          <Link to="/signup">
+            <Button variant="outline" size="sm">{t('landing.nav.signup')}</Button>
+          </Link>
           <Button asChild variant="default" size="sm">
             <Link to="/auth">{t('landing.nav.login')}</Link>
           </Button>

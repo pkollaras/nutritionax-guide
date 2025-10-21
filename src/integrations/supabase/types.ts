@@ -308,6 +308,89 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          address: string
+          city: string
+          company_address: string | null
+          company_name: string | null
+          contact_phone: string
+          contact_phone_2: string | null
+          country: string
+          county: string | null
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          nutritionist_id: string
+          postal_code: string
+          profession: string | null
+          region: string
+          status: string
+          tax_office: string | null
+          tax_reference_number: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address: string
+          city: string
+          company_address?: string | null
+          company_name?: string | null
+          contact_phone: string
+          contact_phone_2?: string | null
+          country?: string
+          county?: string | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          nutritionist_id: string
+          postal_code: string
+          profession?: string | null
+          region: string
+          status?: string
+          tax_office?: string | null
+          tax_reference_number?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          company_address?: string | null
+          company_name?: string | null
+          contact_phone?: string
+          contact_phone_2?: string | null
+          country?: string
+          county?: string | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          nutritionist_id?: string
+          postal_code?: string
+          profession?: string | null
+          region?: string
+          status?: string
+          tax_office?: string | null
+          tax_reference_number?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
