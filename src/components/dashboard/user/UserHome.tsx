@@ -18,7 +18,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Save, XCircle, RefreshCw } from 'lucide-react';
+import { Save, XCircle, RefreshCw, ListX } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MealGroup {
@@ -40,7 +40,9 @@ const UserHome = () => {
   const [selectedMeal, setSelectedMeal] = useState<MealGroup | null>(null);
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [showReplaceDialog, setShowReplaceDialog] = useState(false);
+  const [showPartialBypassDialog, setShowPartialBypassDialog] = useState(false);
   const [replacementText, setReplacementText] = useState('');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const today = new Date();
   
@@ -169,6 +171,44 @@ const UserHome = () => {
     });
   };
 
+  const handlePartialBypass = (meal: MealGroup) => {
+    setSelectedMeal(meal);
+    setSelectedItems([]);
+    setShowPartialBypassDialog(true);
+  };
+
+  const toggleItemSelection = (item: string) => {
+    setSelectedItems(prev => 
+      prev.includes(item) 
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    );
+  };
+
+  const confirmPartialBypass = () => {
+    if (!selectedMeal || selectedItems.length === 0) {
+      toast({
+        title: t('common.error'),
+        description: t('userDashboard.home.noItemsSelected'),
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    const noteText = `Μερική παράκαμψη γεύματος ${selectedMeal.meal_number}: Δεν φάγατε → ${selectedItems.join(', ')}`;
+    
+    setNotes(prev => prev ? `${prev}\n${noteText}` : noteText);
+    
+    setShowPartialBypassDialog(false);
+    setSelectedMeal(null);
+    setSelectedItems([]);
+    
+    toast({ 
+      title: t('common.success'), 
+      description: t('userDashboard.home.partialBypassRecorded')
+    });
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
@@ -222,19 +262,30 @@ const UserHome = () => {
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
-                      size="icon"
+                      size="sm"
                       onClick={() => handleSkipMeal(mealGroup)}
                       title={t('userDashboard.home.mealSkipped')}
                     >
-                      <XCircle className="h-4 w-4" />
+                      <XCircle className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Παράκαμψη</span>
                     </Button>
                     <Button 
                       variant="outline" 
-                      size="icon"
+                      size="sm"
+                      onClick={() => handlePartialBypass(mealGroup)}
+                      title={t('userDashboard.home.partialBypass')}
+                    >
+                      <ListX className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Μερική</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
                       onClick={() => handleReplaceMeal(mealGroup)}
                       title={t('userDashboard.home.mealReplaced')}
                     >
-                      <RefreshCw className="h-4 w-4" />
+                      <RefreshCw className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Αντικατάσταση</span>
                     </Button>
                   </div>
                 </div>
@@ -370,6 +421,53 @@ const UserHome = () => {
             <AlertDialogAction 
               onClick={confirmReplaceMeal}
               disabled={!replacementText.trim()}
+            >
+              {t('userDashboard.home.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Partial Bypass Meal Dialog */}
+      <AlertDialog open={showPartialBypassDialog} onOpenChange={setShowPartialBypassDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedMeal && `Μερική Παράκαμψη Γεύματος ${selectedMeal.meal_number}`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Επιλέξτε ποια στοιχεία ΔΕΝ φάγατε:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="py-4 space-y-3 max-h-[300px] overflow-y-auto">
+            {selectedMeal?.items.map((item, idx) => (
+              <div key={idx} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`item-${idx}`}
+                  checked={selectedItems.includes(item)}
+                  onCheckedChange={() => toggleItemSelection(item)}
+                />
+                <Label 
+                  htmlFor={`item-${idx}`} 
+                  className="cursor-pointer text-sm"
+                >
+                  {item}
+                </Label>
+              </div>
+            ))}
+          </div>
+          
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setSelectedItems([]);
+              setSelectedMeal(null);
+            }}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmPartialBypass}
+              disabled={selectedItems.length === 0}
             >
               {t('userDashboard.home.confirm')}
             </AlertDialogAction>
