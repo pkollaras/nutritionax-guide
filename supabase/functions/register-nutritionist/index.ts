@@ -110,14 +110,16 @@ async function getServicesOTP(customerApiToken: string): Promise<string> {
   return data.data.otp;
 }
 
-// Helper function to generate begin subscription URL
+// Helper function to generate begin subscription URL with free first month
 function generateBeginSubscriptionUrl(otp: string): string {
   const servicesUrl = "https://services.advisable.gr";
   const redirectUrl = encodeURIComponent("https://nutritionax.com/signup-success");
   const productCodeId = 1237;
   const quantity = 1;
+  const productList = `${productCodeId}:${quantity}`;
   
-  return `${servicesUrl}/customer/begin_subscription/${productCodeId}:${quantity}?otp=${otp}&redirectUrl=${redirectUrl}`;
+  // Free first month - card verification only (no immediate charge)
+  return `${servicesUrl}/customer/begin_subscription/${productList}?otp=${otp}&redirectUrl=${redirectUrl}`;
 }
 
 const handler = async (req: Request): Promise<Response> => {
