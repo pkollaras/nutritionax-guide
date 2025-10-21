@@ -2,9 +2,30 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, TrendingUp, Scale, ShoppingCart, FileText } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselApi } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import { useRef, useState, useEffect } from 'react';
 
 const ClientJourneySection = () => {
   const { t } = useLanguage();
+  
+  // Autoplay plugin instance
+  const plugin = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
+  // State for progress dots
+  const [api, setApi] = useState<CarouselApi>();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+
+    // Update current index on slide change
+    api.on('select', () => {
+      setCurrentIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   const steps = [
     {
@@ -67,61 +88,84 @@ const ClientJourneySection = () => {
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="space-y-24">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            const features = t(step.featuresKey) as unknown as string[];
-            
-            return (
-              <div
-                key={index}
-                className="grid md:grid-cols-2 gap-12 items-center"
-              >
-                {/* Mock Screenshot Card */}
-                <div
-                  className={`${
-                    index % 2 === 0 ? 'md:order-1' : 'md:order-2'
-                  } order-1`}
-                >
-                  <Card className={`relative overflow-hidden bg-gradient-to-br ${step.gradient} border-2 aspect-video flex items-center justify-center`}>
-                    <div className="absolute top-4 left-4">
-                      <Badge variant="secondary" className="text-xs">
-                        Preview: {step.badge}
+        {/* Carousel Slider */}
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          plugins={[plugin.current]}
+          className="w-full"
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+        >
+          <CarouselContent>
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              const features = t(step.featuresKey) as unknown as string[];
+              
+              return (
+                <CarouselItem key={index}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center px-4 py-8">
+                    {/* Left: Text Content */}
+                    <div className="order-2 md:order-1 space-y-4 md:space-y-6">
+                      <Badge className="mb-2">
+                        {t('common.step')} {index + 1}
                       </Badge>
+                      <h3 className="text-3xl md:text-4xl font-bold">
+                        {t(step.titleKey)}
+                      </h3>
+                      <p className="text-lg text-muted-foreground">
+                        {t(step.descKey)}
+                      </p>
+                      <ul className="space-y-3 mt-6">
+                        {Array.isArray(features) && features.map((feature, i) => (
+                          <li key={i} className="flex items-start gap-3">
+                            <span className="text-primary mt-1 text-xl">✓</span>
+                            <span className="text-foreground">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <Icon className={`h-24 w-24 ${step.iconColor}`} />
-                  </Card>
-                </div>
 
-                {/* Content */}
-                <div
-                  className={`${
-                    index % 2 === 0 ? 'md:order-2' : 'md:order-1'
-                  } order-2 space-y-4`}
-                >
-                  <Badge className="mb-2">
-                    {t('common.step')} {index + 1}
-                  </Badge>
-                  <h3 className="text-3xl font-bold">
-                    {t(step.titleKey)}
-                  </h3>
-                  <p className="text-lg text-muted-foreground">
-                    {t(step.descKey)}
-                  </p>
-                  <ul className="space-y-3 mt-6">
-                    {Array.isArray(features) && features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <span className="text-primary mt-1">✓</span>
-                        <span className="text-foreground">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                    {/* Right: Mock Screenshot */}
+                    <div className="order-1 md:order-2">
+                      <Card className={`relative overflow-hidden bg-gradient-to-br ${step.gradient} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
+                        <div className="absolute top-4 left-4">
+                          <Badge variant="secondary" className="text-xs">
+                            Preview: {step.badge}
+                          </Badge>
+                        </div>
+                        <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                      </Card>
+                    </div>
+                  </div>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+
+          {/* Navigation Arrows */}
+          <CarouselPrevious className="left-4 md:-left-12 bg-background/80 backdrop-blur-sm hover:bg-background shadow-lg" />
+          <CarouselNext className="right-4 md:-right-12 bg-background/80 backdrop-blur-sm hover:bg-background shadow-lg" />
+          
+          {/* Progress Dots */}
+          <div className="flex justify-center gap-2 mt-8">
+            {steps.map((_, index) => (
+              <button
+                key={index}
+                className={`h-2 rounded-full transition-all duration-300 hover:bg-primary/50 ${
+                  currentIndex === index 
+                    ? 'w-8 bg-primary' 
+                    : 'w-2 bg-muted-foreground/30'
+                }`}
+                onClick={() => api?.scrollTo(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </Carousel>
       </div>
     </section>
   );
