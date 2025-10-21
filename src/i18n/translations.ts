@@ -1280,6 +1280,7 @@ export const translations = {
         button: 'Start Today',
         loginText: 'Or login if you already have an account',
       },
+    },
     clientJourney: {
       title: 'What Does the Client See and Do?',
       subtitle: 'Follow a client\'s journey from first login to achieving their goals',
@@ -1357,6 +1358,7 @@ export const translations = {
         'Upcoming & past appointments',
         'Location, time and notes',
       ],
+    },
     footer: {
       copyright: 'Nutritionax © 2025',
       madeWith: 'Made with love by',
