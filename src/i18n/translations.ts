@@ -627,7 +627,7 @@ export const translations = {
         ],
       },
       cta: {
-        title: 'Έτοιμοι να Αναβαθμίσετε τη Διατροφική σας Πρακτική;',
+        title: 'Ξεκινήστε να Διαχειρίζεστε τους Πελάτες σας Σήμερα',
         pricing: {
           price: '€49',
           period: '/μήνα',
@@ -1199,7 +1199,7 @@ export const translations = {
         benefit4: 'Secure authentication & RLS',
       },
       cta: {
-        title: 'Ready to Upgrade Your Nutrition Practice?',
+        title: 'Start Managing Your Clients Today',
         pricing: {
           price: '€49',
           period: '/month',

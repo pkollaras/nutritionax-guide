@@ -38,9 +38,6 @@ const CTASection = () => {
                     {t('landing.cta.pricing.period')}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {t('landing.cta.pricing.trial')}
-                </p>
               </div>
 
               {/* Features List */}
