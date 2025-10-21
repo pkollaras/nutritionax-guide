@@ -266,8 +266,8 @@ const UserHome = () => {
                       onClick={() => handleSkipMeal(mealGroup)}
                       title={t('userDashboard.home.mealSkipped')}
                     >
-                      <XCircle className="h-4 w-4 mr-1" />
-                      <span className="text-xs">Παράκαμψη</span>
+                      <XCircle className="h-4 w-4 md:mr-1" />
+                      <span className="text-xs hidden md:inline">Παράκαμψη</span>
                     </Button>
                     <Button 
                       variant="outline" 
@@ -275,8 +275,8 @@ const UserHome = () => {
                       onClick={() => handlePartialBypass(mealGroup)}
                       title={t('userDashboard.home.partialBypass')}
                     >
-                      <ListX className="h-4 w-4 mr-1" />
-                      <span className="text-xs">Μερική</span>
+                      <ListX className="h-4 w-4 md:mr-1" />
+                      <span className="text-xs hidden md:inline">Μερική</span>
                     </Button>
                     <Button 
                       variant="outline" 
@@ -284,8 +284,8 @@ const UserHome = () => {
                       onClick={() => handleReplaceMeal(mealGroup)}
                       title={t('userDashboard.home.mealReplaced')}
                     >
-                      <RefreshCw className="h-4 w-4 mr-1" />
-                      <span className="text-xs">Αντικατάσταση</span>
+                      <RefreshCw className="h-4 w-4 md:mr-1" />
+                      <span className="text-xs hidden md:inline">Αντικατάσταση</span>
                     </Button>
                   </div>
                 </div>
