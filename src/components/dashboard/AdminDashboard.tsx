@@ -13,6 +13,7 @@ import {
   Stethoscope,
   Calendar,
   Activity,
+  CreditCard,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -25,8 +26,9 @@ import AdminNutritionists from './admin/AdminNutritionists';
 import AdminSettings from './admin/AdminSettings';
 import AdminAppointments from './admin/AdminAppointments';
 import AdminBodyMeasurements from './admin/AdminBodyMeasurements';
+import AdminBilling from './admin/AdminBilling';
 
-type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'appointments' | 'measurements' | 'nutritionists' | 'settings';
+type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'appointments' | 'measurements' | 'nutritionists' | 'settings' | 'billing';
 
 const AdminDashboard = () => {
   const [currentView, setCurrentView] = useState<AdminView>('home');
@@ -55,10 +57,12 @@ const AdminDashboard = () => {
         ...baseMenuItems,
         { id: 'nutritionists' as AdminView, label: t('adminDashboard.nav.nutritionists'), icon: Stethoscope },
         { id: 'settings' as AdminView, label: t('adminDashboard.nav.settings'), icon: Settings },
+        { id: 'billing' as AdminView, label: t('adminDashboard.nav.billing'), icon: CreditCard },
       ]
     : [
         ...baseMenuItems,
         { id: 'settings' as AdminView, label: t('adminDashboard.nav.settings'), icon: Settings },
+        { id: 'billing' as AdminView, label: t('adminDashboard.nav.billing'), icon: CreditCard },
       ];
 
   const renderView = () => {
@@ -81,6 +85,8 @@ const AdminDashboard = () => {
         return <AdminNutritionists />;
       case 'settings':
         return <AdminSettings />;
+      case 'billing':
+        return <AdminBilling />;
       default:
         return <AdminHome />;
     }

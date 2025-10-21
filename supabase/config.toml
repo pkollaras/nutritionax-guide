@@ -93,3 +93,12 @@ verify_jwt = true
 
 [functions.parse-body-measurements-pdf]
 verify_jwt = true
+
+[functions.get-billing-info]
+verify_jwt = true
+
+[functions.get-billing-otp]
+verify_jwt = true
+
+[functions.cancel-subscription]
+verify_jwt = true
