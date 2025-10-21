@@ -301,6 +301,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      client_can_view_nutritionist: {
+        Args: { _client_id: string; _nutritionist_id: string }
+        Returns: boolean
+      }
       copy_default_guidelines: {
         Args: { _user_id: string }
         Returns: undefined
