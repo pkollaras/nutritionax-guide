@@ -3,6 +3,7 @@ import LandingNavbar from '@/components/landing/LandingNavbar';
 import HeroSection from '@/components/landing/HeroSection';
 import ProblemsSection from '@/components/landing/ProblemsSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
+import ClientJourneySection from '@/components/landing/ClientJourneySection';
 import TechStackSection from '@/components/landing/TechStackSection';
 import CTASection from '@/components/landing/CTASection';
 const Home = () => {
@@ -16,7 +17,8 @@ const Home = () => {
         <HeroSection />
         <ProblemsSection />
         <FeaturesSection />
-        
+        <ClientJourneySection />
+        <TechStackSection />
         <CTASection />
       </main>
 
