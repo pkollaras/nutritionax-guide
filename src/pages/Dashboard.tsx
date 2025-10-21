@@ -28,7 +28,7 @@ const Dashboard = () => {
     return null;
   }
 
-  return userRole === 'admin' ? <AdminDashboard /> : <UserDashboard />;
+  return (userRole === 'admin' || userRole === 'super_admin') ? <AdminDashboard /> : <UserDashboard />;
 };
 
 export default Dashboard;
