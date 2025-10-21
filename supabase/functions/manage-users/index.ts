@@ -96,12 +96,16 @@ Deno.serve(async (req) => {
 
       // If creating a client, auto-assign to the nutritionist who created them
       if (accountType === 'client') {
-        // Get nutritionist_id of the caller
-        const { data: nutritionistData } = await supabaseClient
+        console.log('Attempting to auto-assign client. Caller user_id:', user.id);
+        
+        // Get nutritionist_id of the caller (using supabaseAdmin to bypass RLS)
+        const { data: nutritionistData, error: nutritionistError } = await supabaseAdmin
           .from('nutritionists')
           .select('id')
           .eq('user_id', user.id)
           .maybeSingle();
+        
+        console.log('Nutritionist lookup result:', nutritionistData, 'Error:', nutritionistError);
         
         if (nutritionistData) {
           // Assign client to nutritionist
@@ -117,6 +121,8 @@ Deno.serve(async (req) => {
           } else {
             console.log('Client auto-assigned to nutritionist:', nutritionistData.id);
           }
+        } else {
+          console.log('No nutritionist found for user_id:', user.id);
         }
       }
 
