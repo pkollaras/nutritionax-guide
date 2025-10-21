@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import { format } from 'date-fns';
+import { PDFUploadSection } from './PDFUploadSection';
 
 interface BodyMeasurement {
   id: string;
@@ -279,6 +280,32 @@ const AdminBodyMeasurements = () => {
     setFormData({ ...formData, custom_fields: updated });
   };
 
+  const handlePDFParsed = (parsedData: any) => {
+    setFormData({
+      date: parsedData.measurement_date || format(new Date(), 'yyyy-MM-dd'),
+      triceps_1: parsedData.triceps_1?.toString() || '',
+      triceps_2: parsedData.triceps_2?.toString() || '',
+      waist_1: parsedData.waist_1?.toString() || '',
+      waist_2: parsedData.waist_2?.toString() || '',
+      back_1: parsedData.back_1?.toString() || '',
+      back_2: parsedData.back_2?.toString() || '',
+      armpit_1: parsedData.armpit_1?.toString() || '',
+      armpit_2: parsedData.armpit_2?.toString() || '',
+      chest_1: parsedData.chest_1?.toString() || '',
+      chest_2: parsedData.chest_2?.toString() || '',
+      abdomen_1: parsedData.abdomen_1?.toString() || '',
+      abdomen_2: parsedData.abdomen_2?.toString() || '',
+      thigh_1: parsedData.thigh_1?.toString() || '',
+      thigh_2: parsedData.thigh_2?.toString() || '',
+      body_fat_percentage: parsedData.body_fat_percentage?.toString() || '',
+      body_mass_percentage: parsedData.body_mass_percentage?.toString() || '',
+      fat_mass: parsedData.fat_mass?.toString() || '',
+      lean_body_mass: parsedData.lean_body_mass?.toString() || '',
+      notes: parsedData.notes || '',
+      custom_fields: formData.custom_fields
+    });
+  };
+
   const skinfolds = [
     { key: 'triceps', label: t('bodyMeasurements.triceps') },
     { key: 'waist', label: t('bodyMeasurements.waist') },
@@ -401,6 +428,14 @@ const AdminBodyMeasurements = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
+            {!currentMeasurement && selectedClient && (
+              <PDFUploadSection
+                onParsed={handlePDFParsed}
+                clientId={selectedClient}
+                disabled={loading}
+              />
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="date">{t('bodyMeasurements.date')}</Label>
               <Input

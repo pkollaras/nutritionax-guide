@@ -90,3 +90,6 @@ verify_jwt = true
 
 [functions.generate-shopping-list]
 verify_jwt = true
+
+[functions.parse-body-measurements-pdf]
+verify_jwt = true
