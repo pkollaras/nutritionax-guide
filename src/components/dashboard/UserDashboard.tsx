@@ -11,6 +11,8 @@ import {
   UtensilsCrossed,
   FileText,
   ShoppingCart,
+  Calendar,
+  Activity,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -20,6 +22,8 @@ import UserProfile from './user/UserProfile';
 import UserDiet from './user/UserDiet';
 import UserGuidelines from './user/UserGuidelines';
 import UserShoppingList from './user/UserShoppingList';
+import UserAppointments from './user/UserAppointments';
+import UserBodyMeasurements from './user/UserBodyMeasurements';
 
 type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines' | 'appointments' | 'measurements' | 'shopping';
 
@@ -36,6 +40,8 @@ const UserDashboard = () => {
 
   const menuItems = [
     { id: 'home' as UserView, label: t('userDashboard.nav.today'), icon: Home },
+    { id: 'appointments' as UserView, label: t('userDashboard.nav.appointments'), icon: Calendar },
+    { id: 'measurements' as UserView, label: t('userDashboard.nav.measurements'), icon: Activity },
     { id: 'guidelines' as UserView, label: t('userDashboard.nav.guidelines'), icon: FileText },
     { id: 'diet' as UserView, label: t('userDashboard.nav.diet'), icon: UtensilsCrossed },
     { id: 'shopping' as UserView, label: t('userDashboard.nav.shoppingList'), icon: ShoppingCart },
@@ -57,6 +63,10 @@ const UserDashboard = () => {
         return <UserProgress />;
       case 'profile':
         return <UserProfile />;
+      case 'appointments':
+        return <UserAppointments />;
+      case 'measurements':
+        return <UserBodyMeasurements />;
       default:
         return <UserHome />;
     }

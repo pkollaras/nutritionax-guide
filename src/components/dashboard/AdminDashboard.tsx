@@ -11,6 +11,8 @@ import {
   LogOut,
   Menu,
   Stethoscope,
+  Calendar,
+  Activity,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -21,6 +23,8 @@ import AdminGuidelines from './admin/AdminGuidelines';
 import AdminReports from './admin/AdminReports';
 import AdminNutritionists from './admin/AdminNutritionists';
 import AdminSettings from './admin/AdminSettings';
+import AdminAppointments from './admin/AdminAppointments';
+import AdminBodyMeasurements from './admin/AdminBodyMeasurements';
 
 type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'appointments' | 'measurements' | 'nutritionists' | 'settings';
 
@@ -38,6 +42,8 @@ const AdminDashboard = () => {
   const baseMenuItems = [
     { id: 'home' as AdminView, label: t('adminDashboard.nav.dashboard'), icon: LayoutDashboard },
     { id: 'users' as AdminView, label: t('adminDashboard.nav.users'), icon: Users },
+    { id: 'appointments' as AdminView, label: t('adminDashboard.nav.appointments'), icon: Calendar },
+    { id: 'measurements' as AdminView, label: t('adminDashboard.nav.measurements'), icon: Activity },
     { id: 'diets' as AdminView, label: t('adminDashboard.nav.diets'), icon: FileText },
     { id: 'guidelines' as AdminView, label: t('adminDashboard.nav.guidelines'), icon: BookOpen },
     { id: 'reports' as AdminView, label: t('adminDashboard.nav.reports'), icon: FileText },
@@ -67,6 +73,10 @@ const AdminDashboard = () => {
         return <AdminGuidelines />;
       case 'reports':
         return <AdminReports />;
+      case 'appointments':
+        return <AdminAppointments />;
+      case 'measurements':
+        return <AdminBodyMeasurements />;
       case 'nutritionists':
         return <AdminNutritionists />;
       case 'settings':
