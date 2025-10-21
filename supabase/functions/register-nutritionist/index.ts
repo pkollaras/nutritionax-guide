@@ -113,7 +113,7 @@ async function getServicesOTP(customerApiToken: string): Promise<string> {
 // Helper function to generate begin subscription URL with free first month
 function generateBeginSubscriptionUrl(otp: string): string {
   const servicesUrl = "https://services.advisable.gr";
-  const redirectUrl = encodeURIComponent("https://nutritionax.com/signup-success");
+  const redirectUrl = "https://nutritionax.com/signup-success";
   const productCodeId = 1237;
   const quantity = 1;
   const productList = `${productCodeId}:${quantity}`;
