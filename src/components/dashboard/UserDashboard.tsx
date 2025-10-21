@@ -21,7 +21,7 @@ import UserDiet from './user/UserDiet';
 import UserGuidelines from './user/UserGuidelines';
 import UserShoppingList from './user/UserShoppingList';
 
-type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines' | 'shopping';
+type UserView = 'home' | 'progress' | 'profile' | 'diet' | 'guidelines' | 'appointments' | 'measurements' | 'shopping';
 
 const UserDashboard = () => {
   const [currentView, setCurrentView] = useState<UserView>('home');

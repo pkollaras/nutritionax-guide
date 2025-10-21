@@ -22,7 +22,7 @@ import AdminReports from './admin/AdminReports';
 import AdminNutritionists from './admin/AdminNutritionists';
 import AdminSettings from './admin/AdminSettings';
 
-type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'nutritionists' | 'settings';
+type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'appointments' | 'measurements' | 'nutritionists' | 'settings';
 
 const AdminDashboard = () => {
   const [currentView, setCurrentView] = useState<AdminView>('home');

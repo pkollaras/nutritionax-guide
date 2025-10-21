@@ -53,6 +53,93 @@ export type Database = {
         }
         Relationships: []
       }
+      body_measurements: {
+        Row: {
+          abdomen_1: number | null
+          abdomen_2: number | null
+          armpit_1: number | null
+          armpit_2: number | null
+          back_1: number | null
+          back_2: number | null
+          body_fat_percentage: number | null
+          body_mass_percentage: number | null
+          chest_1: number | null
+          chest_2: number | null
+          client_id: string
+          created_at: string | null
+          custom_fields: Json | null
+          fat_mass: number | null
+          id: string
+          lean_body_mass: number | null
+          measurement_date: string
+          notes: string | null
+          nutritionist_id: string
+          thigh_1: number | null
+          thigh_2: number | null
+          triceps_1: number | null
+          triceps_2: number | null
+          updated_at: string | null
+          waist_1: number | null
+          waist_2: number | null
+        }
+        Insert: {
+          abdomen_1?: number | null
+          abdomen_2?: number | null
+          armpit_1?: number | null
+          armpit_2?: number | null
+          back_1?: number | null
+          back_2?: number | null
+          body_fat_percentage?: number | null
+          body_mass_percentage?: number | null
+          chest_1?: number | null
+          chest_2?: number | null
+          client_id: string
+          created_at?: string | null
+          custom_fields?: Json | null
+          fat_mass?: number | null
+          id?: string
+          lean_body_mass?: number | null
+          measurement_date?: string
+          notes?: string | null
+          nutritionist_id: string
+          thigh_1?: number | null
+          thigh_2?: number | null
+          triceps_1?: number | null
+          triceps_2?: number | null
+          updated_at?: string | null
+          waist_1?: number | null
+          waist_2?: number | null
+        }
+        Update: {
+          abdomen_1?: number | null
+          abdomen_2?: number | null
+          armpit_1?: number | null
+          armpit_2?: number | null
+          back_1?: number | null
+          back_2?: number | null
+          body_fat_percentage?: number | null
+          body_mass_percentage?: number | null
+          chest_1?: number | null
+          chest_2?: number | null
+          client_id?: string
+          created_at?: string | null
+          custom_fields?: Json | null
+          fat_mass?: number | null
+          id?: string
+          lean_body_mass?: number | null
+          measurement_date?: string
+          notes?: string | null
+          nutritionist_id?: string
+          thigh_1?: number | null
+          thigh_2?: number | null
+          triceps_1?: number | null
+          triceps_2?: number | null
+          updated_at?: string | null
+          waist_1?: number | null
+          waist_2?: number | null
+        }
+        Relationships: []
+      }
       client_nutritionists: {
         Row: {
           client_id: string
