@@ -141,9 +141,14 @@ const Signup = () => {
 
       if (error) throw error;
 
-      // Store services data in sessionStorage
+      // Store services data and credentials in sessionStorage for auto-login
       if (data.servicesData) {
         sessionStorage.setItem('nutritionax_services_data', JSON.stringify(data.servicesData));
+        // Store credentials for auto-login after payment
+        sessionStorage.setItem('nutritionax_signup_credentials', JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }));
       }
 
       if (data.paymentUrl) {

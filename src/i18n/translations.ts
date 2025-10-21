@@ -123,7 +123,7 @@ export const translations = {
     invalidFileType: 'Παρακαλώ επιλέξτε αρχείο PDF',
     orManualEntry: 'ή συμπληρώστε χειροκίνητα:',
     rateLimitError: 'Πολλά αιτήματα. Δοκιμάστε ξανά σε λίγο.',
-  },
+    },
     dashboard: {
       loading: 'Φόρτωση...',
     },
@@ -693,9 +693,11 @@ export const translations = {
       
       success: {
         title: 'Επιτυχής Εγγραφή!',
-        message: 'Η εγγραφή σας ολοκληρώθηκε επιτυχώς και η πληρωμή σας καταχωρήθηκε!',
-        emailSent: 'Θα λάβετε ένα email επιβεβαίωσης με τα στοιχεία σύνδεσής σας.',
-        loginButton: 'Σύνδεση στην Πλατφόρμα',
+        message: 'Η πληρωμή σας ολοκληρώθηκε επιτυχώς.',
+        emailSent: 'Ένα email επιβεβαίωσης στάλθηκε στο email σας.',
+        loginButton: 'Σύνδεση',
+        autoLogin: 'Αυτόματη σύνδεση σε {seconds} δευτερόλεπτα...',
+        loggingIn: 'Γίνεται σύνδεση...',
       },
       
       authorization: {
@@ -1424,9 +1426,11 @@ export const translations = {
     
     success: {
       title: 'Registration Successful!',
-      message: 'Your registration is complete and your payment has been processed!',
-      emailSent: 'You will receive a confirmation email with your login details.',
-      loginButton: 'Login to Platform',
+      message: 'Your payment has been completed successfully.',
+      emailSent: 'A confirmation email has been sent to your email.',
+      loginButton: 'Login',
+      autoLogin: 'Auto-login in {seconds} seconds...',
+      loggingIn: 'Logging in...',
     },
     
     authorization: {
