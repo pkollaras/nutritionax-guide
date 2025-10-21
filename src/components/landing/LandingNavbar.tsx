@@ -24,9 +24,12 @@ const LandingNavbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/home" className="flex items-center gap-2 text-xl font-bold text-foreground">
+        <Link to="/home" className="flex items-center gap-2 text-foreground">
           <Leaf className="h-6 w-6 text-primary" />
-          <span>Nutritionax</span>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold">Nutritionax</span>
+            <span className="text-[10px] text-muted-foreground -mt-1">by Advisable</span>
+          </div>
         </Link>
 
         <div className="hidden md:flex items-center gap-6 text-sm font-medium">
