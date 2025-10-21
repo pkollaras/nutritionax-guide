@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          client_id: string
+          created_at: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          nutritionist_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          client_id: string
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          nutritionist_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          nutritionist_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       client_nutritionists: {
         Row: {
           client_id: string
