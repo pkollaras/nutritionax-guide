@@ -12,9 +12,9 @@ interface RecurringService {
   price: string;
   recurring_type: string;
   status: string;
-  next_billing_date: string;
-  card_number: string;
-  is_card_verification: number;
+  next_recurring_billing_date: string;
+  CardNum: string;
+  is_card_verification: string;
 }
 
 serve(async (req) => {
@@ -100,7 +100,7 @@ serve(async (req) => {
     console.log('Services data received:', servicesData);
 
     // Check if there are any active subscriptions
-    if (!servicesData.data || servicesData.data.length === 0) {
+    if (!servicesData.data?.recurring_services || servicesData.data.recurring_services.length === 0) {
       return new Response(
         JSON.stringify({ hasSubscription: false }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -108,7 +108,7 @@ serve(async (req) => {
     }
 
     // Get the first active subscription
-    const service: RecurringService = servicesData.data[0];
+    const service: RecurringService = servicesData.data.recurring_services[0];
 
     const billingInfo = {
       hasSubscription: true,
@@ -118,9 +118,9 @@ serve(async (req) => {
         price: service.price,
         recurringType: service.recurring_type,
         status: service.status,
-        nextBillingDate: service.next_billing_date,
-        cardNumber: service.card_number,
-        isCardVerification: service.is_card_verification === 1,
+        nextBillingDate: service.next_recurring_billing_date,
+        cardNumber: service.CardNum,
+        isCardVerification: service.is_card_verification === "1",
       },
     };
 
