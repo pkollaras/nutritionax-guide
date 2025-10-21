@@ -53,6 +53,11 @@ const SignupSuccess = () => {
         window.location.origin
       );
       
+      // Close the popup automatically after sending the message
+      setTimeout(() => {
+        window.close();
+      }, 500);
+      
       // Don't render anything in popup - parent will close it
       return;
     }
