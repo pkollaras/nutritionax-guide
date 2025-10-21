@@ -1477,7 +1477,6 @@ export const translations = {
       region: 'Region is required',
     },
   },
-  },
 };
 
 export const getTranslation = (lang: Language, key: string): string => {
