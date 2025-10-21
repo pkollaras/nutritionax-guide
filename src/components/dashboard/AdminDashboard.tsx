@@ -20,6 +20,7 @@ import AdminDiets from './admin/AdminDiets';
 import AdminGuidelines from './admin/AdminGuidelines';
 import AdminReports from './admin/AdminReports';
 import AdminNutritionists from './admin/AdminNutritionists';
+import AdminSettings from './admin/AdminSettings';
 
 type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'nutritionists' | 'settings';
 
@@ -47,11 +48,11 @@ const AdminDashboard = () => {
     ? [
         ...baseMenuItems,
         { id: 'nutritionists' as AdminView, label: t('adminDashboard.nav.nutritionists'), icon: Stethoscope },
-        { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
+        { id: 'settings' as AdminView, label: t('adminDashboard.nav.settings'), icon: Settings },
       ]
     : [
         ...baseMenuItems,
-        { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
+        { id: 'settings' as AdminView, label: t('adminDashboard.nav.settings'), icon: Settings },
       ];
 
   const renderView = () => {
@@ -69,7 +70,7 @@ const AdminDashboard = () => {
       case 'nutritionists':
         return <AdminNutritionists />;
       case 'settings':
-        return <div className="p-6"><h2 className="text-2xl font-bold">Ρυθμίσεις</h2></div>;
+        return <AdminSettings />;
       default:
         return <AdminHome />;
     }
