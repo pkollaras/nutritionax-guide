@@ -8,9 +8,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Upload } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 const AdminGuidelines = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { nutritionistId } = useAuth();
   const [users, setUsers] = useState<Array<{
     id: string;
     name: string;
@@ -22,28 +24,46 @@ const AdminGuidelines = () => {
   const [userGuidelineId, setUserGuidelineId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (nutritionistId) {
+      fetchUsers();
+    }
+  }, [nutritionistId]);
   useEffect(() => {
     if (selectedUserId) {
       fetchUserGuidelines(selectedUserId);
     }
   }, [selectedUserId]);
   const fetchUsers = async () => {
-    const {
-      data
-    } = await supabase.from('profiles').select('id, name, email').order('name');
+    if (!nutritionistId) return;
+    
+    const { data } = await supabase
+      .from('profiles')
+      .select(`
+        id, 
+        name, 
+        email,
+        client_nutritionists!inner(nutritionist_id)
+      `)
+      .eq('client_nutritionists.nutritionist_id', nutritionistId)
+      .order('name');
+    
     if (data) {
       setUsers(data);
     }
   };
   const fetchUserGuidelines = async (userId: string) => {
+    if (!nutritionistId) return;
+    
     setUserLoading(true);
-    const {
-      data
-    } = await supabase.from('guidelines').select('*').eq('user_id', userId).order('created_at', {
-      ascending: false
-    }).limit(1).maybeSingle();
+    const { data } = await supabase
+      .from('guidelines')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('nutritionist_id', nutritionistId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
     if (data) {
       setUserGuidelines(data.content);
       setUserGuidelineId(data.id);
@@ -117,22 +137,32 @@ const AdminGuidelines = () => {
       });
       return;
     }
+    
+    if (!nutritionistId) {
+      toast({
+        title: t('common.error'),
+        description: 'Nutritionist ID not found',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     setUserLoading(true);
     try {
       if (userGuidelineId) {
-        const {
-          error
-        } = await supabase.from('guidelines').update({
-          content: userGuidelines
-        }).eq('id', userGuidelineId);
+        const { error } = await supabase
+          .from('guidelines')
+          .update({ content: userGuidelines })
+          .eq('id', userGuidelineId);
         if (error) throw error;
       } else {
-        const {
-          error
-        } = await supabase.from('guidelines').insert({
-          content: userGuidelines,
-          user_id: selectedUserId
-        });
+        const { error } = await supabase
+          .from('guidelines')
+          .insert({
+            content: userGuidelines,
+            user_id: selectedUserId,
+            nutritionist_id: nutritionistId
+          });
         if (error) throw error;
       }
       toast({

@@ -14,26 +14,73 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_nutritionists: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          nutritionist_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          nutritionist_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          nutritionist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_nutritionists_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_nutritionists_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       default_guidelines: {
         Row: {
           content: string
           created_at: string | null
           id: string
+          nutritionist_id: string
           updated_at: string | null
         }
         Insert: {
           content: string
           created_at?: string | null
           id?: string
+          nutritionist_id: string
           updated_at?: string | null
         }
         Update: {
           content?: string
           created_at?: string | null
           id?: string
+          nutritionist_id?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "default_guidelines_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       diet_plans: {
         Row: {
@@ -41,6 +88,7 @@ export type Database = {
           day_of_week: string
           id: string
           meals: Json
+          nutritionist_id: string
           updated_at: string | null
           user_id: string
         }
@@ -49,6 +97,7 @@ export type Database = {
           day_of_week: string
           id?: string
           meals?: Json
+          nutritionist_id: string
           updated_at?: string | null
           user_id: string
         }
@@ -57,16 +106,26 @@ export type Database = {
           day_of_week?: string
           id?: string
           meals?: Json
+          nutritionist_id?: string
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "diet_plans_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       guidelines: {
         Row: {
           content: string
           created_at: string | null
           id: string
+          nutritionist_id: string
           updated_at: string | null
           user_id: string
         }
@@ -74,6 +133,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          nutritionist_id: string
           updated_at?: string | null
           user_id: string
         }
@@ -81,6 +141,42 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          nutritionist_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guidelines_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nutritionists: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
           updated_at?: string | null
           user_id?: string
         }
@@ -209,11 +305,19 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      get_nutritionist_id: {
+        Args: { _user_id: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_clients_nutritionist: {
+        Args: { _client_id: string; _nutritionist_user_id: string }
         Returns: boolean
       }
     }

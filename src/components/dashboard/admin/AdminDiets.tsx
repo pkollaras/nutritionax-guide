@@ -9,12 +9,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Upload } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 // English day names for database (must match database values)
 const DAYS_EN = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const AdminDiets = () => {
   const { t } = useLanguage();
+  const { nutritionistId } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [dietPlans, setDietPlans] = useState<any>({});
@@ -30,8 +32,10 @@ const AdminDiets = () => {
   ];
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (nutritionistId) {
+      fetchUsers();
+    }
+  }, [nutritionistId]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -40,15 +44,28 @@ const AdminDiets = () => {
   }, [selectedUser]);
 
   const fetchUsers = async () => {
-    const { data } = await supabase.from('profiles').select('*');
+    if (!nutritionistId) return;
+    
+    // Fetch clients for this nutritionist
+    const { data } = await supabase
+      .from('profiles')
+      .select(`
+        *,
+        client_nutritionists!inner(nutritionist_id)
+      `)
+      .eq('client_nutritionists.nutritionist_id', nutritionistId);
+    
     setUsers(data || []);
   };
 
   const fetchDietPlan = async (userId: string) => {
+    if (!nutritionistId) return;
+    
     const { data } = await supabase
       .from('diet_plans')
       .select('*')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('nutritionist_id', nutritionistId);
 
     const plansObj: any = {};
     data?.forEach((plan) => {
@@ -83,6 +100,15 @@ const AdminDiets = () => {
       return;
     }
 
+    if (!nutritionistId) {
+      toast({ 
+        title: t('common.error'), 
+        description: 'Nutritionist ID not found', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -96,8 +122,9 @@ const AdminDiets = () => {
             user_id: selectedUser,
             day_of_week: dayEN,
             meals,
+            nutritionist_id: nutritionistId
           }, {
-            onConflict: 'user_id,day_of_week'
+            onConflict: 'user_id,day_of_week,nutritionist_id'
           });
       }
 

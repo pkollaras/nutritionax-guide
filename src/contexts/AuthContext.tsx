@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: 'admin' | 'user' | null;
+  nutritionistId: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: any }>;
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
+  const [nutritionistId, setNutritionistId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -65,13 +67,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // If user has multiple roles, prioritize admin
       if (data && data.length > 0) {
         const hasAdmin = data.some(r => r.role === 'admin');
-        setUserRole(hasAdmin ? 'admin' : data[0].role as 'admin' | 'user');
+        const role = hasAdmin ? 'admin' : data[0].role as 'admin' | 'user';
+        setUserRole(role);
+        
+        // If admin, fetch nutritionist_id
+        if (role === 'admin') {
+          const { data: nutritionistData } = await supabase
+            .from('nutritionists')
+            .select('id')
+            .eq('user_id', userId)
+            .maybeSingle();
+          
+          setNutritionistId(nutritionistData?.id || null);
+        } else {
+          setNutritionistId(null);
+        }
       } else {
         setUserRole('user');
+        setNutritionistId(null);
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
       setUserRole('user');
+      setNutritionistId(null);
     } finally {
       setLoading(false);
     }
@@ -176,7 +194,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, userRole, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      userRole, 
+      nutritionistId,
+      loading, 
+      signIn, 
+      signUp, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -8,9 +8,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UtensilsCrossed } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AdminReports = () => {
   const { t, language } = useLanguage();
+  const { nutritionistId } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [reports, setReports] = useState<any[]>([]);
@@ -20,8 +22,10 @@ const AdminReports = () => {
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (nutritionistId) {
+      fetchUsers();
+    }
+  }, [nutritionistId]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -30,7 +34,16 @@ const AdminReports = () => {
   }, [selectedUser]);
 
   const fetchUsers = async () => {
-    const { data } = await supabase.from('profiles').select('*');
+    if (!nutritionistId) return;
+    
+    const { data } = await supabase
+      .from('profiles')
+      .select(`
+        *,
+        client_nutritionists!inner(nutritionist_id)
+      `)
+      .eq('client_nutritionists.nutritionist_id', nutritionistId);
+    
     setUsers(data || []);
   };
 
@@ -57,6 +70,8 @@ const AdminReports = () => {
   };
 
   const handleViewDiet = async (reportDate: string) => {
+    if (!nutritionistId) return;
+    
     const dayOfWeek = getDayOfWeekInEnglish(reportDate);
     
     const { data } = await supabase
@@ -64,7 +79,8 @@ const AdminReports = () => {
       .select('*')
       .eq('user_id', selectedUser)
       .eq('day_of_week', dayOfWeek)
-      .single();
+      .eq('nutritionist_id', nutritionistId)
+      .maybeSingle();
 
     setSelectedDiet(data);
     setDialogOpen(true);

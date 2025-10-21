@@ -61,7 +61,16 @@ Deno.serve(async (req) => {
     }
 
     // Parse the request body
-    const { action, email, password, name, userId, sendEmail, newPassword } = await req.json();
+    const { 
+      action, 
+      email, 
+      password, 
+      name, 
+      userId, 
+      sendEmail, 
+      newPassword,
+      accountType = 'client' 
+    } = await req.json();
 
     if (action === 'create') {
       // Create a new user
@@ -69,7 +78,10 @@ Deno.serve(async (req) => {
         email,
         password,
         email_confirm: true,
-        user_metadata: { name },
+        user_metadata: { 
+          name,
+          account_type: accountType // 'client' or 'nutritionist'
+        },
       });
 
       if (createError) {
@@ -80,7 +92,33 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log('User created successfully:', newUser.user.id);
+      console.log('User created successfully:', newUser.user.id, 'Type:', accountType);
+
+      // If creating a client, auto-assign to the nutritionist who created them
+      if (accountType === 'client') {
+        // Get nutritionist_id of the caller
+        const { data: nutritionistData } = await supabaseClient
+          .from('nutritionists')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (nutritionistData) {
+          // Assign client to nutritionist
+          const { error: assignError } = await supabaseAdmin
+            .from('client_nutritionists')
+            .insert({
+              client_id: newUser.user.id,
+              nutritionist_id: nutritionistData.id
+            });
+          
+          if (assignError) {
+            console.error('Error assigning client to nutritionist:', assignError);
+          } else {
+            console.log('Client auto-assigned to nutritionist:', nutritionistData.id);
+          }
+        }
+      }
 
       // Send welcome email if requested
       if (sendEmail) {

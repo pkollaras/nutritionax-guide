@@ -24,6 +24,8 @@ const UserDiet = () => {
   const [dietPlans, setDietPlans] = useState<DietPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
+  const [nutritionists, setNutritionists] = useState<Array<{ id: string; name: string }>>([]);
+  const [selectedNutritionist, setSelectedNutritionist] = useState<string>('');
 
   // English day names for database (must match database values)
   const daysEN = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -36,18 +38,51 @@ const UserDiet = () => {
 
   useEffect(() => {
     if (user) {
-      fetchDietPlan();
+      fetchNutritionists();
     }
   }, [user]);
 
-  const fetchDietPlan = async () => {
+  useEffect(() => {
+    if (selectedNutritionist) {
+      fetchDietPlan();
+    }
+  }, [selectedNutritionist]);
+
+  const fetchNutritionists = async () => {
     if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('client_nutritionists')
+        .select(`
+          nutritionist_id,
+          nutritionists(id, name)
+        `)
+        .eq('client_id', user.id);
+
+      if (error) throw error;
+
+      const nutritionistsList = data?.map((cn: any) => cn.nutritionists).filter(Boolean) || [];
+      setNutritionists(nutritionistsList);
+      
+      // Auto-select first nutritionist if available
+      if (nutritionistsList.length > 0 && !selectedNutritionist) {
+        setSelectedNutritionist(nutritionistsList[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching nutritionists:', error);
+    }
+  };
+
+  const fetchDietPlan = async () => {
+    if (!user || !selectedNutritionist) return;
 
     try {
       const { data, error } = await supabase
         .from('diet_plans')
         .select('*')
         .eq('user_id', user.id)
+        .eq('nutritionist_id', selectedNutritionist)
         .order('day_of_week');
 
       if (error) throw error;
@@ -100,6 +135,29 @@ const UserDiet = () => {
           {t('userDashboard.diet.title')}
         </h1>
       </div>
+
+      {/* Nutritionist Selector (if multiple nutritionists) */}
+      {nutritionists.length > 1 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">{t('userDashboard.diet.selectNutritionist')}</CardTitle>
+            <CardDescription>{t('userDashboard.diet.selectNutritionistDesc')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <select
+              className="w-full p-2 border rounded-md"
+              value={selectedNutritionist}
+              onChange={(e) => setSelectedNutritionist(e.target.value)}
+            >
+              {nutritionists.map((nutritionist) => (
+                <option key={nutritionist.id} value={nutritionist.id}>
+                  {nutritionist.name}
+                </option>
+              ))}
+            </select>
+          </CardContent>
+        </Card>
+      )}
 
       {dietPlans.length === 0 ? (
         <Card className="text-center py-12">
