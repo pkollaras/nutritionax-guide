@@ -2,17 +2,27 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, Plus, CalendarIcon, Pencil, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const AdminReports = () => {
   const { t, language } = useLanguage();
   const { nutritionistId } = useAuth();
+  const { toast } = useToast();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [reports, setReports] = useState<any[]>([]);
@@ -20,6 +30,17 @@ const AdminReports = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedNotes, setSelectedNotes] = useState('');
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  
+  // Form state
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [weight, setWeight] = useState('');
+  const [toiletVisits, setToiletVisits] = useState('');
+  const [morningBM, setMorningBM] = useState(false);
+  const [notes, setNotes] = useState('');
+  const [dayOfDiet, setDayOfDiet] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (nutritionistId) {
@@ -30,6 +51,7 @@ const AdminReports = () => {
   useEffect(() => {
     if (selectedUser) {
       fetchReports(selectedUser);
+      resetForm();
     }
   }, [selectedUser]);
 
@@ -55,6 +77,123 @@ const AdminReports = () => {
       .order('date', { ascending: false });
 
     setReports(data || []);
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setWeight('');
+    setToiletVisits('');
+    setMorningBM(false);
+    setNotes('');
+    setDayOfDiet('');
+    setSelectedDate(new Date());
+    setShowAddForm(false);
+  };
+
+  const autoFillDietDay = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const { data } = await supabase
+        .from('progress_reports')
+        .select('day_of_diet, date')
+        .eq('user_id', selectedUser)
+        .not('day_of_diet', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data?.day_of_diet) {
+        setDayOfDiet((data.day_of_diet + 1).toString());
+      }
+    } catch (error) {
+      console.error('Error auto-filling diet day:', error);
+    }
+  };
+
+  const handleEdit = (report: any) => {
+    setEditingId(report.id);
+    setSelectedDate(new Date(report.date));
+    setWeight(report.weight?.toString() || '');
+    setToiletVisits(report.wc?.toString() || '');
+    setMorningBM(report.morning_bm || false);
+    setNotes(report.notes || '');
+    setDayOfDiet(report.day_of_diet?.toString() || '');
+    setShowAddForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSave = async () => {
+    if (!selectedUser || !selectedDate) return;
+
+    // Validation
+    if (!weight && !toiletVisits && !dayOfDiet && !notes && !morningBM) {
+      toast({
+        title: t('common.error'),
+        description: t('adminDashboard.reports.atLeastOneField'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    const dateString = format(selectedDate, 'yyyy-MM-dd');
+
+    try {
+      if (editingId) {
+        // Update existing
+        const { error } = await supabase
+          .from('progress_reports')
+          .update({
+            date: dateString,
+            weight: weight ? parseFloat(weight) : null,
+            wc: toiletVisits ? parseFloat(toiletVisits) : null,
+            morning_bm: morningBM,
+            notes,
+            day_of_diet: dayOfDiet ? parseInt(dayOfDiet) : null,
+          })
+          .eq('id', editingId);
+
+        if (error) throw error;
+
+        toast({
+          title: t('common.success'),
+          description: t('adminDashboard.reports.updateSuccess'),
+        });
+      } else {
+        // Insert new
+        const { error } = await supabase
+          .from('progress_reports')
+          .insert({
+            user_id: selectedUser,
+            date: dateString,
+            weight: weight ? parseFloat(weight) : null,
+            wc: toiletVisits ? parseFloat(toiletVisits) : null,
+            morning_bm: morningBM,
+            notes,
+            day_of_diet: dayOfDiet ? parseInt(dayOfDiet) : null,
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: t('common.success'),
+          description: t('adminDashboard.reports.saveSuccess'),
+        });
+      }
+
+      fetchReports(selectedUser);
+      resetForm();
+    } catch (error) {
+      console.error('Error saving report:', error);
+      toast({
+        title: t('common.error'),
+        description: 'Σφάλμα κατά την αποθήκευση',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getDayName = (date: string) => {
@@ -118,6 +257,134 @@ const AdminReports = () => {
           </Select>
         </CardContent>
       </Card>
+
+      {selectedUser && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>
+              {editingId ? t('adminDashboard.reports.editEntry') : t('adminDashboard.reports.addNewEntry')}
+            </CardTitle>
+            {showAddForm && (
+              <Button variant="ghost" size="sm" onClick={resetForm}>
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </CardHeader>
+          {showAddForm ? (
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>{t('adminDashboard.reports.selectDate')}</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          'w-full justify-start text-left font-normal',
+                          !selectedDate && 'text-muted-foreground'
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(selectedDate, 'PPP') : t('adminDashboard.reports.pickDate')}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>{t('adminDashboard.reports.dietDay')}</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={autoFillDietDay}
+                      className="h-auto p-1 text-xs"
+                    >
+                      {t('adminDashboard.reports.autoFillDietDay')}
+                    </Button>
+                  </div>
+                  <Input
+                    type="number"
+                    value={dayOfDiet}
+                    onChange={(e) => setDayOfDiet(e.target.value)}
+                    placeholder="1, 2, 3..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('adminDashboard.reports.weight')}</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                    placeholder="kg"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('adminDashboard.reports.toiletVisits')}</Label>
+                  <Input
+                    type="number"
+                    value={toiletVisits}
+                    onChange={(e) => setToiletVisits(e.target.value)}
+                    placeholder="0, 1, 2..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="morningBM"
+                  checked={morningBM}
+                  onCheckedChange={(checked) => setMorningBM(checked as boolean)}
+                />
+                <label
+                  htmlFor="morningBM"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {t('adminDashboard.reports.morningBM')}
+                </label>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('adminDashboard.reports.notes')}</Label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={t('adminDashboard.reports.notes')}
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={resetForm} disabled={loading}>
+                  {t('common.cancel')}
+                </Button>
+                <Button onClick={handleSave} disabled={loading}>
+                  {loading ? t('common.saving') : t('adminDashboard.reports.saveProgress')}
+                </Button>
+              </div>
+            </CardContent>
+          ) : (
+            <CardContent>
+              <Button onClick={() => setShowAddForm(true)} className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                {t('adminDashboard.reports.addNewEntry')}
+              </Button>
+            </CardContent>
+          )}
+        </Card>
+      )}
 
       {selectedUser && reports.length > 0 && (
         <>
@@ -191,14 +458,22 @@ const AdminReports = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewDiet(report.date)}
-                          >
-                            <UtensilsCrossed className="h-4 w-4" />
-                            {t('adminDashboard.reports.viewDiet')}
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(report)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewDiet(report.date)}
+                            >
+                              <UtensilsCrossed className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -221,13 +496,22 @@ const AdminReports = () => {
                               {getDayName(report.date)}
                             </p>
                           </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleViewDiet(report.date)}
-                          >
-                            <UtensilsCrossed className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(report)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleViewDiet(report.date)}
+                            >
+                              <UtensilsCrossed className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3 text-sm">
