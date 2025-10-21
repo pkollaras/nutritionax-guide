@@ -105,13 +105,24 @@ const Signup = () => {
 
       if (error) throw error;
 
+      // Store services data in sessionStorage
+      if (data.servicesData) {
+        sessionStorage.setItem('nutritionax_services_data', JSON.stringify(data.servicesData));
+      }
+
       toast({
         title: t("signup.success"),
-        description: t("signup.successMessage"),
+        description: t("signup.paymentRedirect"),
       });
 
+      // Redirect to payment URL
       setTimeout(() => {
-        navigate("/auth");
+        if (data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+        } else {
+          // Fallback if no payment URL
+          navigate("/auth");
+        }
       }, 2000);
 
     } catch (error: any) {

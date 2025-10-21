@@ -287,6 +287,8 @@ export type Database = {
           email: string
           id: string
           name: string
+          services_api_token: string | null
+          services_customer_id: number | null
           updated_at: string | null
           user_id: string
         }
@@ -295,6 +297,8 @@ export type Database = {
           email: string
           id?: string
           name: string
+          services_api_token?: string | null
+          services_customer_id?: number | null
           updated_at?: string | null
           user_id: string
         }
@@ -303,6 +307,8 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          services_api_token?: string | null
+          services_customer_id?: number | null
           updated_at?: string | null
           user_id?: string
         }

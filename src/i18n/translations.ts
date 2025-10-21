@@ -686,10 +686,16 @@ export const translations = {
       
       submit: 'Ολοκλήρωση Εγγραφής',
       submitting: 'Εγγραφή...',
-      success: 'Επιτυχής Εγγραφή!',
-      successMessage: 'Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Μπορείτε να συνδεθείτε τώρα.',
+      paymentRedirect: 'Μεταφορά στη σελίδα πληρωμής...',
       error: 'Σφάλμα Εγγραφής',
       errorMessage: 'Παρουσιάστηκε σφάλμα κατά την εγγραφή. Παρακαλώ ελέγξτε τα στοιχεία σας.',
+      
+      success: {
+        title: 'Επιτυχής Εγγραφή!',
+        message: 'Η εγγραφή σας ολοκληρώθηκε επιτυχώς και η πληρωμή σας καταχωρήθηκε!',
+        emailSent: 'Θα λάβετε ένα email επιβεβαίωσης με τα στοιχεία σύνδεσής σας.',
+        loginButton: 'Σύνδεση στην Πλατφόρμα',
+      },
       
       pricingCard: {
         title: 'Ξεκινήστε Σήμερα',
@@ -1397,10 +1403,16 @@ export const translations = {
     
     submit: 'Complete Registration',
     submitting: 'Registering...',
-    success: 'Registration Successful!',
-    successMessage: 'Your account has been created successfully. You can now log in.',
+    paymentRedirect: 'Redirecting to payment...',
     error: 'Registration Error',
     errorMessage: 'An error occurred during registration. Please check your details.',
+    
+    success: {
+      title: 'Registration Successful!',
+      message: 'Your registration is complete and your payment has been processed!',
+      emailSent: 'You will receive a confirmation email with your login details.',
+      loginButton: 'Login to Platform',
+    },
     
     pricingCard: {
       title: 'Start Today',

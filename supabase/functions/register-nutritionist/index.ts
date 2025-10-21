@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
-import { Resend } from "npm:resend@4.0.0";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,6 +29,97 @@ interface RegistrationData {
   companyAddress?: string;
 }
 
+interface ServicesCustomerData {
+  provider: string;
+  friendly_name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  phone: string;
+  company_afm?: string;
+  company_doy?: string;
+  company_name?: string;
+  company_profession?: string;
+  company_address?: string;
+}
+
+interface ServicesCustomerResponse {
+  data: {
+    customer_id: number;
+    services_api_token: string;
+  };
+}
+
+interface ServicesOTPResponse {
+  data: {
+    otp: string;
+  };
+}
+
+// Helper function to create customer in Advisable Services
+async function createServicesCustomer(customerData: ServicesCustomerData): Promise<ServicesCustomerResponse> {
+  const servicesApiToken = Deno.env.get("ADVISABLE_SERVICES_API_TOKEN")!;
+  const servicesUrl = "https://services.advisable.gr";
+  
+  console.log("Creating customer in Advisable Services...");
+  
+  const response = await fetch(`${servicesUrl}/api/services/admin/customer`, {
+    method: 'POST',
+    headers: {
+      'X-Advisable-API-Token': servicesApiToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(customerData),
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Services API error:", errorText);
+    throw new Error(`Failed to create customer in Services: ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log("Services customer created:", result);
+  return result;
+}
+
+// Helper function to get OTP
+async function getServicesOTP(customerApiToken: string): Promise<string> {
+  const servicesUrl = "https://services.advisable.gr";
+  
+  console.log("Getting OTP from Services...");
+  
+  const response = await fetch(`${servicesUrl}/api/services/customer/getOTP`, {
+    method: 'GET',
+    headers: {
+      'X-Customer-API-Token': customerApiToken,
+    },
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("OTP API error:", errorText);
+    throw new Error(`Failed to get OTP: ${response.statusText}`);
+  }
+  
+  const data: ServicesOTPResponse = await response.json();
+  console.log("OTP obtained successfully");
+  return data.data.otp;
+}
+
+// Helper function to generate begin subscription URL
+function generateBeginSubscriptionUrl(otp: string): string {
+  const servicesUrl = "https://services.advisable.gr";
+  const redirectUrl = encodeURIComponent("https://nutritionax.com/signup-success");
+  const productCodeId = 1237;
+  const quantity = 1;
+  
+  return `${servicesUrl}/customer/begin_subscription/${productCodeId}:${quantity}?otp=${otp}&redirectUrl=${redirectUrl}`;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -53,14 +144,46 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create user account as nutritionist
+    // STEP 1: Create Customer in Advisable Services
+    console.log("STEP 1: Creating customer in Advisable Services...");
+    const servicesCustomerData: ServicesCustomerData = {
+      provider: "nutritionax",
+      friendly_name: `${data.firstName} ${data.lastName}`,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      address: data.address,
+      city: data.city,
+      postal_code: data.postalCode,
+      phone: data.contactPhone,
+      company_afm: data.taxReferenceNumber,
+      company_doy: data.taxOffice,
+      company_name: data.companyName,
+      company_profession: data.profession,
+      company_address: data.companyAddress,
+    };
+    
+    const servicesResponse = await createServicesCustomer(servicesCustomerData);
+    const { customer_id, services_api_token } = servicesResponse.data;
+    
+    console.log("Services customer created with ID:", customer_id);
+    
+    // STEP 2: Get OTP for this customer
+    console.log("STEP 2: Getting OTP for customer...");
+    const otp = await getServicesOTP(services_api_token);
+    console.log("OTP obtained successfully");
+
+    // STEP 3: Create user in Supabase Auth
+    console.log("STEP 3: Creating user in Supabase Auth...");
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
       password: data.password,
       email_confirm: true,
       user_metadata: {
         name: `${data.firstName} ${data.lastName}`,
-        account_type: 'nutritionist'
+        account_type: 'nutritionist',
+        services_customer_id: customer_id,
+        services_api_token: services_api_token,
       }
     });
 
@@ -74,24 +197,30 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("User created successfully:", userData.user.id);
 
-    // Get the nutritionist record (created automatically by trigger)
+    // STEP 4: Get and update the nutritionist record with Services data
+    console.log("STEP 4: Updating nutritionist with Services data...");
     const { data: nutritionistData, error: nutritionistError } = await supabaseAdmin
       .from('nutritionists')
-      .select('id')
+      .update({
+        services_customer_id: customer_id,
+        services_api_token: services_api_token,
+      })
       .eq('user_id', userData.user.id)
+      .select('id')
       .single();
 
     if (nutritionistError) {
-      console.error("Error fetching nutritionist:", nutritionistError);
+      console.error("Error updating nutritionist:", nutritionistError);
       return new Response(
-        JSON.stringify({ error: "Failed to create nutritionist profile" }),
+        JSON.stringify({ error: "Failed to update nutritionist profile with Services data" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Nutritionist record found:", nutritionistData.id);
+    console.log("Nutritionist record updated with Services data:", nutritionistData.id);
 
-    // Create order record
+    // STEP 5: Create order record in local database
+    console.log("STEP 5: Creating order record...");
     const { error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -123,7 +252,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Order created successfully");
     }
 
-    // Send welcome email
+    // STEP 6: Send welcome email
+    console.log("STEP 6: Sending welcome email...");
     try {
       await resend.emails.send({
         from: "Nutritionax <onboarding@resend.dev>",
@@ -141,8 +271,9 @@ const handler = async (req: Request): Promise<Response> => {
               <p><strong>Κωδικός:</strong> Ο κωδικός που επιλέξατε</p>
             </div>
             
-            <p>Μπορείτε να συνδεθείτε στην πλατφόρμα μας εδώ:</p>
-            <a href="https://nutritionax.mini-site.gr/auth" 
+            <p>Ολοκληρώστε την πληρωμή σας για να ενεργοποιηθεί ο λογαριασμός σας.</p>
+            <p>Μετά την ολοκλήρωση, μπορείτε να συνδεθείτε στην πλατφόρμα μας εδώ:</p>
+            <a href="https://nutritionax.com/auth" 
                style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; 
                       text-decoration: none; border-radius: 4px; margin: 10px 0;">
               Σύνδεση στο Nutritionax
@@ -172,11 +303,21 @@ const handler = async (req: Request): Promise<Response> => {
       // Don't fail the whole request if email sending fails
     }
 
+    // STEP 7: Generate payment URL and return
+    console.log("STEP 7: Generating payment URL...");
+    const paymentUrl = generateBeginSubscriptionUrl(otp);
+    console.log("Payment URL generated:", paymentUrl);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: "Registration successful",
-        userId: userData.user.id 
+        userId: userData.user.id,
+        paymentUrl: paymentUrl,
+        servicesData: {
+          customer_id: customer_id,
+          services_api_token: services_api_token,
+        }
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
