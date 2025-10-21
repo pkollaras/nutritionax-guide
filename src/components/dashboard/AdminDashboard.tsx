@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Menu,
+  Stethoscope,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -18,13 +19,14 @@ import AdminUsers from './admin/AdminUsers';
 import AdminDiets from './admin/AdminDiets';
 import AdminGuidelines from './admin/AdminGuidelines';
 import AdminReports from './admin/AdminReports';
+import AdminNutritionists from './admin/AdminNutritionists';
 
-type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'settings';
+type AdminView = 'home' | 'users' | 'diets' | 'guidelines' | 'reports' | 'nutritionists' | 'settings';
 
 const AdminDashboard = () => {
   const [currentView, setCurrentView] = useState<AdminView>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { signOut } = useAuth();
+  const { signOut, userRole } = useAuth();
   const { t } = useLanguage();
 
   const handleViewChange = (view: AdminView) => {
@@ -32,14 +34,25 @@ const AdminDashboard = () => {
     setMobileMenuOpen(false); // Close mobile menu when changing view
   };
 
-  const menuItems = [
+  const baseMenuItems = [
     { id: 'home' as AdminView, label: t('adminDashboard.nav.dashboard'), icon: LayoutDashboard },
     { id: 'users' as AdminView, label: t('adminDashboard.nav.users'), icon: Users },
     { id: 'diets' as AdminView, label: t('adminDashboard.nav.diets'), icon: FileText },
     { id: 'guidelines' as AdminView, label: t('adminDashboard.nav.guidelines'), icon: BookOpen },
     { id: 'reports' as AdminView, label: t('adminDashboard.nav.reports'), icon: FileText },
-    { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
   ];
+
+  // Add Nutritionists tab only for super_admin
+  const menuItems = userRole === 'super_admin' 
+    ? [
+        ...baseMenuItems,
+        { id: 'nutritionists' as AdminView, label: t('adminDashboard.nav.nutritionists'), icon: Stethoscope },
+        { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
+      ]
+    : [
+        ...baseMenuItems,
+        { id: 'settings' as AdminView, label: 'Settings', icon: Settings },
+      ];
 
   const renderView = () => {
     switch (currentView) {
@@ -53,6 +66,8 @@ const AdminDashboard = () => {
         return <AdminGuidelines />;
       case 'reports':
         return <AdminReports />;
+      case 'nutritionists':
+        return <AdminNutritionists />;
       case 'settings':
         return <div className="p-6"><h2 className="text-2xl font-bold">Ρυθμίσεις</h2></div>;
       default:

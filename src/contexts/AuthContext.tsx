@@ -7,7 +7,7 @@ import { getTranslation } from '@/i18n/translations';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  userRole: 'admin' | 'user' | null;
+  userRole: 'admin' | 'user' | 'super_admin' | null;
   nutritionistId: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -20,7 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
+  const [userRole, setUserRole] = useState<'admin' | 'user' | 'super_admin' | null>(null);
   const [nutritionistId, setNutritionistId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -64,14 +64,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
       
-      // If user has multiple roles, prioritize admin
+      // If user has multiple roles, prioritize super_admin, then admin
       if (data && data.length > 0) {
+        const hasSuperAdmin = data.some(r => r.role === 'super_admin');
         const hasAdmin = data.some(r => r.role === 'admin');
-        const role = hasAdmin ? 'admin' : data[0].role as 'admin' | 'user';
+        const role = hasSuperAdmin ? 'super_admin' : (hasAdmin ? 'admin' : data[0].role as 'admin' | 'user' | 'super_admin');
         setUserRole(role);
         
-        // If admin, fetch nutritionist_id
-        if (role === 'admin') {
+        // If admin or super_admin, fetch nutritionist_id
+        if (role === 'admin' || role === 'super_admin') {
           const { data: nutritionistData } = await supabase
             .from('nutritionists')
             .select('id')
