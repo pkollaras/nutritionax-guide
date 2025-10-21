@@ -18,6 +18,7 @@ export const translations = {
       creating: 'Δημιουργία...',
       viewAll: 'Προβολή Όλων',
       step: 'Βήμα',
+      language: 'Γλώσσα',
     },
     auth: {
       title: 'Nutritionax',
@@ -515,6 +516,7 @@ export const translations = {
         forNutritionists: 'Για Διατροφολόγους',
         forClients: 'Για Πελάτες',
         pricing: 'Τιμή',
+        menu: 'Μενού',
       },
       hero: {
         title: 'Η Ολοκληρωμένη Λύση για Διατροφολόγους',
@@ -751,6 +753,7 @@ export const translations = {
       creating: 'Creating...',
       viewAll: 'View All',
       step: 'Step',
+      language: 'Language',
     },
     auth: {
       title: 'Nutritionax',
@@ -1247,6 +1250,7 @@ export const translations = {
         forNutritionists: 'For Nutritionists',
         forClients: 'For Clients',
         pricing: 'Pricing',
+        menu: 'Menu',
       },
       hero: {
         title: 'The Complete Solution for Nutritionists',
