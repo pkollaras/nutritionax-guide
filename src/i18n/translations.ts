@@ -628,7 +628,19 @@ export const translations = {
       },
       cta: {
         title: 'Έτοιμοι να Αναβαθμίσετε τη Διατροφική σας Πρακτική;',
-        button: 'Δημιουργήστε Λογαριασμό Δωρεάν',
+        pricing: {
+          price: '€49',
+          period: '/μήνα',
+          trial: 'Πρώτος μήνας ΔΩΡΕΑΝ',
+          features: [
+            'Απεριόριστοι πελάτες',
+            'AI-powered PDF parsing',
+            'Αυτόματη δημιουργία λίστας αγορών',
+            'Real-time reports & analytics',
+            'Secure cloud storage',
+          ],
+        },
+        button: 'Ξεκινήστε Σήμερα',
         loginText: 'Ή συνδεθείτε αν έχετε ήδη λογαριασμό',
       },
       footer: {
@@ -1188,7 +1200,19 @@ export const translations = {
       },
       cta: {
         title: 'Ready to Upgrade Your Nutrition Practice?',
-        button: 'Create Free Account',
+        pricing: {
+          price: '€49',
+          period: '/month',
+          trial: 'First month FREE',
+          features: [
+            'Unlimited clients',
+            'AI-powered PDF parsing',
+            'Automatic shopping list generation',
+            'Real-time reports & analytics',
+            'Secure cloud storage',
+          ],
+        },
+        button: 'Start Today',
         loginText: 'Or login if you already have an account',
       },
     clientJourney: {
