@@ -4,6 +4,7 @@ import HeroSection from '@/components/landing/HeroSection';
 import ProblemsSection from '@/components/landing/ProblemsSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import ClientJourneySection from '@/components/landing/ClientJourneySection';
+import NutritionistJourneySection from '@/components/landing/NutritionistJourneySection';
 import TechStackSection from '@/components/landing/TechStackSection';
 import CTASection from '@/components/landing/CTASection';
 const Home = () => {
@@ -18,6 +19,7 @@ const Home = () => {
         <ProblemsSection />
         <FeaturesSection />
         <ClientJourneySection />
+        <NutritionistJourneySection />
         <TechStackSection />
         <CTASection />
       </main>
