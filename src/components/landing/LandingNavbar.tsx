@@ -54,11 +54,20 @@ const LandingNavbar = () => {
           >
             {t('landing.nav.forClients')}
           </button>
+          <button 
+            onClick={() => scrollToSection('pricing')}
+            className="text-foreground/80 hover:text-foreground transition-colors"
+          >
+            {t('landing.nav.pricing')}
+          </button>
         </div>
 
         <div className="flex items-center gap-4">
           <LanguageSwitcher />
-          <Button asChild variant="default">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/auth">{t('landing.nav.signup')}</Link>
+          </Button>
+          <Button asChild variant="default" size="sm">
             <Link to="/auth">{t('landing.nav.login')}</Link>
           </Button>
         </div>

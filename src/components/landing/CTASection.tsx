@@ -32,7 +32,7 @@ const CTASection = () => {
               <div className="mb-6">
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-5xl md:text-6xl font-bold text-foreground">
-                    {t('landing.cta.pricing.price')}
+                    49€
                   </span>
                   <span className="text-xl text-muted-foreground">
                     {t('landing.cta.pricing.period')}

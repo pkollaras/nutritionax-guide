@@ -5,6 +5,7 @@ import ProblemsSection from '@/components/landing/ProblemsSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import ClientJourneySection from '@/components/landing/ClientJourneySection';
 import NutritionistJourneySection from '@/components/landing/NutritionistJourneySection';
+import CTASection from '@/components/landing/CTASection';
 const Home = () => {
   const {
     t
@@ -25,6 +26,9 @@ const Home = () => {
         </div>
         <div id="clients">
           <ClientJourneySection />
+        </div>
+        <div id="pricing">
+          <CTASection />
         </div>
       </main>
 

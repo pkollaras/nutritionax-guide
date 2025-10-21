@@ -508,6 +508,7 @@ export const translations = {
     landing: {
       nav: {
         login: 'Σύνδεση',
+        signup: 'Εγγραφή',
         getStarted: 'Ξεκινήστε Τώρα',
         problems: 'Προβλήματα',
         features: 'Χαρακτηριστικά',
@@ -632,7 +633,7 @@ export const translations = {
         ],
       },
       cta: {
-        title: 'Ξεκινήστε να Διαχειρίζεστε τους Πελάτες σας Σήμερα',
+        title: 'Ξεκινήστε Σήμερα',
         pricing: {
           price: '€49',
           period: '/μήνα',
@@ -1163,6 +1164,7 @@ export const translations = {
     landing: {
       nav: {
         login: 'Login',
+        signup: 'Sign Up',
         getStarted: 'Get Started',
         problems: 'Problems',
         features: 'Features',
@@ -1209,7 +1211,7 @@ export const translations = {
         benefit4: 'Secure authentication & RLS',
       },
       cta: {
-        title: 'Start Managing Your Clients Today',
+        title: 'Start Today',
         pricing: {
           price: '€49',
           period: '/month',
