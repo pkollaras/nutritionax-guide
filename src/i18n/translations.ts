@@ -514,7 +514,7 @@ export const translations = {
         features: 'Χαρακτηριστικά',
         forNutritionists: 'Για Διατροφολόγους',
         forClients: 'Για Πελάτες',
-        pricing: 'Τιμοδότηση',
+        pricing: 'Τιμή',
       },
       hero: {
         title: 'Η Ολοκληρωμένη Λύση για Διατροφολόγους',
