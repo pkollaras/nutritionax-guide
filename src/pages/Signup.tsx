@@ -7,13 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -31,7 +33,7 @@ const Signup = () => {
     county: "",
     taxReferenceNumber: "",
     taxOffice: "",
-    profession: "",
+    profession: "Διατροφολόγος",
     companyName: "",
     companyAddress: "",
   });
@@ -219,26 +221,44 @@ const Signup = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="password">{t("signup.password")} *</Label>
-                        <Input
-                          id="password"
-                          name="password"
-                          type="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          className={errors.password ? "border-destructive" : ""}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            name="password"
+                            type={showPassword ? "text" : "password"}
+                            value={formData.password}
+                            onChange={handleChange}
+                            className={errors.password ? "border-destructive pr-10" : "pr-10"}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
                         {errors.password && <p className="text-sm text-destructive mt-1">{errors.password}</p>}
                       </div>
                       <div>
                         <Label htmlFor="confirmPassword">{t("signup.confirmPassword")} *</Label>
-                        <Input
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          type="password"
-                          value={formData.confirmPassword}
-                          onChange={handleChange}
-                          className={errors.confirmPassword ? "border-destructive" : ""}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className={errors.confirmPassword ? "border-destructive pr-10" : "pr-10"}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
                         {errors.confirmPassword && <p className="text-sm text-destructive mt-1">{errors.confirmPassword}</p>}
                       </div>
                     </div>
