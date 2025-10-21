@@ -698,10 +698,38 @@ export const translations = {
         loginButton: 'Σύνδεση στην Πλατφόρμα',
       },
       
+      authorization: {
+        waiting: 'Αναμονή εξουσιοδότησης...',
+        message: 'Παρακαλώ ολοκληρώστε την πληρωμή στο popup παράθυρο',
+        doNotClose: 'Μην κλείσετε αυτό το παράθυρο',
+      },
+      
       pricingCard: {
         title: 'Ξεκινήστε Σήμερα',
         price: '49€/μήνα',
         vat: '+24% ΦΠΑ',
+        trial: 'Πρώτος μήνας ΔΩΡΕΑΝ',
+        features: {
+          feature1: 'Διαχείριση πελατών',
+          feature2: 'Παρακολούθηση προόδου',
+          feature3: 'Δημιουργία διατροφικών πλάνων',
+          feature4: 'ΑΙ δημιουργία λίστας αγορών',
+          feature5: 'Διαχείριση μετρήσεων σώματος',
+        },
+      },
+      
+      errors: {
+        firstName: 'Το όνομα πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
+        lastName: 'Το επώνυμο πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
+        contactPhone: 'Το τηλέφωνο πρέπει να έχει τουλάχιστον 10 ψηφία',
+        email: 'Μη έγκυρη διεύθυνση email',
+        password: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες',
+        confirmPassword: 'Οι κωδικοί δεν ταιριάζουν',
+        city: 'Η πόλη πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
+        postalCode: 'Ο ταχυδρομικός κώδικας πρέπει να έχει τουλάχιστον 5 ψηφία',
+        address: 'Η διεύθυνση πρέπει να έχει τουλάχιστον 5 χαρακτήρες',
+        region: 'Η περιφέρεια πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
+      },
         freeFirstMonth: 'Πρώτος μήνας ΔΩΡΕΑΝ',
       },
       
@@ -1416,11 +1444,24 @@ export const translations = {
       loginButton: 'Login to Platform',
     },
     
+    authorization: {
+      waiting: 'Waiting for authorization...',
+      message: 'Please complete the payment in the popup window',
+      doNotClose: 'Do not close this window',
+    },
+    
     pricingCard: {
       title: 'Start Today',
       price: '€49/month',
       vat: '+24% VAT',
-      freeFirstMonth: 'First month FREE',
+      trial: 'First month FREE',
+      features: {
+        feature1: 'Client management',
+        feature2: 'Progress tracking',
+        feature3: 'Diet plan creation',
+        feature4: 'AI shopping list generation',
+        feature5: 'Body measurement management',
+      },
     },
     
     errors: {
@@ -1434,8 +1475,8 @@ export const translations = {
       postalCode: 'Invalid postal code',
       address: 'Address is required',
       region: 'Region is required',
-    }
-  }
+    },
+  },
 };
 
 export const getTranslation = (lang: Language, key: string): string => {
