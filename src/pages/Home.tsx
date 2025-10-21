@@ -5,19 +5,18 @@ import ProblemsSection from '@/components/landing/ProblemsSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import TechStackSection from '@/components/landing/TechStackSection';
 import CTASection from '@/components/landing/CTASection';
-
 const Home = () => {
-  const { t } = useLanguage();
-
-  return (
-    <div className="min-h-screen bg-background">
+  const {
+    t
+  } = useLanguage();
+  return <div className="min-h-screen bg-background">
       <LandingNavbar />
       
       <main>
         <HeroSection />
         <ProblemsSection />
         <FeaturesSection />
-        <TechStackSection />
+        
         <CTASection />
       </main>
 
@@ -26,12 +25,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>
               {t('landing.footer.copyright')} • {t('landing.footer.madeWith')}{' '}
-              <a 
-                href="https://advisable.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-primary hover:underline font-medium"
-              >
+              <a href="https://advisable.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
                 Advisable.com
               </a>
             </p>
@@ -50,8 +44,6 @@ const Home = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Home;
