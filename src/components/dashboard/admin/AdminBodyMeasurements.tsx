@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { PDFUploadSection } from './PDFUploadSection';
 
@@ -55,7 +55,9 @@ const AdminBodyMeasurements = () => {
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [viewReportOpen, setViewReportOpen] = useState(false);
   const [currentMeasurement, setCurrentMeasurement] = useState<BodyMeasurement | null>(null);
+  const [viewMeasurement, setViewMeasurement] = useState<BodyMeasurement | null>(null);
   const [deleteMeasurementId, setDeleteMeasurementId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
@@ -280,6 +282,11 @@ const AdminBodyMeasurements = () => {
     setFormData({ ...formData, custom_fields: updated });
   };
 
+  const handleViewReport = (measurement: BodyMeasurement) => {
+    setViewMeasurement(measurement);
+    setViewReportOpen(true);
+  };
+
   const handlePDFParsed = (parsedData: any) => {
     setFormData({
       date: parsedData.measurement_date || format(new Date(), 'yyyy-MM-dd'),
@@ -393,6 +400,13 @@ const AdminBodyMeasurements = () => {
                         </div>
                       </div>
                       <div className="flex sm:flex-col gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewReport(measurement)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -593,6 +607,110 @@ const AdminBodyMeasurements = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={viewReportOpen} onOpenChange={setViewReportOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {viewMeasurement && format(new Date(viewMeasurement.measurement_date), 'dd MMMM yyyy')}
+            </DialogTitle>
+          </DialogHeader>
+          {viewMeasurement && (
+            <div className="space-y-6 print:p-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {viewMeasurement.body_fat_percentage && (
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-3xl font-bold text-primary">
+                      {viewMeasurement.body_fat_percentage}%
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {t('bodyMeasurements.bodyFatPercentage')}
+                    </div>
+                  </div>
+                )}
+                {viewMeasurement.body_mass_percentage && (
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-3xl font-bold text-primary">
+                      {viewMeasurement.body_mass_percentage}%
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {t('bodyMeasurements.bodyMassPercentage')}
+                    </div>
+                  </div>
+                )}
+                {viewMeasurement.fat_mass && (
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-3xl font-bold text-primary">
+                      {viewMeasurement.fat_mass} kg
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {t('bodyMeasurements.fatMass')}
+                    </div>
+                  </div>
+                )}
+                {viewMeasurement.lean_body_mass && (
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-3xl font-bold text-primary">
+                      {viewMeasurement.lean_body_mass} kg
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {t('bodyMeasurements.leanBodyMass')}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg mb-4">{t('bodyMeasurements.skinfolds')}</h3>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-3 gap-2 text-sm font-medium pb-2 border-b">
+                    <div></div>
+                    <div className="text-center">{t('bodyMeasurements.measurement1')}</div>
+                    <div className="text-center">{t('bodyMeasurements.measurement2')}</div>
+                  </div>
+                  {skinfolds.map(({ key, label }) => {
+                    const val1 = viewMeasurement[`${key}_1` as keyof BodyMeasurement];
+                    const val2 = viewMeasurement[`${key}_2` as keyof BodyMeasurement];
+                    if (val1 || val2) {
+                      return (
+                        <div key={key} className="grid grid-cols-3 gap-2 items-center py-2 border-b">
+                          <div className="text-sm font-medium">{label}</div>
+                          <div className="text-center">{val1 || '-'}</div>
+                          <div className="text-center">{val2 || '-'}</div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </div>
+
+              {viewMeasurement.custom_fields && Array.isArray(viewMeasurement.custom_fields) && viewMeasurement.custom_fields.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-4">{t('bodyMeasurements.customFields')}</h3>
+                  <div className="space-y-2">
+                    {viewMeasurement.custom_fields.map((field: any, index: number) => (
+                      <div key={index} className="flex justify-between py-2 border-b">
+                        <span className="font-medium">{field.name}</span>
+                        <span>{field.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {viewMeasurement.notes && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">{t('bodyMeasurements.notes')}</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap p-4 bg-muted rounded-lg">
+                    {viewMeasurement.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
