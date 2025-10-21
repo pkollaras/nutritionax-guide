@@ -655,61 +655,61 @@ export const translations = {
         terms: 'Όροι Χρήσης',
         contact: 'Επικοινωνία',
       },
-      signup: {
-        title: 'Εγγραφή Διατροφολόγου',
-        subtitle: 'Συμπληρώστε τα στοιχεία σας για να ξεκινήσετε',
-        
-        orderDetails: 'Στοιχεία Παραγγελίας',
-        firstName: 'Όνομα',
-        lastName: 'Επώνυμο',
-        contactPhone: 'Τηλέφωνο Επικοινωνίας',
-        contactPhone2: 'Τηλέφωνο Επικοινωνίας 2 (προαιρετικό)',
-        email: 'Email',
-        password: 'Κωδικός',
-        confirmPassword: 'Επιβεβαίωση Κωδικού',
-        
-        addressDetails: 'Στοιχεία Διεύθυνσης',
-        city: 'Πόλη',
-        postalCode: 'Ταχυδρομικός Κώδικας',
-        address: 'Διεύθυνση',
-        region: 'Περιφέρεια',
-        country: 'Χώρα',
-        county: 'Νομός (προαιρετικό)',
-        
-        invoicingDetails: 'Τιμολογιακά Στοιχεία (προαιρετικό)',
-        taxReferenceNumber: 'ΑΦΜ',
-        taxOffice: 'ΔΟΥ',
-        profession: 'Επάγγελμα',
-        companyName: 'Επωνυμία Εταιρείας',
-        companyAddress: 'Διεύθυνση Εταιρείας',
-        
-        submit: 'Ολοκλήρωση Εγγραφής',
-        submitting: 'Εγγραφή...',
-        success: 'Επιτυχής Εγγραφή!',
-        successMessage: 'Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Μπορείτε να συνδεθείτε τώρα.',
-        error: 'Σφάλμα Εγγραφής',
-        errorMessage: 'Παρουσιάστηκε σφάλμα κατά την εγγραφή. Παρακαλώ ελέγξτε τα στοιχεία σας.',
-        
-        pricingCard: {
-          title: 'Ξεκινήστε Σήμερα',
-          price: '49€/μήνα',
-          vat: '+24% ΦΠΑ',
-          freeFirstMonth: 'Πρώτος μήνας ΔΩΡΕΑΝ',
-        },
-        
-        errors: {
-          firstName: 'Το όνομα πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
-          lastName: 'Το επώνυμο πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
-          contactPhone: 'Μη έγκυρο τηλέφωνο',
-          email: 'Μη έγκυρη διεύθυνση email',
-          password: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες',
-          confirmPassword: 'Οι κωδικοί δεν ταιριάζουν',
-          city: 'Η πόλη είναι υποχρεωτική',
-          postalCode: 'Μη έγκυρος ταχυδρομικός κώδικας',
-          address: 'Η διεύθυνση είναι υποχρεωτική',
-          region: 'Η περιφέρεια είναι υποχρεωτική',
-        }
+    },
+    signup: {
+      title: 'Εγγραφή Διατροφολόγου',
+      subtitle: 'Συμπληρώστε τα στοιχεία σας για να ξεκινήσετε',
+      
+      orderDetails: 'Στοιχεία Παραγγελίας',
+      firstName: 'Όνομα',
+      lastName: 'Επώνυμο',
+      contactPhone: 'Τηλέφωνο Επικοινωνίας',
+      contactPhone2: 'Τηλέφωνο Επικοινωνίας 2 (προαιρετικό)',
+      email: 'Email',
+      password: 'Κωδικός',
+      confirmPassword: 'Επιβεβαίωση Κωδικού',
+      
+      addressDetails: 'Στοιχεία Διεύθυνσης',
+      city: 'Πόλη',
+      postalCode: 'Ταχυδρομικός Κώδικας',
+      address: 'Διεύθυνση',
+      region: 'Περιφέρεια',
+      country: 'Χώρα',
+      county: 'Νομός (προαιρετικό)',
+      
+      invoicingDetails: 'Τιμολογιακά Στοιχεία (προαιρετικό)',
+      taxReferenceNumber: 'ΑΦΜ',
+      taxOffice: 'ΔΟΥ',
+      profession: 'Επάγγελμα',
+      companyName: 'Επωνυμία Εταιρείας',
+      companyAddress: 'Διεύθυνση Εταιρείας',
+      
+      submit: 'Ολοκλήρωση Εγγραφής',
+      submitting: 'Εγγραφή...',
+      success: 'Επιτυχής Εγγραφή!',
+      successMessage: 'Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Μπορείτε να συνδεθείτε τώρα.',
+      error: 'Σφάλμα Εγγραφής',
+      errorMessage: 'Παρουσιάστηκε σφάλμα κατά την εγγραφή. Παρακαλώ ελέγξτε τα στοιχεία σας.',
+      
+      pricingCard: {
+        title: 'Ξεκινήστε Σήμερα',
+        price: '49€/μήνα',
+        vat: '+24% ΦΠΑ',
+        freeFirstMonth: 'Πρώτος μήνας ΔΩΡΕΑΝ',
       },
+      
+      errors: {
+        firstName: 'Το όνομα πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
+        lastName: 'Το επώνυμο πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
+        contactPhone: 'Μη έγκυρο τηλέφωνο',
+        email: 'Μη έγκυρη διεύθυνση email',
+        password: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες',
+        confirmPassword: 'Οι κωδικοί δεν ταιριάζουν',
+        city: 'Η πόλη είναι υποχρεωτική',
+        postalCode: 'Μη έγκυρος ταχυδρομικός κώδικας',
+        address: 'Η διεύθυνση είναι υποχρεωτική',
+        region: 'Η περιφέρεια είναι υποχρεωτική',
+      }
     },
   },
   en: {
@@ -1366,61 +1366,61 @@ export const translations = {
       terms: 'Terms of Use',
       contact: 'Contact',
     },
-    signup: {
-      title: 'Nutritionist Registration',
-      subtitle: 'Fill in your details to get started',
-      
-      orderDetails: 'Order Details',
-      firstName: 'First Name',
-      lastName: 'Last Name',
-      contactPhone: 'Contact Phone',
-      contactPhone2: 'Contact Phone 2 (optional)',
-      email: 'Email',
-      password: 'Password',
-      confirmPassword: 'Confirm Password',
-      
-      addressDetails: 'Address Details',
-      city: 'City',
-      postalCode: 'Postal Code',
-      address: 'Address',
-      region: 'Region',
-      country: 'Country',
-      county: 'County (optional)',
-      
-      invoicingDetails: 'Invoicing Details (optional)',
-      taxReferenceNumber: 'Tax Reference Number',
-      taxOffice: 'Tax Office',
-      profession: 'Profession',
-      companyName: 'Company Name',
-      companyAddress: 'Company Address',
-      
-      submit: 'Complete Registration',
-      submitting: 'Registering...',
-      success: 'Registration Successful!',
-      successMessage: 'Your account has been created successfully. You can now log in.',
-      error: 'Registration Error',
-      errorMessage: 'An error occurred during registration. Please check your details.',
-      
-      pricingCard: {
-        title: 'Start Today',
-        price: '€49/month',
-        vat: '+24% VAT',
-        freeFirstMonth: 'First month FREE',
-      },
-      
-      errors: {
-        firstName: 'First name must be at least 2 characters',
-        lastName: 'Last name must be at least 2 characters',
-        contactPhone: 'Invalid phone number',
-        email: 'Invalid email address',
-        password: 'Password must be at least 6 characters',
-        confirmPassword: 'Passwords do not match',
-        city: 'City is required',
-        postalCode: 'Invalid postal code',
-        address: 'Address is required',
-        region: 'Region is required',
-      }
+  },
+  signup: {
+    title: 'Nutritionist Registration',
+    subtitle: 'Fill in your details to get started',
+    
+    orderDetails: 'Order Details',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    contactPhone: 'Contact Phone',
+    contactPhone2: 'Contact Phone 2 (optional)',
+    email: 'Email',
+    password: 'Password',
+    confirmPassword: 'Confirm Password',
+    
+    addressDetails: 'Address Details',
+    city: 'City',
+    postalCode: 'Postal Code',
+    address: 'Address',
+    region: 'Region',
+    country: 'Country',
+    county: 'County (optional)',
+    
+    invoicingDetails: 'Invoicing Details (optional)',
+    taxReferenceNumber: 'Tax Reference Number',
+    taxOffice: 'Tax Office',
+    profession: 'Profession',
+    companyName: 'Company Name',
+    companyAddress: 'Company Address',
+    
+    submit: 'Complete Registration',
+    submitting: 'Registering...',
+    success: 'Registration Successful!',
+    successMessage: 'Your account has been created successfully. You can now log in.',
+    error: 'Registration Error',
+    errorMessage: 'An error occurred during registration. Please check your details.',
+    
+    pricingCard: {
+      title: 'Start Today',
+      price: '€49/month',
+      vat: '+24% VAT',
+      freeFirstMonth: 'First month FREE',
     },
+    
+    errors: {
+      firstName: 'First name must be at least 2 characters',
+      lastName: 'Last name must be at least 2 characters',
+      contactPhone: 'Invalid phone number',
+      email: 'Invalid email address',
+      password: 'Password must be at least 6 characters',
+      confirmPassword: 'Passwords do not match',
+      city: 'City is required',
+      postalCode: 'Invalid postal code',
+      address: 'Address is required',
+      region: 'Region is required',
+    }
   }
 };
 
