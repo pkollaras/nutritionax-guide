@@ -509,6 +509,11 @@ export const translations = {
       nav: {
         login: 'Σύνδεση',
         getStarted: 'Ξεκινήστε Τώρα',
+        problems: 'Προβλήματα',
+        features: 'Χαρακτηριστικά',
+        forNutritionists: 'Για Διατροφολόγους',
+        forClients: 'Για Πελάτες',
+        pricing: 'Τιμοδότηση',
       },
       hero: {
         title: 'Η Ολοκληρωμένη Λύση για Διατροφολόγους',
@@ -1159,6 +1164,11 @@ export const translations = {
       nav: {
         login: 'Login',
         getStarted: 'Get Started',
+        problems: 'Problems',
+        features: 'Features',
+        forNutritionists: 'For Nutritionists',
+        forClients: 'For Clients',
+        pricing: 'Pricing',
       },
       hero: {
         title: 'The Complete Solution for Nutritionists',

@@ -15,11 +15,21 @@ const Home = () => {
       
       <main>
         <HeroSection />
-        <ProblemsSection />
-        <FeaturesSection />
-        <NutritionistJourneySection />
-        <ClientJourneySection />
-        <CTASection />
+        <div id="problems">
+          <ProblemsSection />
+        </div>
+        <div id="features">
+          <FeaturesSection />
+        </div>
+        <div id="nutritionists">
+          <NutritionistJourneySection />
+        </div>
+        <div id="clients">
+          <ClientJourneySection />
+        </div>
+        <div id="pricing">
+          <CTASection />
+        </div>
       </main>
 
       <footer className="border-t border-border py-8 px-4">
