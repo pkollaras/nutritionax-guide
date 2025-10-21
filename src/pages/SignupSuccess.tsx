@@ -43,26 +43,7 @@ const SignupSuccess = () => {
   };
 
   useEffect(() => {
-    // Check if we're in a popup window (opened from Signup page)
-    if (window.opener && !window.opener.closed) {
-      console.log("Running in popup context, sending success message to parent");
-      
-      // Send success message to parent window
-      window.opener.postMessage(
-        { type: 'PAYMENT_SUCCESS' },
-        window.location.origin
-      );
-      
-      // Close the popup automatically after sending the message
-      setTimeout(() => {
-        window.close();
-      }, 500);
-      
-      // Don't render anything in popup - parent will close it
-      return;
-    }
-
-    // Normal flow: Check for credentials and start countdown
+    // Read credentials from sessionStorage
     const servicesDataStr = sessionStorage.getItem('nutritionax_services_data');
     const credentialsStr = sessionStorage.getItem('nutritionax_signup_credentials');
     
@@ -94,19 +75,6 @@ const SignupSuccess = () => {
       }
     }
   }, []);
-
-  // If we're in a popup, don't render anything
-  if (window.opener && !window.opener.closed) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="text-center pt-6">
-            <p className="text-muted-foreground">{t("common.loading")}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   // Show loading state during login
   if (isLoggingIn) {

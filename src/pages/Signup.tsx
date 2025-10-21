@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react";
-import { PaymentAuthDialog } from "@/components/PaymentAuthDialog";
 
 const Signup = () => {
   const { t } = useLanguage();
@@ -17,8 +16,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [paymentPopup, setPaymentPopup] = useState<Window | null>(null);
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -42,37 +39,6 @@ const Signup = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Listen for payment completion messages from popup
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Verify origin for security
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-
-      if (event.data?.type === 'PAYMENT_SUCCESS') {
-        console.log("Payment completed successfully");
-        
-        // Close popup
-        if (paymentPopup && !paymentPopup.closed) {
-          paymentPopup.close();
-        }
-        
-        // Close auth dialog
-        setShowAuthDialog(false);
-        
-        // Navigate to success page
-        navigate("/signup-success");
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, [paymentPopup, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -152,40 +118,17 @@ const Signup = () => {
       }
 
       if (data.paymentUrl) {
-        console.log("Opening payment in popup:", data.paymentUrl);
+        console.log("Redirecting to payment:", data.paymentUrl);
         
-        // Open payment URL in popup
-        const popup = window.open(
-          data.paymentUrl,
-          'payment_window',
-          'width=800,height=800,scrollbars=yes,resizable=yes'
-        );
-
-        if (!popup) {
-          // Popup was blocked, fallback to full page redirect
-          console.warn("Popup blocked, redirecting in same window");
-          toast({
-            title: t("signup.success"),
-            description: t("signup.paymentRedirect"),
-          });
-          setTimeout(() => {
-            window.location.href = data.paymentUrl;
-          }, 2000);
-          return;
-        }
-
-        setPaymentPopup(popup);
-        setShowAuthDialog(true);
-
-        // Monitor if popup is closed manually
-        const checkPopupClosed = setInterval(() => {
-          if (popup.closed) {
-            clearInterval(checkPopupClosed);
-            setShowAuthDialog(false);
-            setLoading(false);
-            console.log("Payment popup was closed");
-          }
-        }, 500);
+        toast({
+          title: t("signup.success"),
+          description: t("signup.paymentRedirect"),
+        });
+        
+        // Direct redirect to payment page (full page)
+        setTimeout(() => {
+          window.location.href = data.paymentUrl;
+        }, 1500);
       }
 
     } catch (error: any) {
@@ -200,10 +143,7 @@ const Signup = () => {
   };
 
   return (
-    <>
-      <PaymentAuthDialog open={showAuthDialog} />
-      
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         <div className="container mx-auto px-4 py-8">
           <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {/* Form Section - Left/Top */}
@@ -505,8 +445,7 @@ const Signup = () => {
           </div>
         </div>
       </div>
-    </>
-  );
-};
-
-export default Signup;
+    );
+  };
+  
+  export default Signup;
