@@ -57,7 +57,7 @@ const CTASection = () => {
             {/* CTA Button */}
             <div className="flex flex-col items-center gap-4">
               <Button asChild size="lg" variant="secondary" className="text-lg px-12 py-6 shadow-xl">
-                <Link to="/auth">
+                <Link to="/signup">
                   {t('landing.cta.button')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
