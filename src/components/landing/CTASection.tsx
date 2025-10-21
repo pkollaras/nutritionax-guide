@@ -38,6 +38,9 @@ const CTASection = () => {
                     {t('landing.cta.pricing.period')}
                   </span>
                 </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  +24% ΦΠΑ
+                </p>
               </div>
 
               {/* Features List */}
