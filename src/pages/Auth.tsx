@@ -86,6 +86,15 @@ const Auth = () => {
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                 />
                 {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/forgot-password')}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {t('auth.forgotPassword')}
+                  </button>
+                </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
