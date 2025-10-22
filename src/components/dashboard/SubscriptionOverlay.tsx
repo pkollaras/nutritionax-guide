@@ -8,7 +8,7 @@ import { AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export const SubscriptionOverlay = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
@@ -120,7 +120,7 @@ export const SubscriptionOverlay = () => {
             {t('adminDashboard.subscriptionOverlay.message')}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
           <Button 
             onClick={handleRestartSubscription}
             className="w-full"
@@ -130,6 +130,14 @@ export const SubscriptionOverlay = () => {
               ? t('adminDashboard.billing.restartingSubscription')
               : t('adminDashboard.subscriptionOverlay.renew')
             }
+          </Button>
+          <Button 
+            onClick={signOut}
+            variant="ghost"
+            className="w-full"
+            disabled={restartLoading}
+          >
+            {t('auth.signOut')}
           </Button>
         </CardContent>
       </Card>
