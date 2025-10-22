@@ -1522,7 +1522,7 @@ export const translations = {
   },
 };
 
-export const getTranslation = (lang: Language, key: string): string => {
+export const getTranslation = (lang: Language, key: string): any => {
   const keys = key.split('.');
   let result: any = translations[lang];
   

@@ -4,7 +4,7 @@ import { Language, getTranslation } from '@/i18n/translations';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: (key: string, params?: Record<string, string | number>) => any;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -22,8 +22,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     localStorage.setItem(STORAGE_KEY, lang);
   };
 
-  const t = (key: string, params?: Record<string, string | number>): string => {
+  const t = (key: string, params?: Record<string, string | number>): any => {
     let translation = getTranslation(language, key);
+    
+    // If translation is not a string (e.g., array), return as is
+    if (typeof translation !== 'string') {
+      return translation;
+    }
     
     // Replace parameters in translation (e.g., {{day}} with actual value)
     if (params) {
