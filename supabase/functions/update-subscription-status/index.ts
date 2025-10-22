@@ -21,9 +21,17 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get('Authorization');
-    const supabaseClient = createClient(
+    
+    // Service Role Client for database operations (bypasses RLS)
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // User Client for authentication (when called by user)
+    const supabaseUser = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
           headers: authHeader ? { Authorization: authHeader } : {},
@@ -41,7 +49,7 @@ Deno.serve(async (req) => {
 
     if (isCronCall) {
       // Cron job: Update all nutritionists
-      await updateAllNutritionists(supabaseClient);
+      await updateAllNutritionists(supabaseAdmin);
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -52,7 +60,7 @@ Deno.serve(async (req) => {
       );
     } else {
       // User-triggered: Update specific nutritionist
-      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
       
       if (userError || !user) {
         console.error('Error getting user:', userError);
@@ -62,7 +70,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      await updateNutritionistSubscription(supabaseClient, user.id);
+      await updateNutritionistSubscription(supabaseAdmin, user.id);
       
       return new Response(
         JSON.stringify({ 
