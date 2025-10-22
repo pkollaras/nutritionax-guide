@@ -115,43 +115,21 @@ serve(async (req) => {
     const otpData = await otpResponse.json();
     console.log('OTP obtained successfully');
 
-    // Create payment URL (product ID 1 for subscription)
-    const paymentUrlResponse = await fetch(
-      'https://services.advisable.gr/api/services/customer/get-payment-url',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${otpData.data.otp}`,
-        },
-        body: JSON.stringify({
-          productId: 1,
-          recurring: true,
-        }),
-      }
-    );
+    // Generate payment URL directly (like register-nutritionist does)
+    const servicesUrl = "https://services.advisable.gr";
+    const redirectUrl = encodeURIComponent("https://nutritionax.com/dashboard");
+    const productCodeId = 1237; // Same product as registration
+    const quantity = 1;
+    const productList = `${productCodeId}:${quantity}`;
+    const otp = otpData.data.otp;
 
-    if (!paymentUrlResponse.ok) {
-      const errorText = await paymentUrlResponse.text();
-      console.error('Failed to create payment URL:', paymentUrlResponse.status, errorText);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to create payment URL',
-          details: errorText 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500 
-        }
-      );
-    }
+    const paymentUrl = `${servicesUrl}/customer/begin_subscription/${productList}?otp=${otp}&redirectUrl=${redirectUrl}`;
 
-    const paymentData = await paymentUrlResponse.json();
     console.log('Payment URL created successfully');
 
     return new Response(
       JSON.stringify({ 
-        paymentUrl: paymentData.url,
+        paymentUrl: paymentUrl,
         message: 'Payment URL created successfully'
       }),
       { 
