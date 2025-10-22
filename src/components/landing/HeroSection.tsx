@@ -48,28 +48,25 @@ const HeroSection = () => {
             </Button>
           </div>
 
-          <div className="mt-16 rounded-lg border border-border bg-card shadow-2xl overflow-hidden">
-            {!isVideoPlaying ? (
+          <div className="mt-16 rounded-lg border border-border bg-card shadow-2xl overflow-hidden relative group">
+            <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
+              <iframe 
+                src={`https://player.vimeo.com/video/1129464505?h=940979671e&badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&background=1${isVideoPlaying ? '&autoplay=1' : ''}`}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                frameBorder="0" 
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                referrerPolicy="strict-origin-when-cross-origin"
+                title="Nutritionax Platform Demo"
+              />
+            </div>
+            {!isVideoPlaying && (
               <div 
-                className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center cursor-pointer hover:from-primary/20 hover:to-accent/20 transition-all group"
+                className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/30 transition-all z-10"
                 onClick={() => setIsVideoPlaying(true)}
               >
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Play className="h-10 w-10 text-white ml-1" fill="currentColor" />
-                  </div>
+                <div className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
+                  <Play className="h-10 w-10 text-white ml-1" fill="currentColor" />
                 </div>
-              </div>
-            ) : (
-              <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
-                <iframe 
-                  src="https://player.vimeo.com/video/1129464505?h=940979671e&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&title=0&byline=0&portrait=0" 
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  frameBorder="0" 
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Nutritionax Platform Demo"
-                />
               </div>
             )}
           </div>
