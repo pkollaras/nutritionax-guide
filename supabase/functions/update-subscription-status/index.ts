@@ -39,11 +39,15 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Check if this is a cron call (no auth) or user-triggered (with auth)
-    const isCronCall = !authHeader || authHeader.includes('Bearer ' + Deno.env.get('SUPABASE_ANON_KEY'));
+    // Try to get the authenticated user first
+    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+    
+    // If there's no authenticated user, treat as cron call
+    const isCronCall = !user || userError;
     
     console.log('Update subscription status called:', { 
-      isCronCall, 
+      isCronCall,
+      hasUser: !!user,
       timestamp: new Date().toISOString() 
     });
 
@@ -60,10 +64,8 @@ Deno.serve(async (req) => {
       );
     } else {
       // User-triggered: Update specific nutritionist
-      const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-      
-      if (userError || !user) {
-        console.error('Error getting user:', userError);
+      if (!user) {
+        console.error('No authenticated user found');
         return new Response(
           JSON.stringify({ error: 'Unauthorized' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
