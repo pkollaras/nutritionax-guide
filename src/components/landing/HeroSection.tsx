@@ -52,7 +52,7 @@ const HeroSection = () => {
             <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
               <iframe 
                 src={`https://player.vimeo.com/video/1129464505?h=940979671e&badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&background=1${isVideoPlaying ? '&autoplay=1' : ''}`}
-                style={{ position: 'absolute', top: '50%', left: '50%', width: '100%', height: '100%', transform: 'translate(-50%, -50%) scale(1.15)' }}
+                style={{ position: 'absolute', top: '50%', left: '50%', width: '100%', height: '100%', transform: 'translate(-50%, -50%) scaleY(1.15)' }}
                 frameBorder="0" 
                 allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
                 referrerPolicy="strict-origin-when-cross-origin"
