@@ -5,6 +5,11 @@ import { Calendar, TrendingUp, Scale, ShoppingCart, FileText } from 'lucide-reac
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselApi } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { useRef, useState, useEffect } from 'react';
+import screenshotUserDiet from '@/assets/screenshot-user-diet.png';
+import screenshotUserDaily from '@/assets/screenshot-user-daily.png';
+import screenshotUserProgress from '@/assets/screenshot-user-progress.png';
+import screenshotUserShopping from '@/assets/screenshot-user-shopping.png';
+import screenshotUserMeasurements from '@/assets/screenshot-user-measurements.png';
 
 const ClientJourneySection = () => {
   const { t } = useLanguage();
@@ -36,6 +41,7 @@ const ClientJourneySection = () => {
       gradient: 'from-blue-500/10 to-cyan-500/10',
       iconColor: 'text-blue-500',
       badge: 'User Diet',
+      screenshot: screenshotUserDiet
     },
     {
       icon: TrendingUp,
@@ -45,6 +51,7 @@ const ClientJourneySection = () => {
       gradient: 'from-green-500/10 to-emerald-500/10',
       iconColor: 'text-green-500',
       badge: 'User Progress',
+      screenshot: screenshotUserDaily
     },
     {
       icon: Scale,
@@ -54,6 +61,7 @@ const ClientJourneySection = () => {
       gradient: 'from-purple-500/10 to-pink-500/10',
       iconColor: 'text-purple-500',
       badge: 'User Charts',
+      screenshot: screenshotUserProgress
     },
     {
       icon: ShoppingCart,
@@ -63,6 +71,7 @@ const ClientJourneySection = () => {
       gradient: 'from-orange-500/10 to-red-500/10',
       iconColor: 'text-orange-500',
       badge: 'Shopping List',
+      screenshot: screenshotUserShopping
     },
     {
       icon: FileText,
@@ -72,6 +81,7 @@ const ClientJourneySection = () => {
       gradient: 'from-indigo-500/10 to-violet-500/10',
       iconColor: 'text-indigo-500',
       badge: 'Body Measurements',
+      screenshot: screenshotUserMeasurements
     },
   ];
 
@@ -129,15 +139,23 @@ const ClientJourneySection = () => {
                       </ul>
                     </div>
 
-                    {/* Right: Mock Screenshot */}
+                    {/* Right: Screenshot */}
                     <div className="order-1 md:order-2">
-                      <Card className={`relative overflow-hidden bg-gradient-to-br ${step.gradient} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
-                        <div className="absolute top-4 left-4">
+                      <Card className={`relative overflow-hidden ${step.screenshot ? '' : `bg-gradient-to-br ${step.gradient}`} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
+                        <div className="absolute top-4 left-4 z-10">
                           <Badge variant="secondary" className="text-xs">
-                            Preview: {step.badge}
+                            {step.badge}
                           </Badge>
                         </div>
-                        <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                        {step.screenshot ? (
+                          <img 
+                            src={step.screenshot} 
+                            alt={t(step.titleKey)}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                        )}
                       </Card>
                     </div>
                   </div>
