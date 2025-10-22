@@ -51,12 +51,7 @@ export const SubscriptionOverlay = () => {
         if (session) {
           // Call update-subscription-status to verify real-time status
           const { data: updateResult, error: updateError } = await supabase.functions.invoke(
-            'update-subscription-status',
-            {
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            }
+            'update-subscription-status'
           );
 
           if (updateError) {
