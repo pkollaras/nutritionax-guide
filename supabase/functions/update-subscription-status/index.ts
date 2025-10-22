@@ -171,8 +171,7 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${services_api_token}`,
-          'X-OTP': otp,
+          'Authorization': `Bearer ${otp}`,
         },
       }
     );
