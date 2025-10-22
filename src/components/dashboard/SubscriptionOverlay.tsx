@@ -27,13 +27,18 @@ export const SubscriptionOverlay = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke('check-subscription-status');
+        // Check subscription status from database
+        const { data: nutritionist, error } = await supabase
+          .from('nutritionists')
+          .select('subscription_active')
+          .eq('user_id', user.id)
+          .single();
         
         if (error) {
           console.error('Error checking subscription:', error);
           setHasSubscription(true); // Default to true on error to avoid blocking
         } else {
-          setHasSubscription(data?.hasSubscription || false);
+          setHasSubscription(nutritionist?.subscription_active || false);
         }
       } catch (error) {
         console.error('Error checking subscription:', error);

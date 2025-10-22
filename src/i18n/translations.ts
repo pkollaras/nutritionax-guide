@@ -320,7 +320,12 @@ export const translations = {
       billing: {
         title: 'Διαχείριση Χρεώσεων',
         subscription: 'Συνδρομή',
-        subscriptionStatus: 'Κατάσταση Συνδρομής',
+        subscriptionStatus: {
+          label: 'Κατάσταση Συνδρομής',
+          active: 'Ενεργή',
+          inactive: 'Ανενεργή',
+          lastChecked: 'Τελευταίος Έλεγχος',
+        },
         active: 'Ενεργή',
         inactive: 'Ανενεργή',
         productName: 'Υπηρεσία',
@@ -1089,7 +1094,12 @@ export const translations = {
       billing: {
         title: 'Billing Management',
         subscription: 'Subscription',
-        subscriptionStatus: 'Subscription Status',
+        subscriptionStatus: {
+          label: 'Subscription Status',
+          active: 'Active',
+          inactive: 'Inactive',
+          lastChecked: 'Last Checked',
+        },
         active: 'Active',
         inactive: 'Inactive',
         productName: 'Service',

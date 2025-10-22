@@ -289,6 +289,9 @@ export type Database = {
           name: string
           services_api_token: string | null
           services_customer_id: number | null
+          subscription_active: boolean | null
+          subscription_last_checked_at: string | null
+          subscription_next_billing_date: string | null
           updated_at: string | null
           user_id: string
         }
@@ -299,6 +302,9 @@ export type Database = {
           name: string
           services_api_token?: string | null
           services_customer_id?: number | null
+          subscription_active?: boolean | null
+          subscription_last_checked_at?: string | null
+          subscription_next_billing_date?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -309,6 +315,9 @@ export type Database = {
           name?: string
           services_api_token?: string | null
           services_customer_id?: number | null
+          subscription_active?: boolean | null
+          subscription_last_checked_at?: string | null
+          subscription_next_billing_date?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -524,10 +533,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
-      get_nutritionist_id: {
-        Args: { _user_id: string }
-        Returns: string
-      }
+      get_nutritionist_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -539,10 +545,7 @@ export type Database = {
         Args: { _client_id: string; _nutritionist_user_id: string }
         Returns: boolean
       }
-      is_super_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user" | "super_admin"

@@ -29,6 +29,8 @@ interface BillingInfo {
     cardNumber: string;
     isCardVerification: boolean;
   };
+  subscriptionActive?: boolean;
+  lastChecked?: string;
 }
 
 const AdminBilling = () => {
@@ -47,11 +49,30 @@ const AdminBilling = () => {
   const loadBillingInfo = async () => {
     try {
       setLoading(true);
+      
+      // Fetch billing info (which will trigger subscription status update)
       const { data, error } = await supabase.functions.invoke('get-billing-info');
 
       if (error) throw error;
 
-      setBillingData(data);
+      // Also fetch the subscription status from database
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: nutritionist } = await supabase
+          .from('nutritionists')
+          .select('subscription_active, subscription_last_checked_at')
+          .eq('user_id', user.id)
+          .single();
+
+        setBillingData({
+          ...data,
+          subscriptionActive: nutritionist?.subscription_active,
+          lastChecked: nutritionist?.subscription_last_checked_at,
+        });
+      } else {
+        setBillingData(data);
+      }
     } catch (error) {
       console.error('Error loading billing info:', error);
       toast({
@@ -204,8 +225,14 @@ const AdminBilling = () => {
             <div className="text-center py-12">
               <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-lg text-muted-foreground mb-4">{t('adminDashboard.billing.noSubscription')}</p>
-              <Button onClick={() => window.location.href = '/signup'}>
-                {t('adminDashboard.billing.startSubscription')}
+              <Button 
+                onClick={handleRestartSubscription}
+                disabled={restartLoading}
+              >
+                {restartLoading 
+                  ? t('adminDashboard.billing.restartingSubscription')
+                  : t('adminDashboard.billing.startSubscription')
+                }
               </Button>
             </div>
           </CardContent>
@@ -237,6 +264,27 @@ const AdminBilling = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Subscription Status Indicator */}
+          {billingData.subscriptionActive !== undefined && (
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+              <div className="flex items-center gap-2">
+                <div className={`h-3 w-3 rounded-full ${billingData.subscriptionActive ? 'bg-green-500' : 'bg-destructive'}`} />
+                <span className="font-medium">
+                  {t('adminDashboard.billing.subscriptionStatus.label')}:{' '}
+                  {billingData.subscriptionActive 
+                    ? t('adminDashboard.billing.subscriptionStatus.active')
+                    : t('adminDashboard.billing.subscriptionStatus.inactive')
+                  }
+                </span>
+              </div>
+              {billingData.lastChecked && (
+                <span className="text-sm text-muted-foreground">
+                  {t('adminDashboard.billing.subscriptionStatus.lastChecked')}: {new Date(billingData.lastChecked).toLocaleString('el-GR')}
+                </span>
+              )}
+            </div>
+          )}
+
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <p className="text-sm text-muted-foreground mb-1">{t('adminDashboard.billing.productName')}</p>

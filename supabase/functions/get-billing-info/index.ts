@@ -42,6 +42,21 @@ serve(async (req) => {
 
     console.log('Getting billing info for user:', user.id);
 
+    // Update subscription status before fetching billing info
+    console.log('Updating subscription status before fetching billing info');
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/update-subscription-status`, {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Error updating subscription status:', error);
+      // Continue even if update fails
+    }
+
     // Get nutritionist's API token from database
     const { data: nutritionist, error: nutritionistError } = await supabase
       .from('nutritionists')
