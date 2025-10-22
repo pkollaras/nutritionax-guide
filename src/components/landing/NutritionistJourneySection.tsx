@@ -5,6 +5,10 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, Activity, UserPlus, CalendarCheck } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
+import screenshotUsers from '@/assets/screenshot-users.png';
+import screenshotDiet from '@/assets/screenshot-diet.png';
+import screenshotMeasurements from '@/assets/screenshot-measurements.png';
+import screenshotAppointments from '@/assets/screenshot-appointments.png';
 
 const NutritionistJourneySection = () => {
   const { t } = useLanguage();
@@ -32,7 +36,8 @@ const NutritionistJourneySection = () => {
       featuresKey: 'landing.nutritionistJourney.step1Features',
       badge: 'Admin Dashboard',
       gradient: 'from-blue-500/10 to-indigo-500/10',
-      iconColor: 'text-blue-500'
+      iconColor: 'text-blue-500',
+      screenshot: screenshotUsers
     },
     {
       icon: Calendar,
@@ -41,7 +46,8 @@ const NutritionistJourneySection = () => {
       featuresKey: 'landing.nutritionistJourney.step2Features',
       badge: 'Admin Diets',
       gradient: 'from-green-500/10 to-emerald-500/10',
-      iconColor: 'text-green-500'
+      iconColor: 'text-green-500',
+      screenshot: screenshotDiet
     },
     {
       icon: Activity,
@@ -50,7 +56,8 @@ const NutritionistJourneySection = () => {
       featuresKey: 'landing.nutritionistJourney.step3Features',
       badge: 'Body Measurements',
       gradient: 'from-purple-500/10 to-pink-500/10',
-      iconColor: 'text-purple-500'
+      iconColor: 'text-purple-500',
+      screenshot: screenshotMeasurements
     },
     {
       icon: UserPlus,
@@ -68,7 +75,8 @@ const NutritionistJourneySection = () => {
       featuresKey: 'landing.nutritionistJourney.step5Features',
       badge: 'Appointments',
       gradient: 'from-cyan-500/10 to-teal-500/10',
-      iconColor: 'text-cyan-500'
+      iconColor: 'text-cyan-500',
+      screenshot: screenshotAppointments
     }
   ];
 
@@ -105,15 +113,23 @@ const NutritionistJourneySection = () => {
               return (
                 <CarouselItem key={index}>
                   <div className="grid md:grid-cols-2 gap-12 items-center px-4">
-                    {/* Left: Mock Screenshot */}
+                    {/* Left: Screenshot */}
                     <div className="order-1">
-                      <Card className={`relative overflow-hidden bg-gradient-to-br ${step.gradient} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
-                        <div className="absolute top-4 left-4">
+                      <Card className={`relative overflow-hidden ${step.screenshot ? '' : `bg-gradient-to-br ${step.gradient}`} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
+                        <div className="absolute top-4 left-4 z-10">
                           <Badge variant="secondary" className="text-xs">
                             {step.badge}
                           </Badge>
                         </div>
-                        <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                        {step.screenshot ? (
+                          <img 
+                            src={step.screenshot} 
+                            alt={t(step.titleKey)}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                        )}
                       </Card>
                     </div>
 
