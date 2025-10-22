@@ -169,9 +169,10 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
     const servicesResponse = await fetch(
       `https://services.advisable.gr/api/services/customer/services/recurring?status=active`,
       {
+        method: 'GET',
         headers: {
+          'X-Customer-API-Token': services_api_token,
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${otp}`,
         },
       }
     );
