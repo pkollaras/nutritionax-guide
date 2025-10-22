@@ -14,6 +14,7 @@ export const SubscriptionOverlay = () => {
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [restartLoading, setRestartLoading] = useState(false);
+  const [recheckLoading, setRecheckLoading] = useState(false);
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -94,6 +95,73 @@ export const SubscriptionOverlay = () => {
     checkSubscription();
   }, [user]);
 
+  const handleRecheckSubscription = async () => {
+    try {
+      setRecheckLoading(true);
+      
+      console.log('Manual recheck triggered, verifying with Services API...');
+      
+      // Call update-subscription-status to verify real-time status
+      const { data: updateResult, error: updateError } = await supabase.functions.invoke(
+        'update-subscription-status'
+      );
+
+      if (updateError) {
+        console.error('Error updating subscription status:', updateError);
+        toast({
+          title: t('adminDashboard.subscriptionOverlay.recheckError'),
+          description: t('adminDashboard.subscriptionOverlay.recheckErrorDesc'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      console.log('Subscription status updated, rechecking...');
+      
+      // Re-fetch from database after update
+      const { data: updatedNutritionist, error: recheckError } = await supabase
+        .from('nutritionists')
+        .select('subscription_active')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (recheckError) {
+        console.error('Error rechecking subscription:', recheckError);
+        toast({
+          title: t('adminDashboard.subscriptionOverlay.recheckError'),
+          description: t('adminDashboard.subscriptionOverlay.recheckErrorDesc'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const isActive = updatedNutritionist?.subscription_active || false;
+      setHasSubscription(isActive);
+      
+      if (isActive) {
+        toast({
+          title: t('adminDashboard.subscriptionOverlay.recheckSuccess'),
+          description: t('adminDashboard.subscriptionOverlay.recheckSuccessDesc'),
+        });
+      } else {
+        toast({
+          title: t('adminDashboard.subscriptionOverlay.stillInactive'),
+          description: t('adminDashboard.subscriptionOverlay.stillInactiveDesc'),
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error rechecking subscription:', error);
+      toast({
+        title: t('adminDashboard.subscriptionOverlay.recheckError'),
+        description: t('adminDashboard.subscriptionOverlay.recheckErrorDesc'),
+        variant: 'destructive',
+      });
+    } finally {
+      setRecheckLoading(false);
+    }
+  };
+
   const handleRestartSubscription = async () => {
     try {
       setRestartLoading(true);
@@ -165,9 +233,20 @@ export const SubscriptionOverlay = () => {
         </CardHeader>
         <CardContent className="space-y-2">
           <Button 
+            onClick={handleRecheckSubscription}
+            className="w-full"
+            disabled={recheckLoading || restartLoading}
+            variant="outline"
+          >
+            {recheckLoading 
+              ? t('adminDashboard.subscriptionOverlay.rechecking')
+              : t('adminDashboard.subscriptionOverlay.recheck')
+            }
+          </Button>
+          <Button 
             onClick={handleRestartSubscription}
             className="w-full"
-            disabled={restartLoading}
+            disabled={restartLoading || recheckLoading}
           >
             {restartLoading 
               ? t('adminDashboard.billing.restartingSubscription')
@@ -178,7 +257,7 @@ export const SubscriptionOverlay = () => {
             onClick={signOut}
             variant="ghost"
             className="w-full"
-            disabled={restartLoading}
+            disabled={restartLoading || recheckLoading}
           >
             {t('auth.signOut')}
           </Button>
