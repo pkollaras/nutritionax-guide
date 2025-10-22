@@ -184,7 +184,11 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
       return;
     }
 
-    const services: RecurringService[] = await servicesResponse.json();
+    const servicesData = await servicesResponse.json();
+    console.log('Services data received:', JSON.stringify(servicesData).substring(0, 200));
+    
+    // Check if there are active recurring services in the correct structure
+    const recurringServices = servicesData?.data?.recurring_services;
     
     // Check if there's an active subscription
     const today = new Date();
@@ -193,8 +197,8 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
     let isActive = false;
     let nextBillingDate = null;
 
-    if (services && services.length > 0) {
-      const activeService = services[0];
+    if (recurringServices && Array.isArray(recurringServices) && recurringServices.length > 0) {
+      const activeService = recurringServices[0];
       const nextBilling = new Date(activeService.next_recurring_billing_date);
       nextBilling.setHours(0, 0, 0, 0);
       
@@ -204,7 +208,8 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
       console.log(`Subscription check for ${email}:`, {
         nextBilling: nextBillingDate,
         today: today.toISOString().split('T')[0],
-        isActive
+        isActive,
+        hasRecurringServices: true
       });
     } else {
       console.log(`No active services found for ${email}`);

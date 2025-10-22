@@ -111,9 +111,13 @@ Deno.serve(async (req) => {
     }
 
     const servicesData = await servicesResponse.json();
-    console.log('Services fetched successfully');
+    console.log('Services data received:', JSON.stringify(servicesData).substring(0, 200));
 
-    const hasActiveSubscription = servicesData && Array.isArray(servicesData) && servicesData.length > 0;
+    // Check if there are active recurring services in the correct structure
+    const recurringServices = servicesData?.data?.recurring_services;
+    const hasActiveSubscription = recurringServices && Array.isArray(recurringServices) && recurringServices.length > 0;
+
+    console.log('Active subscription found:', hasActiveSubscription);
 
     return new Response(
       JSON.stringify({ hasSubscription: hasActiveSubscription }),
