@@ -1357,8 +1357,7 @@ export const translations = {
         button: 'Start Today',
         loginText: 'Or login if you already have an account',
       },
-    },
-    clientJourney: {
+      clientJourney: {
       title: 'What Does the Client See and Do?',
       subtitle: 'Follow a client\'s journey from first login to achieving their goals',
       step1Title: 'View Diet Plan',
@@ -1436,12 +1435,13 @@ export const translations = {
         'Location, time and notes',
       ],
     },
-    footer: {
-      copyright: 'Nutritionax © 2025',
-      madeWith: 'Made with love by',
-      privacy: 'Privacy Policy',
-      terms: 'Terms of Use',
-      contact: 'Contact',
+      footer: {
+        copyright: 'Nutritionax © 2025',
+        madeWith: 'Made with love by',
+        privacy: 'Privacy Policy',
+        terms: 'Terms of Use',
+        contact: 'Contact',
+      },
     },
   },
   signup: {
