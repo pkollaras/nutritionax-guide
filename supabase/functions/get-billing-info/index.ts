@@ -112,6 +112,7 @@ serve(async (req) => {
 
     const billingInfo = {
       hasSubscription: true,
+      orderId: service.id,
       subscription: {
         id: service.id,
         name: service.name,

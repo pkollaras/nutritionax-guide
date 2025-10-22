@@ -343,6 +343,8 @@ export const translations = {
         changeCardConfirmTitle: 'Αλλαγή Κάρτας',
         changeCardConfirmDesc: 'Θα γίνει αλλαγή της κάρτας σας και θα επανεκδοθεί η παρούσα συνδρομή σας.',
         startSubscription: 'Έναρξη Συνδρομής',
+        restartingSubscription: 'Επανεκκίνηση συνδρομής...',
+        restartError: 'Σφάλμα κατά την επανεκκίνηση της συνδρομής',
       },
       subscriptionOverlay: {
         title: 'Ανενεργή Συνδρομή',
@@ -1110,6 +1112,8 @@ export const translations = {
         changeCardConfirmTitle: 'Change Card',
         changeCardConfirmDesc: 'Your card will be changed and your current subscription will be reissued.',
         startSubscription: 'Start Subscription',
+        restartingSubscription: 'Restarting subscription...',
+        restartError: 'Error restarting subscription',
       },
       subscriptionOverlay: {
         title: 'Inactive Subscription',

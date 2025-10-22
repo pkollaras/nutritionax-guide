@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export const SubscriptionOverlay = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const navigate = useNavigate();
+  const { toast } = useToast();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [restartLoading, setRestartLoading] = useState(false);
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -45,6 +46,41 @@ export const SubscriptionOverlay = () => {
     checkSubscription();
   }, [user]);
 
+  const handleRestartSubscription = async () => {
+    try {
+      setRestartLoading(true);
+      const { data, error } = await supabase.functions.invoke('restart-subscription');
+      
+      if (error) {
+        console.error('Error restarting subscription:', error);
+        toast({
+          title: t('adminDashboard.billing.restartError'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (data?.requiresSignup) {
+        // No existing credentials, redirect to signup
+        window.location.href = '/signup';
+        return;
+      }
+
+      if (data?.paymentUrl) {
+        // Redirect to payment URL
+        window.location.href = data.paymentUrl;
+      }
+    } catch (error) {
+      console.error('Error restarting subscription:', error);
+      toast({
+        title: t('adminDashboard.billing.restartError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setRestartLoading(false);
+    }
+  };
+
   if (loading || hasSubscription === null || hasSubscription) {
     return null;
   }
@@ -63,10 +99,14 @@ export const SubscriptionOverlay = () => {
         </CardHeader>
         <CardContent>
           <Button 
-            onClick={() => navigate('/signup')}
+            onClick={handleRestartSubscription}
             className="w-full"
+            disabled={restartLoading}
           >
-            {t('adminDashboard.subscriptionOverlay.renew')}
+            {restartLoading 
+              ? t('adminDashboard.billing.restartingSubscription')
+              : t('adminDashboard.subscriptionOverlay.renew')
+            }
           </Button>
         </CardContent>
       </Card>

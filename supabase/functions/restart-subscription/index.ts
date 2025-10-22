@@ -13,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Checking subscription status...');
+    console.log('Restarting subscription for existing nutritionist...');
 
-    // Create Supabase client with service role key and auth header
+    // Create Supabase client with service role key
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -35,7 +35,7 @@ serve(async (req) => {
     if (userError || !user) {
       console.error('Error getting user:', userError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized', hasSubscription: false }),
+        JSON.stringify({ error: 'Unauthorized' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 401 
@@ -45,17 +45,31 @@ serve(async (req) => {
 
     console.log('User authenticated:', user.id);
 
-    // Get nutritionist data to fetch API token and customer ID
+    // Get nutritionist data with Services credentials
     const { data: nutritionist, error: nutritionistError } = await supabaseClient
       .from('nutritionists')
-      .select('services_api_token, services_customer_id')
+      .select('services_api_token, services_customer_id, name, email')
       .eq('user_id', user.id)
       .single();
 
-    if (nutritionistError || !nutritionist?.services_api_token || !nutritionist?.services_customer_id) {
-      console.log('No nutritionist data found or missing credentials');
+    if (nutritionistError || !nutritionist) {
+      console.error('Nutritionist not found:', nutritionistError);
       return new Response(
-        JSON.stringify({ hasSubscription: false }),
+        JSON.stringify({ error: 'Nutritionist profile not found' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404 
+        }
+      );
+    }
+
+    if (!nutritionist.services_api_token || !nutritionist.services_customer_id) {
+      console.log('No Services credentials found, redirect to signup');
+      return new Response(
+        JSON.stringify({ 
+          requiresSignup: true,
+          message: 'No existing subscription found. Please complete registration.' 
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200 
@@ -63,9 +77,9 @@ serve(async (req) => {
       );
     }
 
-    console.log('Fetching OTP for customer:', nutritionist.services_customer_id);
+    console.log('Found existing Services credentials for customer:', nutritionist.services_customer_id);
 
-    // Fetch OTP from external service
+    // Get OTP from Services API
     const otpResponse = await fetch('https://services.advisable.gr/api/services/customer/getOTP', {
       method: 'POST',
       headers: {
@@ -78,49 +92,62 @@ serve(async (req) => {
     });
 
     if (!otpResponse.ok) {
-      console.error('Failed to fetch OTP:', otpResponse.status);
+      const errorText = await otpResponse.text();
+      console.error('Failed to get OTP:', otpResponse.status, errorText);
       return new Response(
-        JSON.stringify({ hasSubscription: false }),
+        JSON.stringify({ 
+          error: 'Failed to authenticate with billing service',
+          details: errorText 
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200 
+          status: 500 
         }
       );
     }
 
     const otpData = await otpResponse.json();
-    console.log('OTP fetched successfully');
+    console.log('OTP obtained successfully');
 
-    // Fetch active recurring services
-    const servicesResponse = await fetch(
-      `https://services.advisable.gr/api/services/customer/services/recurring?status=active`,
+    // Create payment URL (product ID 1 for subscription)
+    const paymentUrlResponse = await fetch(
+      'https://services.advisable.gr/api/services/customer/get-payment-url',
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${otpData.otp}`,
         },
+        body: JSON.stringify({
+          productId: 1,
+          recurring: true,
+        }),
       }
     );
 
-    if (!servicesResponse.ok) {
-      console.error('Failed to fetch services:', servicesResponse.status);
+    if (!paymentUrlResponse.ok) {
+      const errorText = await paymentUrlResponse.text();
+      console.error('Failed to create payment URL:', paymentUrlResponse.status, errorText);
       return new Response(
-        JSON.stringify({ hasSubscription: false }),
+        JSON.stringify({ 
+          error: 'Failed to create payment URL',
+          details: errorText 
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200 
+          status: 500 
         }
       );
     }
 
-    const servicesData = await servicesResponse.json();
-    console.log('Services fetched, count:', servicesData?.data?.length || 0);
-
-    const hasActiveSubscription = servicesData?.data && servicesData.data.length > 0;
+    const paymentData = await paymentUrlResponse.json();
+    console.log('Payment URL created successfully');
 
     return new Response(
-      JSON.stringify({ hasSubscription: hasActiveSubscription }),
+      JSON.stringify({ 
+        paymentUrl: paymentData.url,
+        message: 'Payment URL created successfully'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -128,10 +155,10 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in check-subscription-status:', error);
+    console.error('Error in restart-subscription:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMessage, hasSubscription: false }),
+      JSON.stringify({ error: errorMessage }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 

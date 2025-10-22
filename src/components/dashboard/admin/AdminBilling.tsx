@@ -18,6 +18,7 @@ import {
 
 interface BillingInfo {
   hasSubscription: boolean;
+  orderId?: string;
   subscription?: {
     id: string;
     name: string;
@@ -37,6 +38,7 @@ const AdminBilling = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showChangeCardDialog, setShowChangeCardDialog] = useState(false);
+  const [restartLoading, setRestartLoading] = useState(false);
 
   useEffect(() => {
     loadBillingInfo();
@@ -99,30 +101,77 @@ const AdminBilling = () => {
     }
   };
 
-  const handleCancelSubscription = async () => {
-    if (!billingData?.subscription) return;
+  const handleRestartSubscription = async () => {
+    try {
+      setRestartLoading(true);
+      const { data, error } = await supabase.functions.invoke('restart-subscription');
+      
+      if (error) {
+        console.error('Error restarting subscription:', error);
+        toast({
+          title: t('adminDashboard.billing.restartError'),
+          variant: 'destructive',
+        });
+        return;
+      }
 
+      if (data?.requiresSignup) {
+        // No existing credentials, redirect to signup
+        window.location.href = '/signup';
+        return;
+      }
+
+      if (data?.paymentUrl) {
+        // Redirect to payment URL
+        window.location.href = data.paymentUrl;
+      }
+    } catch (error) {
+      console.error('Error restarting subscription:', error);
+      toast({
+        title: t('adminDashboard.billing.restartError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setRestartLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
     try {
       setActionLoading(true);
+      const orderId = billingData?.orderId;
+
+      if (!orderId) {
+        toast({
+          title: t('adminDashboard.billing.noSubscription'),
+          variant: 'destructive',
+        });
+        return;
+      }
 
       const { error } = await supabase.functions.invoke('cancel-subscription', {
-        body: { orderId: billingData.subscription.id },
+        body: { orderId },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error cancelling subscription:', error);
+        toast({
+          title: t('adminDashboard.billing.cancelError'),
+          variant: 'destructive',
+        });
+        return;
+      }
 
       toast({
-        title: t('common.success'),
-        description: t('adminDashboard.billing.cancelSuccess'),
+        title: t('adminDashboard.billing.cancelSuccess'),
       });
 
       setShowCancelDialog(false);
-      loadBillingInfo();
+      await loadBillingInfo();
     } catch (error) {
-      console.error('Error canceling subscription:', error);
+      console.error('Error cancelling subscription:', error);
       toast({
-        title: t('common.error'),
-        description: 'Failed to cancel subscription',
+        title: t('adminDashboard.billing.cancelError'),
         variant: 'destructive',
       });
     } finally {

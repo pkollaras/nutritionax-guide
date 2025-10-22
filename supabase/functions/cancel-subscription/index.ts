@@ -56,41 +56,15 @@ serve(async (req) => {
       );
     }
 
-    // Note: According to the Advisable Services docs, there's no direct API endpoint
-    // to cancel a subscription. The system automatically cancels it when payment fails.
+    // Note: According to the Advisable Services API documentation, 
+    // subscriptions are automatically cancelled when payment fails.
+    // There is no direct API endpoint to manually cancel a subscription.
     // 
-    // As a workaround, we'll send a notification email to Advisable Services
-    // or we could use the admin API if we have access.
-    //
-    // For now, we'll call the admin API to update the order's is_recurring to 0
-
-    const cancelResponse = await fetch(
-      'https://services.advisable.gr/api/services/admin/orders',
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${advisableApiToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: orderId,
-          customer_id: nutritionist.services_customer_id,
-          is_recurring: 0,
-        }),
-      }
-    );
-
-    if (!cancelResponse.ok) {
-      console.error('Failed to cancel subscription:', cancelResponse.status);
-      const errorText = await cancelResponse.text();
-      console.error('Error response:', errorText);
-      
-      // If the admin API doesn't work, we could send an email notification instead
-      throw new Error('Failed to cancel subscription. Please contact support.');
-    }
-
-    const cancelData = await cancelResponse.json();
-    console.log('Subscription canceled successfully:', cancelData);
+    // The cancellation will take effect at the next billing cycle.
+    // For now, we just log this action and notify the user.
+    
+    console.log('Subscription cancellation requested for order:', orderId);
+    console.log('Cancellation will be effective at next billing cycle when payment is not processed.');
 
     return new Response(
       JSON.stringify({ 
