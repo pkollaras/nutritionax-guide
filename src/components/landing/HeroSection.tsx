@@ -47,13 +47,15 @@ const HeroSection = () => {
           </div>
 
           <div className="mt-16 rounded-lg border border-border bg-card shadow-2xl overflow-hidden">
-            <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <Sparkles className="h-16 w-16 text-primary mx-auto" />
-                <p className="text-muted-foreground text-lg font-medium">
-                  Dashboard Preview
-                </p>
-              </div>
+            <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
+              <iframe 
+                src="https://player.vimeo.com/video/1129464505?h=940979671e&badge=0&autopause=0&player_id=0&app_id=58479" 
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                frameBorder="0" 
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                referrerPolicy="strict-origin-when-cross-origin"
+                title="Nutritionax Platform Demo"
+              />
             </div>
           </div>
         </div>
