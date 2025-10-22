@@ -4,7 +4,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { Users, Calendar, Activity, UserPlus, CalendarCheck } from 'lucide-react';
+import { Users, Calendar, Activity, CalendarCheck } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import screenshotUsers from '@/assets/screenshot-users.png';
 import screenshotDiet from '@/assets/screenshot-diet.png';
@@ -59,15 +59,6 @@ const NutritionistJourneySection = () => {
       gradient: 'from-purple-500/10 to-pink-500/10',
       iconColor: 'text-purple-500',
       screenshot: screenshotMeasurements
-    },
-    {
-      icon: UserPlus,
-      titleKey: 'landing.nutritionistJourney.step4Title',
-      descKey: 'landing.nutritionistJourney.step4Desc',
-      featuresKey: 'landing.nutritionistJourney.step4Features',
-      badge: 'User Management',
-      gradient: 'from-orange-500/10 to-red-500/10',
-      iconColor: 'text-orange-500'
     },
     {
       icon: CalendarCheck,
