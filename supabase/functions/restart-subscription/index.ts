@@ -90,14 +90,11 @@ serve(async (req) => {
 
     // Get OTP from Services API
     const otpResponse = await fetch('https://services.advisable.gr/api/services/customer/getOTP', {
-      method: 'POST',
+      method: 'GET',
       headers: {
+        'X-Customer-API-Token': nutritionist.services_api_token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        apiToken: nutritionist.services_api_token,
-        customerId: nutritionist.services_customer_id,
-      }),
     });
 
     if (!otpResponse.ok) {
@@ -125,7 +122,7 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${otpData.otp}`,
+          'Authorization': `Bearer ${otpData.data.otp}`,
         },
         body: JSON.stringify({
           productId: 1,
