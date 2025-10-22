@@ -125,7 +125,7 @@ const NutritionistJourneySection = () => {
                           <img 
                             src={step.screenshot} 
                             alt={t(step.titleKey)}
-                            className="w-full h-full object-cover scale-150 object-right"
+                            className="w-full h-full object-cover scale-125 object-right"
                           />
                         ) : (
                           <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
