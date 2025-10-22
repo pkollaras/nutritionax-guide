@@ -3,6 +3,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from 'embla-carousel-autoplay';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Users, Calendar, Activity, UserPlus, CalendarCheck } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import screenshotUsers from '@/assets/screenshot-users.png';
@@ -115,22 +116,35 @@ const NutritionistJourneySection = () => {
                   <div className="grid md:grid-cols-2 gap-12 items-center px-4">
                     {/* Left: Screenshot */}
                     <div className="order-1">
-                      <Card className={`relative overflow-hidden ${step.screenshot ? '' : `bg-gradient-to-br ${step.gradient}`} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
-                        <div className="absolute top-4 left-4 z-10">
-                          <Badge variant="secondary" className="text-xs">
-                            {step.badge}
-                          </Badge>
-                        </div>
-                        {step.screenshot ? (
-                          <img 
-                            src={step.screenshot} 
-                            alt={t(step.titleKey)}
-                            className="w-full h-full object-cover scale-125 object-right"
-                          />
-                        ) : (
-                          <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Card className={`relative overflow-hidden ${step.screenshot ? 'cursor-pointer' : `bg-gradient-to-br ${step.gradient}`} border-2 aspect-video flex items-center justify-center shadow-2xl transform transition-transform duration-300 hover:scale-105`}>
+                            <div className="absolute top-4 left-4 z-10">
+                              <Badge variant="secondary" className="text-xs">
+                                {step.badge}
+                              </Badge>
+                            </div>
+                            {step.screenshot ? (
+                              <img 
+                                src={step.screenshot} 
+                                alt={t(step.titleKey)}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Icon className={`h-32 w-32 ${step.iconColor} animate-pulse`} />
+                            )}
+                          </Card>
+                        </DialogTrigger>
+                        {step.screenshot && (
+                          <DialogContent className="max-w-7xl w-[95vw] h-[95vh] p-0">
+                            <img 
+                              src={step.screenshot} 
+                              alt={t(step.titleKey)}
+                              className="w-full h-full object-contain"
+                            />
+                          </DialogContent>
                         )}
-                      </Card>
+                      </Dialog>
                     </div>
 
                     {/* Right: Text Content */}
