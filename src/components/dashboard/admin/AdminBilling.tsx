@@ -125,7 +125,25 @@ const AdminBilling = () => {
   const handleRestartSubscription = async () => {
     try {
       setRestartLoading(true);
-      const { data, error } = await supabase.functions.invoke('restart-subscription');
+      
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: t('adminDashboard.billing.restartError'),
+          description: 'Please login first',
+          variant: 'destructive',
+        });
+        window.location.href = '/auth';
+        return;
+      }
+      
+      const { data, error } = await supabase.functions.invoke('restart-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
       
       if (error) {
         console.error('Error restarting subscription:', error);
