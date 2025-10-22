@@ -1,4 +1,3 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
@@ -6,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -45,15 +44,15 @@ serve(async (req) => {
 
     console.log('User authenticated:', user.id);
 
-    // Get nutritionist data to fetch API token and customer ID
+    // Get nutritionist data to fetch API token
     const { data: nutritionist, error: nutritionistError } = await supabaseClient
       .from('nutritionists')
-      .select('services_api_token, services_customer_id')
+      .select('services_api_token')
       .eq('user_id', user.id)
       .single();
 
-    if (nutritionistError || !nutritionist?.services_api_token || !nutritionist?.services_customer_id) {
-      console.log('No nutritionist data found or missing credentials');
+    if (nutritionistError || !nutritionist?.services_api_token) {
+      console.log('No nutritionist data found or missing API token');
       return new Response(
         JSON.stringify({ hasSubscription: false }),
         { 
@@ -63,18 +62,15 @@ serve(async (req) => {
       );
     }
 
-    console.log('Fetching OTP for customer:', nutritionist.services_customer_id);
+    console.log('Fetching OTP...');
 
     // Fetch OTP from external service
     const otpResponse = await fetch('https://services.advisable.gr/api/services/customer/getOTP', {
-      method: 'POST',
+      method: 'GET',
       headers: {
+        'X-Customer-API-Token': nutritionist.services_api_token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        apiToken: nutritionist.services_api_token,
-        customerId: nutritionist.services_customer_id,
-      }),
     });
 
     if (!otpResponse.ok) {
@@ -91,14 +87,14 @@ serve(async (req) => {
     const otpData = await otpResponse.json();
     console.log('OTP fetched successfully');
 
-    // Fetch active recurring services
+    // Fetch active recurring services using API token
     const servicesResponse = await fetch(
       `https://services.advisable.gr/api/services/customer/services/recurring?status=active`,
       {
         method: 'GET',
         headers: {
+          'X-Customer-API-Token': nutritionist.services_api_token,
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${otpData.otp}`,
         },
       }
     );
@@ -115,9 +111,9 @@ serve(async (req) => {
     }
 
     const servicesData = await servicesResponse.json();
-    console.log('Services fetched, count:', servicesData?.data?.length || 0);
+    console.log('Services fetched successfully');
 
-    const hasActiveSubscription = servicesData?.data && servicesData.data.length > 0;
+    const hasActiveSubscription = servicesData && Array.isArray(servicesData) && servicesData.length > 0;
 
     return new Response(
       JSON.stringify({ hasSubscription: hasActiveSubscription }),
