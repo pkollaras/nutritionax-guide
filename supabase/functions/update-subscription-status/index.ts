@@ -142,12 +142,11 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
   try {
     // Get OTP
     const otpResponse = await fetch('https://services.advisable.gr/api/services/customer/getOTP', {
-      method: 'POST',
+      method: 'GET',
       headers: {
+        'X-Customer-API-Token': services_api_token,
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${services_api_token}`,
       },
-      body: JSON.stringify({ customer_id: services_customer_id }),
     });
 
     if (!otpResponse.ok) {
@@ -156,7 +155,7 @@ async function updateSingleNutritionist(supabaseClient: any, nutritionist: any) 
     }
 
     const otpData = await otpResponse.json();
-    const otp = otpData.otp;
+    const otp = otpData.data.otp;
 
     // Get recurring services
     const servicesResponse = await fetch(

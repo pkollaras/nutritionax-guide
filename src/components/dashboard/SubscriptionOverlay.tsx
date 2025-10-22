@@ -26,26 +26,74 @@ export const SubscriptionOverlay = () => {
         return;
       }
 
-      try {
-        // Check subscription status from database
-        const { data: nutritionist, error } = await supabase
-          .from('nutritionists')
-          .select('subscription_active')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (error) {
-          console.error('Error checking subscription:', error);
-          setHasSubscription(true); // Default to true on error to avoid blocking
-        } else {
-          setHasSubscription(nutritionist?.subscription_active || false);
-        }
-      } catch (error) {
+    try {
+      // Check subscription status from database
+      const { data: nutritionist, error } = await supabase
+        .from('nutritionists')
+        .select('subscription_active')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) {
         console.error('Error checking subscription:', error);
-        setHasSubscription(true); // Default to true on error
-      } finally {
+        setHasSubscription(true); // Default to true on error to avoid blocking
         setLoading(false);
+        return;
       }
+
+      // If subscription appears inactive, verify with Services API
+      if (!nutritionist?.subscription_active) {
+        console.log('Subscription appears inactive, verifying with Services API...');
+        
+        // Get current session for authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          // Call update-subscription-status to verify real-time status
+          const { data: updateResult, error: updateError } = await supabase.functions.invoke(
+            'update-subscription-status',
+            {
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            }
+          );
+
+          if (updateError) {
+            console.error('Error updating subscription status:', updateError);
+            // On error, trust the database value
+            setHasSubscription(false);
+          } else {
+            console.log('Subscription status updated, rechecking...');
+            
+            // Re-fetch from database after update
+            const { data: updatedNutritionist, error: recheckError } = await supabase
+              .from('nutritionists')
+              .select('subscription_active')
+              .eq('user_id', user.id)
+              .single();
+            
+            if (recheckError) {
+              console.error('Error rechecking subscription:', recheckError);
+              setHasSubscription(false);
+            } else {
+              setHasSubscription(updatedNutritionist?.subscription_active || false);
+            }
+          }
+        } else {
+          // No session, can't verify - trust database
+          setHasSubscription(false);
+        }
+      } else {
+        // Subscription is active according to database
+        setHasSubscription(true);
+      }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      setHasSubscription(true); // Default to true on error
+    } finally {
+      setLoading(false);
+    }
     };
 
     checkSubscription();
