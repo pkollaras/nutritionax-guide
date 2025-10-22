@@ -36,6 +36,7 @@ const AdminBilling = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showChangeCardDialog, setShowChangeCardDialog] = useState(false);
 
   useEffect(() => {
     loadBillingInfo();
@@ -62,6 +63,7 @@ const AdminBilling = () => {
   };
 
   const handleChangeCard = async () => {
+    setShowChangeCardDialog(false);
     if (!billingData?.subscription) return;
 
     try {
@@ -152,7 +154,10 @@ const AdminBilling = () => {
           <CardContent className="pt-6">
             <div className="text-center py-12">
               <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-lg text-muted-foreground">{t('adminDashboard.billing.noSubscription')}</p>
+              <p className="text-lg text-muted-foreground mb-4">{t('adminDashboard.billing.noSubscription')}</p>
+              <Button onClick={() => window.location.href = '/signup'}>
+                {t('adminDashboard.billing.startSubscription')}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -217,7 +222,7 @@ const AdminBilling = () => {
 
             <div className="flex gap-3">
               <Button 
-                onClick={handleChangeCard}
+                onClick={() => setShowChangeCardDialog(true)}
                 disabled={actionLoading}
                 className="flex-1"
               >
@@ -267,6 +272,24 @@ const AdminBilling = () => {
               ) : (
                 t('adminDashboard.billing.cancelSubscription')
               )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Change Card Confirmation Dialog */}
+      <AlertDialog open={showChangeCardDialog} onOpenChange={setShowChangeCardDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('adminDashboard.billing.changeCardConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('adminDashboard.billing.changeCardConfirmDesc')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleChangeCard}>
+              {t('adminDashboard.billing.changeCard')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

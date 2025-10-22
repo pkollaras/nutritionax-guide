@@ -115,7 +115,7 @@ serve(async (req) => {
       subscription: {
         id: service.id,
         name: service.name,
-        price: service.price,
+        price: parseFloat(service.price || '0').toFixed(2),
         recurringType: service.recurring_type,
         status: service.status,
         nextBillingDate: service.next_recurring_billing_date,

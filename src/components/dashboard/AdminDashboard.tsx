@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SubscriptionOverlay } from './SubscriptionOverlay';
 import {
   LayoutDashboard,
   Users,
@@ -125,6 +126,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-screen w-full bg-background pb-16">
+      {/* Subscription Overlay */}
+      <SubscriptionOverlay />
+      
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 border-r bg-card fixed left-0 top-0 bottom-16 z-20">
         <SidebarContent />

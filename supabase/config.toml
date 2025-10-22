@@ -102,3 +102,9 @@ verify_jwt = true
 
 [functions.cancel-subscription]
 verify_jwt = true
+
+[functions.check-subscription-status]
+verify_jwt = true
+
+[functions.register-nutritionist]
+verify_jwt = false
