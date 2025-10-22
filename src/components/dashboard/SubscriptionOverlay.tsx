@@ -19,8 +19,8 @@ export const SubscriptionOverlay = () => {
     const checkSubscription = async () => {
       if (!user) return;
 
-      // Exempt nutritionax@gmail.com from subscription check
-      if (user.email === 'nutritionax@gmail.com') {
+      // Exempt specific users from subscription check
+      if (user.email === 'nutritionax@gmail.com' || user.email === 'advisable@nutritionax.com') {
         setHasSubscription(true);
         setLoading(false);
         return;
