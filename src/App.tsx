@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
 import SignupSuccess from "./pages/SignupSuccess";
@@ -29,7 +28,6 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<Auth />} />
-                <Route path="/landing" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/signup-success" element={<SignupSuccess />} />
