@@ -28,7 +28,8 @@ const App = () => (
             <div className="min-h-screen">
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<Home />} />
+                <Route path="/home" element={<Auth />} />
+                <Route path="/landing" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/signup-success" element={<SignupSuccess />} />
