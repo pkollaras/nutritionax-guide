@@ -63,8 +63,11 @@ const UserProgress = () => {
     setSelectedDate(new Date());
   };
 
-  const autoFillDietDay = async () => {
-    if (!user) return;
+  const autoFillDietDay = async (targetDate?: Date) => {
+    if (!user || editingId) return;
+
+    const dateToCheck = targetDate || selectedDate;
+    if (!dateToCheck) return;
 
     try {
       const { data, error } = await supabase
@@ -73,19 +76,33 @@ const UserProgress = () => {
         .eq('user_id', user.id)
         .not('day_of_diet', 'is', null)
         .order('date', { ascending: false })
-        .limit(1)
+        .limit(2)
         .maybeSingle();
 
       if (error) throw error;
 
       if (data && data.day_of_diet) {
-        setDayOfDiet((data.day_of_diet + 1).toString());
+        const lastDate = new Date(data.date);
+        const currentDate = new Date(dateToCheck);
+        const diffTime = currentDate.getTime() - lastDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        const calculatedDay = diffDays > 0 
+          ? data.day_of_diet + diffDays 
+          : data.day_of_diet + 1;
+        
+        setDayOfDiet(calculatedDay.toString());
       }
     } catch (error) {
       console.error('Error auto-filling diet day:', error);
-      // Don't show error to user, just leave field empty
     }
   };
+
+  useEffect(() => {
+    if (showAddForm && !editingId && selectedDate) {
+      autoFillDietDay(selectedDate);
+    }
+  }, [selectedDate, showAddForm, editingId]);
 
   const handleEdit = (report: any) => {
     setEditingId(report.id);

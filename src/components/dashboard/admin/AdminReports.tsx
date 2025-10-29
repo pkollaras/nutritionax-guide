@@ -90,8 +90,11 @@ const AdminReports = () => {
     setShowAddForm(false);
   };
 
-  const autoFillDietDay = async () => {
-    if (!selectedUser) return;
+  const autoFillDietDay = async (targetDate?: Date) => {
+    if (!selectedUser || editingId) return;
+
+    const dateToCheck = targetDate || selectedDate;
+    if (!dateToCheck) return;
 
     try {
       const { data } = await supabase
@@ -100,16 +103,31 @@ const AdminReports = () => {
         .eq('user_id', selectedUser)
         .not('day_of_diet', 'is', null)
         .order('date', { ascending: false })
-        .limit(1)
+        .limit(2)
         .maybeSingle();
 
       if (data?.day_of_diet) {
-        setDayOfDiet((data.day_of_diet + 1).toString());
+        const lastDate = new Date(data.date);
+        const currentDate = new Date(dateToCheck);
+        const diffTime = currentDate.getTime() - lastDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        const calculatedDay = diffDays > 0 
+          ? data.day_of_diet + diffDays 
+          : data.day_of_diet + 1;
+        
+        setDayOfDiet(calculatedDay.toString());
       }
     } catch (error) {
       console.error('Error auto-filling diet day:', error);
     }
   };
+
+  useEffect(() => {
+    if (showAddForm && !editingId && selectedDate && selectedUser) {
+      autoFillDietDay(selectedDate);
+    }
+  }, [selectedDate, showAddForm, editingId, selectedUser]);
 
   const handleEdit = (report: any) => {
     setEditingId(report.id);
@@ -306,7 +324,7 @@ const AdminReports = () => {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={autoFillDietDay}
+                      onClick={() => autoFillDietDay()}
                       className="h-auto p-1 text-xs"
                     >
                       {t('adminDashboard.reports.autoFillDietDay')}
